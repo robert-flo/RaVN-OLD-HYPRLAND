@@ -406,7 +406,7 @@ hyprland_hook
 
 uv_hook
 
-print_log -g "[python env]" -b " :: " "Rebuilding HyDE Python environment..."
+print_log -g "[python env]" -b " :: " "Rebuilding RaVN Python environment..."
 if command -v hyde-shell >/dev/null 2>&1; then
 	hyde-shell pyinit
 else
@@ -416,6 +416,7 @@ fi
 print_log -g "[version]" -b " :: " "saving version info..."
 "${scrDir}/version.sh" --cache || echo "Failed to save version info."
 
-state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hyde"
-clone_dir=$(git rev-parse --show-toplevel 2>/dev/null || echo "${HOME}/HyDE")
-[[ -f ${clone_dir}/CHANGELOG.md ]] && cp -f "${clone_dir}/CHANGELOG.md" "${state_dir}/CHANGELOG.md"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/ravn"
+clone_dir=$(git rev-parse --show-toplevel 2>/dev/null || echo "${HOME}/RaVN")
+mkdir -p "${state_dir}"
+[[ -f ${clone_dir}/CHANGELOG.md ]] && cp -f "${clone_dir}/CHANGELOG.md" "${state_dir}/CHANGELOG.md" || true
