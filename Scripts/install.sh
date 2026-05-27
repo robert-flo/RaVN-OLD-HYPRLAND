@@ -180,7 +180,6 @@ EOF
 
 	# Asegura la existencia del directorio de logs de la sesión antes de definir la trampa (trap).
 	mkdir -p "${cacheDir}/logs/${RAVN_LOG}"
-	
 	trap 'mv "${scrDir}/install_pkg.lst" "${cacheDir}/logs/${RAVN_LOG}/install_pkg.lst"' EXIT
 
 	echo -e "\n#user packages" >>"${scrDir}/install_pkg.lst" # Add a marker for user packages
@@ -188,5 +187,25 @@ EOF
 		cat "${custom_pkg}" >>"${scrDir}/install_pkg.lst"
 	fi
 
+	#--------------------------------#
+# add nvidia drivers to the list #
+#--------------------------------#
+	# Si se detecta una GPU Nvidia en el sistema y no se especificó ignorar la instalación (flg_Nvidia=1):
+	# 1. Se leen las bases de paquetes de kernel en /usr/lib/modules/*/pkgbase para añadir
+	#    los correspondientes paquetes de cabecera (-headers) a la lista.
+	# 2. Se añaden los controladores y utilidades Nvidia recomendados (nvidia_detect --drivers).
+	# Si se detecta la GPU pero se especificó ignorarla (flg_Nvidia=0), se emite una advertencia.
+	# Finalmente, se listan en consola con formato detallado las GPUs encontradas en el sistema.
+	if nvidia_detect; then
+		if [ ${flg_Nvidia} -eq 1 ]; then
+			cat /usr/lib/modules/*/pkgbase | while read -r kernel; do
+				echo "${kernel}-headers" >>"${scrDir}/install_pkg.lst"
+			done
+			nvidia_detect --drivers >>"${scrDir}/install_pkg.lst"
+		else
+			print_log -warn "Nvidia" "Nvidia GPU detected but ignored..."
+		fi
+	fi
+	nvidia_detect --verbose
 
 fi
