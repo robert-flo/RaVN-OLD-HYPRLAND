@@ -317,7 +317,7 @@ EOF
 
 	"${scrDir}/restore_fnt.sh"
 	"${scrDir}/restore_cfg.sh"
-	"${scrDir}/restore_thm.sh"
+	[ ! -f "${scrDir}/restore_thm.sh" ] || "${scrDir}/restore_thm.sh"
 	print_log -g "[generate] " "cache ::" "Wallpapers..."
 	if [ "${flg_DryRun}" -ne 1 ]; then
 		export PATH="$HOME/.local/lib/hyde:$HOME/.local/bin:${PATH}"
