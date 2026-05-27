@@ -288,3 +288,43 @@ EOF
 	#--------------------------------#
 	"${scrDir}/install_pkg.sh" "${scrDir}/install_pkg.lst"
 fi
+
+#---------------------------#
+# restore my custom configs #
+#---------------------------#
+# Proceso de restauración de configuraciones personalizadas del usuario:
+# 1. Si la bandera flg_Restore está activa (en 1), se muestra en consola el banner ASCII de "restore".
+# 2. Si Hyprland está ejecutándose (HYPRLAND_INSTANCE_SIGNATURE activo) y no es modo de prueba (dry-run),
+#    desactiva temporalmente el autoreload de configuraciones de Hyprland para evitar parpadeos y cargas innecesarias.
+# 3. Invoca consecutivamente a los scripts de restauración: fuentes (restore_fnt.sh), 
+#    configuraciones (restore_cfg.sh) y temas (restore_thm.sh).
+# 4. Genera la caché de fondos de pantalla (wallpapers), inicializa el tema visual y recarga la barra 
+#    Waybar exportando temporalmente la ruta de utilidades del sistema en el PATH (si no es modo de prueba).
+if [ ${flg_Restore} -eq 1 ]; then
+	cat <<"EOF"
+
+             _           _
+ ___ ___ ___| |_ ___ ___|_|___ ___
+|  _| -_|_ -|  _| . |  _| |   | . |
+|_| |___|___|_| |___|_| |_|_|_|_  |
+                              |___|
+
+EOF
+
+	if [ "${flg_DryRun}" -ne 1 ] && [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+		hyprctl keyword misc:disable_autoreload 1 -q
+	fi
+
+	"${scrDir}/restore_fnt.sh"
+	"${scrDir}/restore_cfg.sh"
+	"${scrDir}/restore_thm.sh"
+	print_log -g "[generate] " "cache ::" "Wallpapers..."
+	if [ "${flg_DryRun}" -ne 1 ]; then
+		export PATH="$HOME/.local/lib/hyde:$HOME/.local/bin:${PATH}"
+		"$HOME/.local/lib/hyde/wallpaper/cache.sh" commence -t ""
+		"$HOME/.local/lib/hyde/theme.switch.sh" -q || true
+		"$HOME/.local/lib/hyde/waybar.py" --update || true
+		echo "[install] reload :: Hyprland"
+	fi
+
+fi
