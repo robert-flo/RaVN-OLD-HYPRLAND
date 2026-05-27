@@ -18,3 +18,13 @@ cat <<"EOF"
 -----------------------------------------------------------
 
 EOF
+
+#--------------------------------#
+# import variables and functions #
+#--------------------------------#
+scrDir="$(dirname "$(realpath "$0")")"
+# shellcheck disable=SC1091
+if ! source "${scrDir}/global_fn.sh"; then
+	echo "Error: unable to source global_fn.sh..."
+	exit 1
+fi
