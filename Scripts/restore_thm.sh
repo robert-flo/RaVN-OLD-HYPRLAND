@@ -22,8 +22,8 @@ export PRINT_LOG=false
 # Validación de la existencia del archivo de lista de temas
 # ==============================================================================
 if [ ! -f "$THEME_IMPORT_FILE" ] || [ -z "$THEME_IMPORT_FILE" ]; then
-    print_log -crit "error" "'$THEME_IMPORT_FILE'  No such file or directory"
-    exit 1
+    print_log -warn "'$THEME_IMPORT_FILE' No such file or directory, skipping theme restoration."
+    exit 0
 fi
 
 # ==============================================================================
