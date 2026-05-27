@@ -328,3 +328,24 @@ EOF
 	fi
 
 fi
+
+
+# ==============================================================================
+# Ejecución del script de post-instalación
+# ==============================================================================
+# Si las banderas de instalación (${flg_Install}) y restauración (${flg_Restore})
+# están activas (valor igual a 1), se imprime un banner de éxito ("post install")
+# en la consola y se ejecuta el script secundario "install_pst.sh".
+if [ ${flg_Install} -eq 1 ] && [ ${flg_Restore} -eq 1 ]; then
+	cat <<"EOF"
+
+             _      _         _       _ _
+ ___ ___ ___| |_   |_|___ ___| |_ ___| | |
+| . | . |_ -|  _|  | |   |_ -|  _| .'| | |
+|  _|___|___|_|    |_|_|_|___|_| |__,|_|_|
+|_|
+
+EOF
+
+	"${scrDir}/install_pst.sh"
+fi
