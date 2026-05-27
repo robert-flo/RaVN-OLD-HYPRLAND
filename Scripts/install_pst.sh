@@ -39,7 +39,7 @@ if pkg_installed sddm; then
             sudo tar -xzf "${cloneDir}/Source/arcs/Sddm_${sddmtheme}.tar.gz" -C /usr/share/sddm/themes/
             sudo touch /etc/sddm.conf.d/ravn.conf
             sudo cp /etc/sddm.conf.d/ravn.conf /etc/sddm.conf.d/backup_ravn.conf
-            sudo cp /usr/share/sddm/themes/${sddmtheme}/ravn.conf /etc/sddm.conf.d/
+            sudo cp /usr/share/sddm/themes/${sddmtheme}/the_hyde_project.conf /etc/sddm.conf.d/ravn.conf
         fi
 
         print_log -g "[DISPLAYMANAGER] " -b " :: " "sddm configured with ${sddmtheme} theme..."

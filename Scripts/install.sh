@@ -317,7 +317,7 @@ EOF
 
 	"${scrDir}/restore_fnt.sh"
 	"${scrDir}/restore_cfg.sh"
-	[ ! -f "${scrDir}/restore_thm.sh" ] || "${scrDir}/restore_thm.sh"
+	"${scrDir}/restore_thm.sh"
 	print_log -g "[generate] " "cache ::" "Wallpapers..."
 	if [ "${flg_DryRun}" -ne 1 ]; then
 		export PATH="$HOME/.local/lib/hyde:$HOME/.local/bin:${PATH}"
@@ -348,4 +348,90 @@ if [ ${flg_Install} -eq 1 ] && [ ${flg_Restore} -eq 1 ]; then
 EOF
 
 	"${scrDir}/install_pst.sh"
+fi
+
+
+# ==============================================================================
+# Ejecución de migraciones de configuración (RaVN Migrations)
+# ==============================================================================
+# Si la bandera de restauración (${flg_Restore}) está activa, este bloque:
+# 1. Establece y verifica la ruta del directorio de migraciones.
+# 2. Busca el archivo de migración más reciente ordenado en orden descendente.
+# 3. Si encuentra un archivo válido, procede a ejecutarlo usando 'sh'.
+# 4. Maneja de manera segura los fallos en la migración registrando una advertencia.
+if [ ${flg_Restore} -eq 1 ]; then
+
+	# migrationDir="$(realpath "$(dirname "$(realpath "$0")")/../migrations")"
+	migrationDir="${scrDir}/migrations"
+
+	if [ ! -d "${migrationDir}" ]; then
+		print_log -warn "Migrations" "Directory not found: ${migrationDir}"
+	fi
+
+	echo "Running migrations from: ${migrationDir}"
+
+	if [ -d "${migrationDir}" ] && find "${migrationDir}" -type f | grep -q .; then
+		migrationFile=$(find "${migrationDir}" -maxdepth 1 -type f -printf '%f\n' | sort -r | head -n 1)
+
+		if [[ -n "${migrationFile}" && -f "${migrationDir}/${migrationFile}" ]]; then
+			echo "Found migration file: ${migrationFile}"
+			sh "${migrationDir}/${migrationFile}" || { true && print_log -warn "Migration" "Failed to execute ${migrationFile}"; }
+		else
+			echo "No migration file found in ${migrationDir}. Skipping migrations."
+		fi
+	fi
+
+fi
+
+# ==============================================================================
+# Habilitación y restauración de servicios del sistema (System Services)
+# ==============================================================================
+# Si la bandera de servicios (${flg_Service}) está activa (igual a 1), se muestra
+# un banner y se ejecuta el script secundario "restore_svc.sh".
+if [ ${flg_Service} -eq 1 ]; then
+	cat <<"EOF"
+
+                 _
+ ___ ___ ___ _ _|_|___ ___ ___
+|_ -| -_|  _| | | |  _| -_|_ -|
+|___|___|_|  \_/|_|___|___|___|
+
+EOF
+
+	"${scrDir}/restore_svc.sh"
+fi
+
+# ==============================================================================
+# Finalización de la instalación y registro de logs
+# ==============================================================================
+if [ $flg_Install -eq 1 ]; then
+	echo ""
+	print_log -g "Installation" " :: " "COMPLETED!"
+fi
+print_log -b "Log" " :: " -y "View logs at ${cacheDir}/logs/${RAVN_LOG}"
+
+# ==============================================================================
+# Solicitud interactiva de reinicio del sistema
+# ==============================================================================
+# Si se realizó alguna acción y no estamos en modo dry-run, se sugiere reiniciar
+# el sistema para aplicar los cambios del entorno de escritorio RaVN correctamente.
+if [ $flg_Install -eq 1 ] ||
+	[ $flg_Restore -eq 1 ] ||
+	[ $flg_Service -eq 1 ] &&
+	[ $flg_DryRun -ne 1 ]; then
+
+	if [[ -z "${HYPRLAND_CONFIG:-}" ]] || [[ ! -f "${HYPRLAND_CONFIG}" ]]; then
+		print_log -warn "Hyprland config not found! Might be a new install or upgrade."
+		print_log -warn "Please reboot the system to apply new changes."
+	fi
+
+	print_log -stat "RaVN" "It is not recommended to use newly installed or upgraded RaVN without rebooting the system. Do you want to reboot the system? (y/N)"
+	read -r answer
+
+	if [[ "$answer" == [Yy] ]]; then
+		echo "Rebooting system"
+		systemctl reboot
+	else
+		echo "The system will not reboot"
+	fi
 fi
