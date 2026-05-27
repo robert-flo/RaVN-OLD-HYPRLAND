@@ -111,3 +111,21 @@ EOF
 		;;
 	esac
 done
+
+
+# Define la variable RAVN_LOG con la marca de tiempo actual y exporta las banderas 
+# de configuración y log para que estén disponibles en subprocesos externos.
+RAVN_LOG="$(date +'%y%m%d_%Hh%Mm%Ss')"
+export flg_DryRun flg_Nvidia flg_Shell flg_Install flg_ThemeInstall RAVN_LOG
+
+# Gestiona el comportamiento de ejecución basándose en los argumentos provistos:
+# - Si se especificó el modo de prueba (dry-run), se imprime un mensaje de estado.
+# - Si el script se ejecutó sin ningún argumento (OPTIND=1), se habilitan por
+#   defecto los procesos de instalación, restauración y activación de servicios.
+if [ "${flg_DryRun}" -eq 1 ]; then
+	print_log -n "[test-run] " -b "enabled :: " "Testing without executing"
+elif [ $OPTIND -eq 1 ]; then
+	flg_Install=1
+	flg_Restore=1
+	flg_Service=1
+fi
