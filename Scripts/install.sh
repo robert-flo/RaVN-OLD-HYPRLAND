@@ -129,3 +129,22 @@ elif [ $OPTIND -eq 1 ]; then
 	flg_Restore=1
 	flg_Service=1
 fi
+
+#--------------------#
+# pre-install script #
+#--------------------#
+# Si las banderas de instalación (flg_Install) y de restauración de configuraciones (flg_Restore)
+# están activadas (ambas en 1), se imprime un banner informativo en arte ASCII ("pre-install")
+# y se ejecuta el script preparatorio install_pre.sh ubicado en el directorio del script.
+if [ ${flg_Install} -eq 1 ] && [ ${flg_Restore} -eq 1 ]; then
+	cat <<"EOF"
+                _         _       _ _
+ ___ ___ ___   |_|___ ___| |_ ___| | |
+| . |  _| -_|  | |   |_ -|  _| .'| | |
+|  _|_| |___|  |_|_|_|___|_| |__,|_|_|
+|_|
+
+EOF
+
+	"${scrDir}/install_pre.sh"
+fi
