@@ -21,6 +21,44 @@ export cacheDir
 export aurList
 export shlList
 
+# Verifica si un paquete específico está instalado en el sistema usando pacman.
+# Parámetros:
+#   $1 : Nombre del paquete a comprobar (PkgIn).
+# Retorno:
+#   Retorna 0 si el paquete está instalado en el sistema, o 1 en caso contrario.
+pkg_installed() {
+    local PkgIn=$1
+
+    if pacman -Q "${PkgIn}" &>/dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Busca cuál de los paquetes de una lista está instalado en el sistema.
+# Parámetros:
+#   $1    : Nombre de la variable dinámica a la que se le asignará el paquete encontrado.
+#   $2... : Lista de nombres de paquetes a verificar.
+# Funcionamiento:
+#   Itera sobre la lista de paquetes provistos. Si detecta que alguno está instalado (mediante
+#   pkg_installed), guarda el nombre del paquete en la variable dinámica especificada en el
+#   primer argumento, exporta dicha variable globalmente en el entorno y retorna 0.
+#   Si ninguno de los paquetes de la lista está instalado, retorna 1.
+chk_list() {
+    vrType="$1"
+    local inList=("${@:2}")
+    for pkg in "${inList[@]}"; do
+        if pkg_installed "${pkg}"; then
+            printf -v "${vrType}" "%s" "${pkg}"
+            # shellcheck disable=SC2163 # dynamic variable
+            export "${vrType}" # export the variable // reference of the variable
+            return 0
+        fi
+    done
+    # print_log -sec "install" -warn "no package found in the list..." "${inList[@]}"
+    return 1
+}
 
 # Detecta adaptadores de gráficos (GPU) de Nvidia en el sistema.
 # Opciones:
@@ -49,3 +87,26 @@ nvidia_detect() {
     fi
 }
 
+# Temporizador interactivo para lecturas de teclado con cuenta regresiva.
+# Parámetros:
+#   $1 : Tiempo de espera máximo en segundos (timsec).
+#   $2 : Mensaje descriptivo a mostrar en la consola (msg).
+# Funcionamiento:
+#   Desactiva temporalmente el modo de salida por error (set +e) para evitar que falle el script
+#   en caso de timeout. Realiza una cuenta regresiva actualizando la línea actual en consola (\r).
+#   Si se pulsa cualquier tecla, detiene la espera inmediatamente. Finalmente exporta la variable
+#   PROMPT_INPUT con el carácter ingresado y reestablece el modo seguro (set -e).
+prompt_timer() {
+    set +e
+    unset PROMPT_INPUT
+    local timsec=$1
+    local msg=$2
+    while [[ ${timsec} -ge 0 ]]; do
+        echo -ne "\r :: ${msg} (${timsec}s) : "
+        read -rt 1 -n 1 PROMPT_INPUT && break
+        ((timsec--))
+    done
+    export PROMPT_INPUT
+    echo ""
+    set -e
+}
