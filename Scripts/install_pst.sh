@@ -77,20 +77,15 @@ fi
 # ==============================================================================
 # Configuración e instalación opcional de aplicaciones Flatpak
 # ==============================================================================
-if ! pkg_installed flatpak; then
-    echo ""
-    print_log -g "[FLATPAK]" -b " list :: " "flatpak application"
-    awk -F '#' '$1 != "" {print "["++count"]", $1}' "${scrDir}/extra/custom_flat.lst"
-    prompt_timer 60 "Install these flatpaks? [Y/n]"
-    fpkopt=${PROMPT_INPUT,,}
+echo ""
+print_log -g "[FLATPAK]" -b " list :: " "flatpak application"
+awk -F '#' '$1 != "" {print "["++count"]", $1}' "${scrDir}/extra/custom_flat.lst"
+prompt_timer 60 "Install these flatpaks? [Y/n]"
+fpkopt=${PROMPT_INPUT,,}
 
-    if [ "${fpkopt}" = "y" ]; then
-        print_log -g "[FLATPAK]" -b " install :: " "flatpaks"
-        [ ${flg_DryRun} -eq 1 ] || "${scrDir}/extra/install_fpk.sh"
-    else
-        print_log -y "[FLATPAK]" -b " skip :: " "flatpak installation"
-    fi
-
+if [ "${fpkopt}" = "y" ]; then
+    print_log -g "[FLATPAK]" -b " install :: " "flatpaks"
+    [ ${flg_DryRun} -eq 1 ] || "${scrDir}/extra/install_fpk.sh"
 else
-    print_log -y "[FLATPAK]" -b " :: " "flatpak is already installed"
+    print_log -y "[FLATPAK]" -b " skip :: " "flatpak installation"
 fi
