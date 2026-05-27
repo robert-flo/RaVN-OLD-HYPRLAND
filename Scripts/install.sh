@@ -208,12 +208,15 @@ EOF
 	fi
 	nvidia_detect --verbose
 
-fi
-
-
 	#----------------#
 	# get user prefs #
 	#----------------#
+	# Selección de preferencias del usuario:
+	# 1. Comprueba si hay algún ayudante de AUR instalado. Si no se encuentra ninguno, muestra
+	#    un menú interactivo con temporizador para elegir e instalar uno (default: yay-bin).
+	# 2. Comprueba si hay alguna shell compatible instalada (zsh o fish). Si no, muestra un menú
+	#    para elegir una, la añade a la lista de instalación y la configura.
+	# 3. Valida la presencia de la cabecera de paquetes de usuario en la lista de instalación.
 	echo ""
 	if ! chk_list "aurhlpr" "${aurList[@]}"; then
 		print_log -c "\nAUR Helpers :: "
