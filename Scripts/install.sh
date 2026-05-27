@@ -148,3 +148,45 @@ EOF
 
 	"${scrDir}/install_pre.sh"
 fi
+
+#------------#
+# installing #
+#------------#
+# Si la bandera de instalación (flg_Install) está activada (en 1), se inicia el proceso principal:
+# 1. Se muestra en consola el banner en arte ASCII de "installing".
+# 2. Se procede a la preparación y compilación de la lista final de paquetes a instalar.
+if [ ${flg_Install} -eq 1 ]; then
+	cat <<"EOF"
+
+ _         _       _ _ _
+|_|___ ___| |_ ___| | |_|___ ___
+| |   |_ -|  _| .'| | | |   | . |
+|_|_|_|___|_| |__,|_|_|_|_|_|_  |
+                            |___|
+
+EOF
+
+	#----------------------#
+	# prepare package list #
+	#----------------------#
+	# Desplaza los argumentos posicionales de la línea de comandos para capturar el archivo
+	# de paquetes personalizados proveído por el usuario como primer argumento no-opción.
+	# Copia la plantilla base de paquetes (pkg_core.lst) al archivo temporal de instalación,
+	# define una trampa (trap) para resguardar la lista procesada en los logs al finalizar, 
+	# y añade al final de la lista los paquetes personalizados si se proporciona un archivo válido.
+	shift $((OPTIND - 1))
+	custom_pkg=$1
+	cp "${scrDir}/pkg_core.lst" "${scrDir}/install_pkg.lst"
+
+	# Asegura la existencia del directorio de logs de la sesión antes de definir la trampa (trap).
+	mkdir -p "${cacheDir}/logs/${RAVN_LOG}"
+	
+	trap 'mv "${scrDir}/install_pkg.lst" "${cacheDir}/logs/${RAVN_LOG}/install_pkg.lst"' EXIT
+
+	echo -e "\n#user packages" >>"${scrDir}/install_pkg.lst" # Add a marker for user packages
+	if [ -f "${custom_pkg}" ] && [ -n "${custom_pkg}" ]; then
+		cat "${custom_pkg}" >>"${scrDir}/install_pkg.lst"
+	fi
+
+
+fi

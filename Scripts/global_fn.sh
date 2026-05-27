@@ -48,3 +48,4 @@ nvidia_detect() {
         return 1
     fi
 }
+
