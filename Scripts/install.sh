@@ -243,7 +243,7 @@ EOF
 			;;
 		esac
 		if [[ -z "$getAur" ]]; then
-			print_log -sec "AUR" -crit "No AUR helper found..." "Log file at ${cacheDir}/logs/${HYDE_LOG}"
+			print_log -sec "AUR" -crit "No AUR helper found..." "Log file at ${cacheDir}/logs/${RAVN_LOG}"
 			exit 1
 		fi
 	fi
@@ -271,7 +271,7 @@ EOF
 		echo "${myShell}" >>"${scrDir}/install_pkg.lst"
 
 		if [[ -z "$myShell" ]]; then
-			print_log -sec "shell" -crit "No shell found..." "Log file at ${cacheDir}/logs/${HYDE_LOG}"
+			print_log -sec "shell" -crit "No shell found..." "Log file at ${cacheDir}/logs/${RAVN_LOG}"
 			exit 1
 		else
 			print_log -sec "shell" -stat "detected :: " "${myShell}"
@@ -279,7 +279,7 @@ EOF
 	fi
 
 	if ! grep -q "^#user packages" "${scrDir}/install_pkg.lst"; then
-		print_log -sec "pkg" -crit "No user packages found..." "Log file at ${cacheDir}/logs/${HYDE_LOG}/install.sh"
+		print_log -sec "pkg" -crit "No user packages found..." "Log file at ${cacheDir}/logs/${RAVN_LOG}/install.sh"
 		exit 1
 	fi
 
