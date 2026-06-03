@@ -13,7 +13,7 @@ confDir="${XDG_CONFIG_HOME:-$HOME/.config}"
 cacheDir="${XDG_CACHE_HOME:-$HOME/.cache}/ravn"
 aurList=("yay" "paru")
 shlList=("zsh" "fish")
-pacmanCmd=${cloneDir}/Configs/.local/lib/ravn/pm.sh
+pacmanCmd=${cloneDir}/Configs/.local/lib/hyde/pm.sh
 
 export cloneDir
 export confDir
