@@ -56,12 +56,26 @@ while read -r line || [ -n "$line" ]; do
                 if [ -e "${active_file}" ]; then
                     # Obtener la ruta relativa respecto a $HOME (DOTBARE_TREE)
                     rel_path="${active_file#${DOTBARE_TREE}/}"
-                    
-                    # Agregar el archivo al repositorio bare
-                    if git --git-dir="${DOTBARE_DIR}" --work-tree="${DOTBARE_TREE}" add "${active_file}" 2>/dev/null; then
-                        print_log -g "[track]" -b " :: " "${rel_path}"
+                    repo_file="${scrDir}/../Configs/${rel_path}"
+
+                    if [ -d "${repo_file}" ]; then
+                        # Si es un directorio en el repo template, agregar solo los archivos que existen en el repo
+                        find "${repo_file}" -type f | while read -r repo_f; do
+                            rel_f="${repo_f#*/Configs/}"
+                            act_f="${DOTBARE_TREE}/${rel_f}"
+                            if [ -f "${act_f}" ]; then
+                                if git --git-dir="${DOTBARE_DIR}" --work-tree="${DOTBARE_TREE}" add "${act_f}" 2>/dev/null; then
+                                    print_log -g "[track]" -b " :: " "${rel_f}"
+                                fi
+                            fi
+                        done
                     else
-                        print_log -err "No se pudo registrar: ${rel_path}"
+                        # Si es un archivo individual
+                        if git --git-dir="${DOTBARE_DIR}" --work-tree="${DOTBARE_TREE}" add "${active_file}" 2>/dev/null; then
+                            print_log -g "[track]" -b " :: " "${rel_path}"
+                        else
+                            print_log -err "No se pudo registrar: ${rel_path}"
+                        fi
                     fi
                 fi
             fi
