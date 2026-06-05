@@ -327,6 +327,12 @@ EOF
 		echo "[install] reload :: Hyprland"
 	fi
 
+	# Inicialización de dotbare para rastreo selectivo
+	if [ -f "${scrDir}/dotbare_init.sh" ]; then
+		print_log -g "[dotbare]" -b " :: " "Configurando seguimiento selectivo de dotfiles..."
+		bash "${scrDir}/dotbare_init.sh"
+	fi
+
 fi
 
 
