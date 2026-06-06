@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=HEY
+Comment=HEY
+Exec=omarchy-webapp-handler-hey %u
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/HEY.png
+StartupNotify=true
+MimeType=x-scheme-handler/mailto

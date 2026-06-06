@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Terminal Disk Usage Analizer
+GenericName=Disk Usage Analyzer
+Comment=Check disk space usage in kitty terminal
+Exec=kitty --class=ncdu --title="Disk Usage Analyzer" -e ncdu
+Terminal=false
+Type=Application
+Keywords=Storage;Disk;Space;Analyzer;
+Icon=harddisk
+Categories=Utility;System;
+StartupNotify=false
