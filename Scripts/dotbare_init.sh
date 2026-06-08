@@ -79,5 +79,12 @@ while read -r line || [[ -n $line ]]; do
   fi
 done < "$track_file_home"
 
+# Crear un commit inicial si hay cambios preparados en el índice
+if ! git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" diff --cached --quiet; then
+  print_log -g "[dotbare]" -b " :: " "Creando commit de las rutas rastreadas..."
+  git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" commit -m "Initial commit of tracked paths" >/dev/null
+fi
+
 print_log -g "[dotbare]" -b " :: " "Rastreo selectivo configurado con éxito."
+
 
