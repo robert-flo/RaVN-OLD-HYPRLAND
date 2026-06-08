@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #|---/ /+--------------------------------------+---/ /|#
 #|--/ /-| Script for final configuration tweaks |--/ /-|#
 #|-/ /--| Roberto Flores                       |-/ /--|#
@@ -109,3 +109,20 @@ setup_omarchy
 # Agrega aquí cualquier otra personalización o comandos finales.
 # Ejemplo:
 # print_log -g "[TWEAKS] " "Aplicando tweaks finales..."
+
+# ==============================================================================
+# 4. Instalar plugin de dotbare para oh-my-zsh
+# ==============================================================================
+if [[ -d "$HOME/.oh-my-zsh" ]]; then
+  if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/dotbare" ]]; then
+    print_log -g "[DOTBARE] " "Clonando plugin de dotbare para oh-my-zsh..."
+    if (( flg_DryRun != 1 )); then
+      git clone https://github.com/kazhala/dotbare.git "$HOME/.oh-my-zsh/custom/plugins/dotbare"
+    else
+      print_log -y "[DOTBARE] " -b " :: " "Simulación: Se omite la clonación del plugin dotbare"
+    fi
+  else
+    print_log -g "[DOTBARE] " "El plugin de dotbare ya está instalado en oh-my-zsh."
+  fi
+fi
+
