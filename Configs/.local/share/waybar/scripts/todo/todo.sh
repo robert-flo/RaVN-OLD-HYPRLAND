@@ -6,7 +6,9 @@
 
 # --- directory and file paths ---
 todo_dir=$(dirname "$(realpath "$0")")
-json_file="$todo_dir/todo.json"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/waybar"
+mkdir -p "$state_dir"
+json_file="$state_dir/todo.json"
 
 # script paths
 tui_script="$todo_dir/todo_tui.sh"

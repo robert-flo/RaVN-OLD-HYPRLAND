@@ -2,7 +2,9 @@
 
 # --- configuration ---
 script_dir=$(dirname "$(realpath "$0")")
-data_file="$script_dir/countdown.json"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/waybar"
+mkdir -p "$state_dir"
+data_file="$state_dir/countdown.json"
 
 # script paths
 rofi_script="$script_dir/countdown_rofi.sh"
