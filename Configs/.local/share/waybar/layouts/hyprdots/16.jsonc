@@ -18,7 +18,9 @@
         "group/pill#center"
     ],
     "modules-right": [
-        "group/pill#right"
+        "group/pill#right",
+        "group/pill#todo",
+        "group/pill#countdown"
     ],
     // positions generated based on config.ctl //
     "group/pill#left": {
@@ -59,5 +61,17 @@
             "custom/swaync",
             "custom/hyde-menu"
         ]
-    }
+    },
+    "group/pill#todo": {
+        "modules": [
+            "custom/todo"
+        ],
+        "orientation": "inherit"
+    },
+    "group/pill#countdown": {
+        "modules": [
+            "custom/countdown"
+        ],
+        "orientation": "inherit"
+    },
 }

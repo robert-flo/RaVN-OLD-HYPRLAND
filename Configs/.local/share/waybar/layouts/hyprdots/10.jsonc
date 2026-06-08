@@ -59,5 +59,17 @@
             "custom/hyde-menu"
         ]
     },
-    "modules-right": []
+    "modules-right": [],
+    "group/pill#todo": {
+        "modules": [
+            "custom/todo"
+        ],
+        "orientation": "inherit"
+    },
+    "group/pill#countdown": {
+        "modules": [
+            "custom/countdown"
+        ],
+        "orientation": "inherit"
+    },
 }

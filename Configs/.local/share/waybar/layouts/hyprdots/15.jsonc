@@ -35,7 +35,9 @@
         ]
     },
     "modules-right": [
-        "group/pill#right"
+        "group/pill#right",
+        "group/pill#todo",
+        "group/pill#countdown"
     ],
     "group/pill#right": {
         "orientation": "inherit",
@@ -52,5 +54,17 @@
             "custom/hyde-menu",
             "custom/power"
         ]
-    }
+    },
+    "group/pill#todo": {
+        "modules": [
+            "custom/todo"
+        ],
+        "orientation": "inherit"
+    },
+    "group/pill#countdown": {
+        "modules": [
+            "custom/countdown"
+        ],
+        "orientation": "inherit"
+    },
 }

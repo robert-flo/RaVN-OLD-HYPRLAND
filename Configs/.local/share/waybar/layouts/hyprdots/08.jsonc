@@ -48,6 +48,8 @@
     },
     "modules-right": [
         "group/pill#right1",
+        "group/pill#todo",
+        "group/pill#countdown",
         "group/pill#right2"
     ],
     "group/pill#right1": {
@@ -68,5 +70,17 @@
             "custom/keybindhint",    
             "custom/weather"
         ]
-    }
+    },
+    "group/pill#todo": {
+        "modules": [
+            "custom/todo"
+        ],
+        "orientation": "inherit"
+    },
+    "group/pill#countdown": {
+        "modules": [
+            "custom/countdown"
+        ],
+        "orientation": "inherit"
+    },
 }
