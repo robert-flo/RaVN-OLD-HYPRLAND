@@ -1,0 +1,10 @@
+# Rutas a rastrear por dotbare
+# Se permiten comentarios (#) y líneas vacías.
+# Puedes usar tilde (~) o variables como $HOME.
+
+~/.config/zsh/.zshrc
+~/.config/zsh/user.zsh
+~/.config/zsh/prompt.zsh
+~/.config/zsh/plugin.zsh
+~/.config/kitty/kitty.conf
+~/.config/hypr/userprefs.conf
