@@ -65,7 +65,8 @@
             "network",
             "pulseaudio",
             "pulseaudio#microphone",
-            "custom/keybindhint"
+            "custom/keybindhint",    
+            "custom/weather"
         ]
     }
 }

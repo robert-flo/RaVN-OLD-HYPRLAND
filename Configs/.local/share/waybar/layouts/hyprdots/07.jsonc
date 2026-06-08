@@ -61,7 +61,8 @@
             "pulseaudio",
             "pulseaudio#microphone",
             "custom/notifications",
-            "custom/keybindhint"
+            "custom/keybindhint",    
+            "custom/weather"
         ]
     },
     "group/pill#right2": {

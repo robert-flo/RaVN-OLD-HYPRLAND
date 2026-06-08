@@ -35,7 +35,8 @@
             "idle_inhibitor",
             "clock",
             "custom/updates",
-            "custom/keybindhint",
+            "custom/keybindhint",    
+            "custom/weather",
             "custom/gamemode",
             "custom/weather"
         ]
