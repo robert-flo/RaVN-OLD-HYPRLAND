@@ -408,6 +408,25 @@ EOF
 fi
 
 # ==============================================================================
+# Configuracion Final (Final Tweaks & Custom Installs)
+# ==============================================================================
+# Si las banderas de instalación (${flg_Install}) y restauración (${flg_Restore})
+# están activas (valor igual a 1), se imprime un banner y se ejecuta el script
+# secundario "install_fnl.sh".
+if [ ${flg_Install} -eq 1 ] && [ ${flg_Restore} -eq 1 ]; then
+	cat <<"EOF"
+
+  _ _             _
+ |  _|_|___ ___ _| |
+ |  _| |   | .'| . |
+ |_| |_|_|_|__,|___|
+
+EOF
+
+	"${scrDir}/install_fnl.sh"
+fi
+
+# ==============================================================================
 # Finalización de la instalación y registro de logs
 # ==============================================================================
 if [ $flg_Install -eq 1 ]; then
