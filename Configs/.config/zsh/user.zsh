@@ -27,3 +27,15 @@ if [[ ${HYDE_ZSH_NO_PLUGINS} != "1" ]]; then
         "sudo"
     )
 fi
+
+
+# unset -f command_not_found_handler # Uncomment to prevent searching for commands not found in package manager
+# Add user-installed Ruby gems executables to PATH.
+export PATH="$HOME/.local/share/gem/ruby/3.4.0/bin:$PATH"
+
+# Initialize rbenv to manage Ruby versions and shims for this shell session.
+eval "$(rbenv init -)"
+
+# Initialize try so it can register commands/environments from ~/src/tries.
+eval "$(ruby /home/dominus/.local/share/gem/ruby/3.4.0/bin/try init ~/src/tries)"
+
