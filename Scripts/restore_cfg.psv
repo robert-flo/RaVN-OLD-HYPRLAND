@@ -45,6 +45,7 @@ P|${HOME}/.config|xdg-terminals.list|xdg-utils
 
 P|${HOME}/.config/hypr|hyprland.conf|hyprland
 S|${HOME}/.local/share|hypr|hyprland
+S|${HOME}/.local/share|applications|hyprland
 O|${HOME}/.local/bin|hyde-shell hydectl|hyprland
 S|${HOME}/.config|gtk-3.0|nwg-look
 S|${HOME}/.config|nwg-look|nwg-look
