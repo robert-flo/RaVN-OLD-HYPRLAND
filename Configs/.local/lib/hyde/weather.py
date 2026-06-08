@@ -378,7 +378,7 @@ def main() -> None:
             forecast_days = 3
     except ValueError:
         forecast_days = 3  # Number of days to show the forecast for (default: 3)
-    get_location = os.getenv("WEATHER_LOCATION", "").replace(
+    get_location = os.getenv("WEATHER_LOCATION", "San Salvador, El Salvador").replace(
         " ", "_"
     )  # Name of the location to get the weather from (default: '')
     # Parse the location to wttr.in format (snake_case)
