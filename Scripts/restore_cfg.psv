@@ -42,6 +42,7 @@ S|${HOME}/.config/uwsm|env env-hyprland env.d env-hyprland.d|systemd hyprland uw
 
  Hyde core files -- xdg-terminal-exec 
 P|${HOME}/.config|xdg-terminals.list|xdg-utils
+P|${HOME}/.config|mimeapps.list|xdg-utils
 
 P|${HOME}/.config/hypr|hyprland.conf|hyprland
 S|${HOME}/.local/share|hypr|hyprland
