@@ -77,6 +77,7 @@ P|${HOME}/.config/VSCodium/User|settings.json|vscodium
  Bar 
 P|${HOME}/.config/waybar|user-style.css config.jsonc theme.css style.css|waybar
 I|${HOME}/.config/waybar|modules styles layouts menus|waybar
+P|${HOME}/.config/waybar/scripts|css_color_extraction.sh|waybar
 S|${HOME}/.local/share|waybar|waybar
 
  Terminal 
