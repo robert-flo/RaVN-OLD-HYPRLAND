@@ -1,0 +1,13 @@
+{
+  "state": {
+    "current_index": 0
+  },
+  "countdowns": [
+    {
+      "label": "mi cumpleanos",
+      "start": "2026-12-30",
+      "end": "2027-12-30",
+      "format": "days"
+    }
+  ]
+}
