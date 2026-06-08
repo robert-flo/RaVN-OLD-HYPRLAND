@@ -36,3 +36,12 @@ eval "$(try init ~/src/tries)"
 
 # Add user-installed mise executables to PATH.
 export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+#  Waybar Tasks & Countdowns Custom Aliases 
+# Interactive Terminal UIs (TUI)
+alias todo="~/.local/share/waybar/scripts/todo/todo.sh --show-tui"
+alias countdown="~/.local/share/waybar/scripts/countdown/countdown.sh --show-tui"
+
+# Direct raw JSON configuration edits
+alias todo-edit='${EDITOR:-nano} ~/.local/state/waybar/todo.json'
+alias countdown-edit='${EDITOR:-nano} ~/.local/state/waybar/countdown.json'
