@@ -17,6 +17,9 @@ blueman                                                # bluetooth manager gui
 brightnessctl                                          # screen brightness control
 playerctl                                              # media controls
 udiskie                                                # manage removable media
+wttrbar                                                # for weather
+python-requests|wttrbar                                # script dependency
+ncdu                                                   # Terminal Disk Usage Analyzer
 
 # --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
@@ -65,13 +68,16 @@ qt5-wayland                                            # wayland support in qt5
 qt6-wayland                                            # wayland support in qt6
 
 # --------------------------------------------------- // Applications
-firefox                                                # browser
+# firefox                                              # browser
+brave-origin-beta-bin                                  # browser
+google-chrome                                          # browser
+microsoft-edge-stable-bin                              # browser 
 kitty                                                  # terminal
 dolphin                                                # kde file manager
 ark                                                    # kde file archiver
 unzip                                                  # extracting zip files
 vim                                                    # terminal text editor
-code                                                   # ide text editor
+# code                                                   # ide text editor
 nwg-displays                                           # monitor management utility
 fzf                                                    # Command-line fuzzy finder
 
@@ -85,3 +91,54 @@ fastfetch                                              # system information fetc
 # --------------------------------------------------- // RaVN
 hyprquery                                              # A CLI utility for querying configuration values from hypr-related configuration. Using native hyprlang lib.
 hypridle                                               # idle daemon
+
+# --------------------------------------------------- // Gaming
+steam                                                  # gaming platform
+gamemode                                               # daemon and library for game optimizations
+
+# --------------------------------------------------- // Music
+cava                                                   # audio visualizer
+spotify                                                # proprietary music streaming service
+spicetify-cli                                          # cli to customize spotify client
+
+# --------------------------------------------------- // Apps
+# neovim                                               # vim based text editor
+
+# --------------------------------------------------- // zsh
+bat|zsh                                                  # enhanced version of cat
+eza|zsh                                                  # file lister for zsh
+duf|zsh                                                  # prettier version of df for zsh
+
+# --------------------------------------------------- // Editor
+visual-studio-code-bin                                # MS  text editor
+visual-studio-code-insiders-bin                       # MS  text editor
+antigravity-ide                                       # An agentic development platform from Google, evolving the IDE into the agent-first era	kIERO	2026-06-04 04:02 (UTC)
+antigravity-cli                                       # Google's agentic development platform (CLI companion)	viridivn	2026-06-06 07:10 (UTC)
+antigravity                                           # Google Antigravity 2.0 multi-agent orchestration platform
+zed                                                   # A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter
+vulkan-intel
+
+# --------------------------------------------------- // Driver for my Intel HD Graphics 530
+vulkan-intel 
+lib32-vulkan-intel 
+intel-media-driver 
+libva-utils
+
+
+
+# --------------------------------------------------- // Git
+github-cli                                            # The GitHub CLI tool  
+gitkraken                                             # The intuitive, fast, and beautiful cross-platform Git client
+gitkraken-cli                                         # The intuitive, fast, and beautiful cross-platform Git client  
+
+# --------------------------------------------------- // Dotbare
+dotbare                                               # Manage your dotfiles interactively with fzf
+diff-so-fancy                                         # Fancy git diff preview
+git-delta                                             # Fancy git diff preview
+highlight                                             # Syntax highlighting when previewing files
+ruby-coderay                                          # highlighting when previewing files
+tree                                                  # Provide a directory tree view when finding directory
+
+# --------------------------------------------------- // mise
+libyaml                                               # YAML 1.1 library
+mise                                                  # The front-end to your dev env
