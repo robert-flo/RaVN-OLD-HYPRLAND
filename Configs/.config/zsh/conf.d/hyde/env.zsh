@@ -10,8 +10,15 @@
 # Hyde's Shell Environment Initialization Script
 # If users used UWSM, uwsm will override any variables set anywhere in your shell configurations
 
+# Helper function to safely prepend paths without creating duplicates
+add_to_path() {
+  if [[ -d $1 && :$PATH: != *:$1:* ]]; then
+    export PATH="$1:$PATH"
+  fi
+}
+
 # Basic PATH prepending (user local bin)
-PATH="$HOME/.local/bin:$PATH"
+add_to_path "$HOME/.local/bin"
 
 # XDG Base Directory Specification variables with defaults
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"

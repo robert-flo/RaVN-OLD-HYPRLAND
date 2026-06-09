@@ -320,7 +320,12 @@ EOF
 	"${scrDir}/restore_thm.sh"
 	print_log -g "[generate] " "cache ::" "Wallpapers..."
 	if [ "${flg_DryRun}" -ne 1 ]; then
-		export PATH="$HOME/.local/lib/hyde:$HOME/.local/bin:${PATH}"
+		for p in "$HOME/.local/lib/hyde" "$HOME/.local/bin"; do
+			case ":$PATH:" in
+				*":$p:"*) ;;
+				*) export PATH="$p:$PATH" ;;
+			esac
+		done
 		"$HOME/.local/lib/hyde/wallpaper/cache.sh" commence -t ""
 		"$HOME/.local/lib/hyde/theme.switch.sh" -q || true
 		"$HOME/.local/lib/hyde/waybar.py" --update || true

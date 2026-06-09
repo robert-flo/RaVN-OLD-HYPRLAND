@@ -3,7 +3,10 @@
 # Hyde's Shell Environment Initialization Script
 
 # Basic PATH prepending (user local bin)
-PATH="$HOME/.local/bin:$PATH"
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) PATH="$HOME/.local/bin:$PATH" ;;
+esac
 
 # Less history file location
 LESSHISTFILE="${LESSHISTFILE:-/tmp/less-hist}"

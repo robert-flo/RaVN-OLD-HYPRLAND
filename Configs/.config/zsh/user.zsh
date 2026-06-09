@@ -39,7 +39,7 @@ fi
 eval "$(try init ~/src/tries)"
 
 # Add user-installed mise executables to PATH.
-export PATH="$HOME/.local/share/mise/shims:$PATH"
+add_to_path "$HOME/.local/share/mise/shims"
 
 #  Waybar Tasks & Countdowns Custom Aliases 
 # Interactive Terminal UIs (TUI)

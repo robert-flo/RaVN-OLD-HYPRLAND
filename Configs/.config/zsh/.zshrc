@@ -62,6 +62,7 @@ fi
 # shellcheck source=.config/nvim-Lazyman/.nvimsbind
 [ -f ~/.config/nvim-Lazyman/.nvimsbind ] && source ~/.config/nvim-Lazyman/.nvimsbind
 # Luarocks bin path
-[ -d ${HOME}/.luarocks/bin ] && {
-  export PATH="${HOME}/.luarocks/bin${PATH:+:${PATH}}"
-}
+add_to_path "$HOME/.luarocks/bin"
+
+# Limpiar el PATH de duplicados y entradas vacías
+export PATH=$(echo -n "$PATH" | awk -v RS=: '$0 != "" && !x[$0]++' | paste -sd:)

@@ -336,7 +336,10 @@ uv_hook() {
 		source "$HOME/.local/bin/env" 2>/dev/null || true
 		# Asegura que uv esté disponible después de la instalación
 		if ! command -v uv &>/dev/null; then
-			export PATH="$HOME/.local/bin:$PATH"
+			case ":$PATH:" in
+				*":$HOME/.local/bin:"*) ;;
+				*) export PATH="$HOME/.local/bin:$PATH" ;;
+			esac
 		fi
 	fi
 }
