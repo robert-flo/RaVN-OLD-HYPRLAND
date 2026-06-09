@@ -44,7 +44,7 @@ show_menu() {
     echo "  [s] Omitir este archivo"
     echo "  [q] Salir"
     echo -n "Opción: "
-    read -r opt
+    read -r opt < /dev/tty
 
     case "$opt" in
       d|D)
@@ -87,7 +87,7 @@ show_menu() {
 # Preguntar si se desea comparar el directorio .config en Meld directamente
 if (( has_meld == 1 )); then
   print_log -g "[sync]" -b " :: " "¿Deseas comparar el directorio .config del repositorio con tu ~/.config en Meld? (y/N)"
-  read -r ans
+  read -r ans < /dev/tty
   if [[ $ans == [Yy] ]]; then
     print_log -g "[meld]" -b " :: " "Abriendo comparación de directorios..."
     meld "$CfgDir/.config" "$HOME/.config" &
@@ -113,7 +113,7 @@ while read -r rel_path; do
       echo "  [r] Copiar al repositorio"
       echo "  [s] Omitir"
       echo -n "Opción: "
-      read -r opt
+      read -r opt < /dev/tty
       if [[ $opt == [Rr] ]]; then
         mkdir -p "$(dirname "$repo_file")"
         cp "$active_file" "$repo_file"
