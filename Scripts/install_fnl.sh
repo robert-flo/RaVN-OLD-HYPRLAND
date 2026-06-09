@@ -84,10 +84,11 @@ Server = https://pkgs.omarchy.org/${channel_name}/\$arch
 EOF
 
         # Sincronizar las bases de datos de pacman
+        print_log -g "[OMARCHY] " "Sincronizando bases de datos de pacman (Fy)...";
+        sudo pacman -Fy
 
         print_log -g "[OMARCHY] " -b " :: " "Instalando tobi-try (directorios independientes para cada prueba)..."
         sudo pacman -S --needed --noconfirm tobi-try
-
 
         print_log -g "[OMARCHY] " -b " :: " "Instalando dependencias necesarias para que omarchy-menu esté disponible y funcional..."
         sudo pacman -S --needed --noconfirm omarchy-walker
@@ -221,7 +222,9 @@ if [[ ! -d "$HOME/.config/nvim-Lazyman" ]]; then
     prompt_timer 10 "Quieres instalar nvim-lazyman ahora? (Paso tardado) [y/N]"
     if [[ "${PROMPT_INPUT,,}" == "y" ]]; then
       print_log -g "[LAZYMAN] " "Instalando nvim-lazyman..."
-      sudo pacman -S --needed --noconfirm tobi-try
+
+      sudo pacman -S --needed --noconfirm neovim
+      
       git clone https://github.com/doctorfree/nvim-lazyman "$HOME/.config/nvim-Lazyman"
       "$HOME/.config/nvim-Lazyman/lazyman.sh"
     else

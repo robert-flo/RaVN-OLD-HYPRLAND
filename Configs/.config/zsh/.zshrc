@@ -51,3 +51,17 @@ fi
 if [ -f ~/.profile ]; then
     . ~/.profile
 fi
+
+if command -v zoxide > /dev/null; then
+  eval "$(zoxide init zsh)"
+fi
+# Source the Lazyman shell initialization for aliases and nvims selector
+# shellcheck source=.config/nvim-Lazyman/.lazymanrc
+[ -f ~/.config/nvim-Lazyman/.lazymanrc ] && source ~/.config/nvim-Lazyman/.lazymanrc
+# Source the Lazyman .nvimsbind for nvims key binding
+# shellcheck source=.config/nvim-Lazyman/.nvimsbind
+[ -f ~/.config/nvim-Lazyman/.nvimsbind ] && source ~/.config/nvim-Lazyman/.nvimsbind
+# Luarocks bin path
+[ -d ${HOME}/.luarocks/bin ] && {
+  export PATH="${HOME}/.luarocks/bin${PATH:+:${PATH}}"
+}
