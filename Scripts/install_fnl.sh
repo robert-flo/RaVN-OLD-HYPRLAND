@@ -84,6 +84,11 @@ Server = https://pkgs.omarchy.org/${channel_name}/\$arch
 EOF
         
         # Sincronizar las bases de datos de pacman
+
+        print_log -g "[OMARCHY] " -b " :: " "Instalando tobi-try (directorios independientes para cada estilo de entorno)..."
+        sudo pacman -S --needed --noconfirm tobi-try
+
+
         print_log -g "[OMARCHY] " -b " :: " "Instalando dependencias necesarias para que omarchy-menu esté disponible y funcional..."
         sudo pacman -S --needed --noconfirm omarchy-walker
 
