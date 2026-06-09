@@ -93,6 +93,47 @@ EOF
 # Ejecutar configuración de Omarchy
 setup_omarchy
 
+setup_ravn() {
+    # Usar rama personalizada si se indica, de lo contrario por defecto la actual o 'master'
+    local default_branch
+    default_branch=$(git -C "$scrDir" branch --show-current 2>/dev/null || echo "master")
+    local ravn_ref="${RAVN_REF:-$default_branch}"
+    # Usar repositorio personalizado si se especifica, de lo contrario por defecto 'robert-flo/RaVN'
+    local ravn_repo="${RAVN_REPO:-robert-flo/RaVN}"
+
+    print_log -g "[RAVN] " -b " :: " "Configurando repositorio RaVN (${ravn_repo}) en la rama ${ravn_ref}..."
+
+    # 1. Asegurar la instalación de git usando los repositorios actuales del sistema
+    if [[ ${flg_DryRun} -ne 1 ]]; then
+        sudo pacman -Sy --noconfirm --needed git
+    else
+        print_log -y "[RAVN] " -b " :: " "Simulación: Se omite la instalación de git"
+    fi
+
+    # 2. Clonar e inicializar el repositorio
+    print_log -g "[RAVN] " "Clonando RaVN desde: https://github.com/${ravn_repo}.git"
+    
+    if [[ ${flg_DryRun} -ne 1 ]]; then
+        rm -rf "$HOME/.local/share/ravn/"
+        git clone "https://github.com/${ravn_repo}.git" "$HOME/.local/share/ravn" >/dev/null
+        
+        if cd "$HOME/.local/share/ravn"; then
+            print_log -g "[RAVN] " "Cambiando a la rama: ${ravn_ref}"
+            git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}"
+            cd - >/dev/null || true
+        else
+            print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio clonado."
+            return 1
+        fi
+    else
+        print_log -y "[RAVN] " -b " :: " "Simulación: Se omite la clonación de RaVN"
+    fi
+}
+
+# Ejecutar configuración de RaVN
+setup_ravn
+
+
 
 # ==============================================================================
 # 2. Instalar gemas de Ruby
