@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Disney+
+Comment=Disney+
+Exec=omarchy-launch-webapp https://www.disneyplus.com/es-sv
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Disney.png
+StartupNotify=true

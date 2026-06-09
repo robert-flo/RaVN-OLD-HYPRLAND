@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Mistral ai
+Comment=Mistral ai
+Exec=omarchy-launch-webapp https://chat.mistral.ai/chat
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Mistral ai.png
+StartupNotify=true

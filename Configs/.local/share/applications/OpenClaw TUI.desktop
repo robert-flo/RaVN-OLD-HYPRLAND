@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OpenClaw TUI
+Comment=OpenClaw Terminal UI
+Exec=xdg-terminal-exec --app-id=TUI.tile -e openclaw tui --session main
+Terminal=false
+Icon=/home/dominus/.local/share/applications/icons/OpenClaw.png
+StartupNotify=true

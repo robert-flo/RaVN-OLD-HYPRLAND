@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Notion
+Comment=Notion
+Exec=omarchy-launch-webapp https://www.notion.so/OMARCHY-28ae971e6e8b8025b230ec19f39596e7?showMoveTo=true&saveParent=true
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Notion .png
+StartupNotify=true

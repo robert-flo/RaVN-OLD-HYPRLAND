@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Platzi
+Comment=Platzi
+Exec=omarchy-launch-webapp https://platzi.com/home/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Platzi.png
+StartupNotify=true

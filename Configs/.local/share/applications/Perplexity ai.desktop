@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Perplexity ai
+Comment=Perplexity ai
+Exec=omarchy-launch-webapp https://www.perplexity.ai/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Perplexity ai.png
+StartupNotify=true

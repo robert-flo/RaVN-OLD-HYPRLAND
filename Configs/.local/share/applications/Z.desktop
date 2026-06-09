@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Z ai
+Comment=Z ai
+Exec=omarchy-launch-webapp https://chat.z.ai/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Z ai.png
+StartupNotify=true

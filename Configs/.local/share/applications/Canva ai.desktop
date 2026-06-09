@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Canva ai
+Comment=Canva ai
+Exec=omarchy-launch-webapp https://www.canva.com/?success=true&continue_in_browser=true
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Canva ai.png
+StartupNotify=true

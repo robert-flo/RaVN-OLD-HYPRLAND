@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Go Rails
+Comment=Go Rails
+Exec=omarchy-launch-webapp https://gorails.com/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Go Rails.png
+StartupNotify=true

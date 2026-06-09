@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Gemini AI
+Comment=Gemini AI
+Exec=omarchy-launch-webapp https://gemini.google.com/app
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Gemini AI.png
+StartupNotify=true

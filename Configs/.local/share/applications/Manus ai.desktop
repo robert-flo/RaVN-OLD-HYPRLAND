@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Manus ai
+Comment=Manus ai
+Exec=omarchy-launch-webapp https://manus.im/app
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Manus ai.png
+StartupNotify=true

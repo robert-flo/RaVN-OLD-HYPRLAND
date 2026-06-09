@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Grok AI
+Comment=Grok AI
+Exec=omarchy-launch-webapp https://grok.com/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Grok AI.png
+StartupNotify=true

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=command-code
+Comment=Command Code - Coding agent that continuously learns your taste of writing code
+Exec=xdg-terminal-exec --app-id=TUI.tile -e cmd
+Terminal=false
+Icon=/home/dominus/.local/share/applications/icons/command-code.png
+StartupNotify=true
+Path=/home/dominus/Work

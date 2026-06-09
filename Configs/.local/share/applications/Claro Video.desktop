@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Claro Video
+Comment=Claro Video
+Exec=omarchy-launch-webapp https://www.clarovideo.com/elsalvador/homeuser
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Claro Video.png
+StartupNotify=true
