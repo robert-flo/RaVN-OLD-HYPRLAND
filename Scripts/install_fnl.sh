@@ -86,6 +86,39 @@ EOF
         # Sincronizar las bases de datos de pacman
         print_log -g "[OMARCHY] " -b " :: " "Instalando dependencias necesarias para que omarchy-menu esté disponible y funcional..."
         sudo pacman -S --needed --noconfirm omarchy-walker
+
+        # 4. Configurar Walker y Elephant (Misma lógica que walker-elephant.sh de Omarchy)
+        print_log -g "[OMARCHY] " "Configurando integración de Walker y Elephant..."
+        
+        # Asegurar la existencia de los directorios necesarios
+        mkdir -p "$HOME/.config/autostart"
+        mkdir -p "$HOME/.config/systemd/user/app-walker@autostart.service.d"
+        mkdir -p "$HOME/.config/elephant/menus"
+
+        # Copiar configuraciones de autostart y reinicio de Walker
+        cp "$HOME/.local/share/omarchy/default/walker/walker.desktop" "$HOME/.config/autostart/"
+        cp "$HOME/.local/share/omarchy/default/walker/restart.conf" "$HOME/.config/systemd/user/app-walker@autostart.service.d/"
+
+        # Crear enlaces simbólicos para los menús de Elephant (enlazados a upstream)
+        ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_themes.lua" "$HOME/.config/elephant/menus/omarchy_themes.lua"
+        ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_background_selector.lua" "$HOME/.config/elephant/menus/omarchy_background_selector.lua"
+        ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_unlocks.lua" "$HOME/.config/elephant/menus/omarchy_unlocks.lua"
+
+        # Crear el hook de pacman para reiniciar walker tras actualizaciones
+        sudo mkdir -p /etc/pacman.d/hooks
+        sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null <<EOF
+[Trigger]
+Type = Package
+Operation = Upgrade
+Target = walker
+Target = walker-debug
+Target = elephant*
+
+[Action]
+Description = Restarting Walker services after system update
+When = PostTransaction
+Exec = $HOME/.local/share/omarchy/bin/omarchy-restart-walker
+EOF
     else
         print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la integración de [omarchy] en pacman.conf"
     fi
