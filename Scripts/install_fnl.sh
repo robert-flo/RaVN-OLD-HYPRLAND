@@ -85,7 +85,7 @@ EOF
         
         # Sincronizar las bases de datos de pacman
 
-        print_log -g "[OMARCHY] " -b " :: " "Instalando tobi-try (directorios independientes para cada estilo de entorno)..."
+        print_log -g "[OMARCHY] " -b " :: " "Instalando tobi-try (directorios independientes para cada prueba)..."
         sudo pacman -S --needed --noconfirm tobi-try
 
 
