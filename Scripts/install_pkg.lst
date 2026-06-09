@@ -144,3 +144,6 @@ tree                                                  # Provide a directory tree
 libyaml                                               # YAML 1.1 library
 mise                                                  # The front-end to your dev env
 #user packages
+
+# --------------------------------------------------- // fonts
+ttf-firacode-nerd
