@@ -47,11 +47,11 @@ setup_omarchy() {
 
     # 2. Clonar e inicializar el repositorio
     print_log -g "[OMARCHY] " "Clonando Omarchy desde: https://github.com/${omarchy_repo}.git"
-    
+
     if [[ ${flg_DryRun} -ne 1 ]]; then
         rm -rf "$HOME/.local/share/omarchy/"
         git clone "https://github.com/${omarchy_repo}.git" "$HOME/.local/share/omarchy" >/dev/null
-        
+
         if cd "$HOME/.local/share/omarchy"; then
             print_log -g "[OMARCHY] " "Cambiando a la rama: ${omarchy_ref}"
             git fetch origin "${omarchy_ref}" && git checkout "${omarchy_ref}"
@@ -71,10 +71,10 @@ setup_omarchy() {
         sudo sed -i '/^\[omarchy\]/,/^[[:space:]]*$/d' /etc/pacman.conf
         # Eliminar saltos de línea adicionales al final del archivo
         sudo sed -i -e :a -e '/^\n*$/{$d;N;ba}' /etc/pacman.conf
-        
+
         # Determinar el canal para la URL
         local channel_name="${omarchy_mirror}"
-        
+
         # Agregar el bloque al final de pacman.conf
         sudo tee -a /etc/pacman.conf >/dev/null <<EOF
 
@@ -82,7 +82,7 @@ setup_omarchy() {
 SigLevel = Optional TrustAll
 Server = https://pkgs.omarchy.org/${channel_name}/\$arch
 EOF
-        
+
         # Sincronizar las bases de datos de pacman
 
         print_log -g "[OMARCHY] " -b " :: " "Instalando tobi-try (directorios independientes para cada prueba)..."
@@ -94,7 +94,7 @@ EOF
 
         # 4. Configurar Walker y Elephant (Misma lógica que walker-elephant.sh de Omarchy)
         print_log -g "[OMARCHY] " "Configurando integración de Walker y Elephant..."
-        
+
         # Asegurar la existencia de los directorios necesarios
         mkdir -p "$HOME/.config/autostart"
         mkdir -p "$HOME/.config/systemd/user/app-walker@autostart.service.d"
@@ -151,21 +151,21 @@ setup_ravn() {
 
     # 2. Clonar e inicializar el repositorio
     print_log -g "[RAVN] " "Clonando RaVN desde: https://github.com/${ravn_repo}.git"
-    
+
     if [[ ${flg_DryRun} -ne 1 ]]; then
         rm -rf "$HOME/.local/share/ravn/"
         git clone "https://github.com/${ravn_repo}.git" "$HOME/.local/share/ravn" >/dev/null
-        
+
         if cd "$HOME/.local/share/ravn"; then
             print_log -g "[RAVN] " "Cambiando a la rama: ${ravn_ref}"
             git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}"
-            
+
             # Cambiar origen a SSH si hay llaves SSH configuradas para facilitar los push
             if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
                 print_log -g "[RAVN] " "Llave SSH detectada. Configurando el origen de git a SSH..."
                 git remote set-url origin "git@github.com:${ravn_repo}.git"
             fi
-            
+
             cd - >/dev/null || true
         else
             print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio clonado."
@@ -221,6 +221,7 @@ if [[ ! -d "$HOME/.config/nvim-Lazyman" ]]; then
     prompt_timer 10 "Quieres instalar nvim-lazyman ahora? (Paso tardado) [y/N]"
     if [[ "${PROMPT_INPUT,,}" == "y" ]]; then
       print_log -g "[LAZYMAN] " "Instalando nvim-lazyman..."
+      sudo pacman -S --needed --noconfirm tobi-try
       git clone https://github.com/doctorfree/nvim-lazyman "$HOME/.config/nvim-Lazyman"
       "$HOME/.config/nvim-Lazyman/lazyman.sh"
     else
