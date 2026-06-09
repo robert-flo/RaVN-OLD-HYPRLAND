@@ -132,6 +132,7 @@ libva-utils
 github-cli                                            # The GitHub CLI tool  
 gitkraken                                             # The intuitive, fast, and beautiful cross-platform Git client
 gitkraken-cli                                         # The intuitive, fast, and beautiful cross-platform Git client  
+lazygit                                               # Simple terminal UI for git commands
 
 # --------------------------------------------------- // Dotbare
 dotbare                                               # Manage your dotfiles interactively with fzf
