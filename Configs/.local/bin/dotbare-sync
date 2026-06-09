@@ -5,11 +5,43 @@
 #|--/ /-| Roberto Flores                             |--/ /-|#
 #|/ /---+--------------------------------------------+/ /---|#
 
-scrDir=$(dirname "$(realpath "$0")")
-if ! source "${scrDir}/global_fn.sh"; then
+# Intentar localizar el directorio del clon del repositorio RaVN para importar funciones globales
+find_global_fn() {
+  local search_dirs=(
+    "$CLONE_DIR"
+    "/home/dominus/src/tries/2026-06-07-robert-flo-RaVN"
+    "$HOME/src/tries/2026-06-07-robert-flo-RaVN"
+    "$HOME/src/RaVN"
+    "$HOME/RaVN"
+  )
+  for dir in "${search_dirs[@]}"; do
+    if [[ -n $dir && -d $dir && -f $dir/Scripts/global_fn.sh ]]; then
+      echo "$dir/Scripts/global_fn.sh"
+      return 0
+    fi
+  done
+
+  local found
+  found=$(find "$HOME/src" -maxdepth 4 -type f -name "global_fn.sh" -print -quit 2>/dev/null)
+  if [[ -n $found ]]; then
+    echo "$found"
+    return 0
+  fi
+
+  return 1
+}
+
+global_fn_path=$(find_global_fn)
+if [[ -z $global_fn_path || ! -f $global_fn_path ]]; then
+  echo "Error: No se pudo localizar global_fn.sh. Asegúrate de configurar la variable CLONE_DIR o de que el repositorio esté en ~/src/"
+  exit 1
+fi
+
+if ! source "$global_fn_path"; then
   echo "Error: unable to source global_fn.sh..."
   exit 1
 fi
+
 
 DOTBARE_DIR="${DOTBARE_DIR:-$HOME/.cfg}"
 CfgDir="${cloneDir}/Configs"
