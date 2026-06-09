@@ -37,6 +37,8 @@ if [[ -z $global_fn_path || ! -f $global_fn_path ]]; then
   exit 1
 fi
 
+export CLONE_DIR=$(dirname "$(dirname "$global_fn_path")")
+
 if ! source "$global_fn_path"; then
   echo "Error: unable to source global_fn.sh..."
   exit 1
