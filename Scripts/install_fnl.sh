@@ -206,3 +206,23 @@ if [[ -d "$HOME/.oh-my-zsh" ]]; then
   fi
 fi
 
+# ==============================================================================
+# 5. Instalar nvim-lazyman (Opcional - Paso tardado)
+# ==============================================================================
+if [[ ! -d "$HOME/.config/nvim-Lazyman" ]]; then
+  if [[ ${flg_DryRun} -ne 1 ]]; then
+    prompt_timer 10 "Quieres instalar nvim-lazyman ahora? (Paso tardado) [y/N]"
+    if [[ "${PROMPT_INPUT,,}" == "y" ]]; then
+      print_log -g "[LAZYMAN] " "Instalando nvim-lazyman..."
+      git clone https://github.com/doctorfree/nvim-lazyman "$HOME/.config/nvim-Lazyman"
+      "$HOME/.config/nvim-Lazyman/lazyman.sh"
+    else
+      print_log -y "[LAZYMAN] " "Instalación omitida. Puedes instalarlo manualmente ejecutando: git clone https://github.com/doctorfree/nvim-lazyman \$HOME/.config/nvim-Lazyman && \$HOME/.config/nvim-Lazyman/lazyman.sh"
+    fi
+  else
+    print_log -y "[LAZYMAN] " -b " :: " "Simulación: Se omite la consulta/instalación de nvim-lazyman"
+  fi
+else
+  print_log -g "[LAZYMAN] " "nvim-lazyman ya está instalado."
+fi
+
