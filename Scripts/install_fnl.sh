@@ -194,9 +194,26 @@ setup_ravn
 # ==============================================================================
 # 3. Tweaks finales y otros comandos
 # ==============================================================================
-# Agrega aquí cualquier otra personalización o comandos finales.
-# Ejemplo:
-# print_log -g "[TWEAKS] " "Aplicando tweaks finales..."
+print_log -g "[SSH-AGENT] " "Habilitando e iniciando el socket de ssh-agent para el usuario..."
+if [[ ${flg_DryRun} -ne 1 ]]; then
+    systemctl --user enable --now ssh-agent.socket
+else
+    print_log -y "[SSH-AGENT] " -b " :: " "Simulación: Se omite la habilitación del socket de ssh-agent"
+fi
+
+print_log -g "[SSH-CONFIG] " "Configurando AddKeysToAgent en ~/.ssh/config..."
+if [[ ${flg_DryRun} -ne 1 ]]; then
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    if [ ! -f "$HOME/.ssh/config" ]; then
+        echo -e "Host *\n    AddKeysToAgent yes" > "$HOME/.ssh/config"
+        chmod 600 "$HOME/.ssh/config"
+    elif ! grep -q "AddKeysToAgent" "$HOME/.ssh/config"; then
+        echo -e "\nHost *\n    AddKeysToAgent yes" >> "$HOME/.ssh/config"
+    fi
+else
+    print_log -y "[SSH-CONFIG] " -b " :: " "Simulación: Se omite la configuración de ~/.ssh/config"
+fi
 
 # ==============================================================================
 # 4. Instalar plugin de dotbare para oh-my-zsh
