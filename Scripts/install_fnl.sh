@@ -84,7 +84,8 @@ Server = https://pkgs.omarchy.org/${channel_name}/\$arch
 EOF
         
         # Sincronizar las bases de datos de pacman
-        sudo pacman -Sy
+        print_log -g "[OMARCHY] " -b " :: " "Instalando dependencias necesarias para que omarchy-menu esté disponible y funcional..."
+        sudo pacman -Syu omarchy-walker --noconfirm --needed
     else
         print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la integración de [omarchy] en pacman.conf"
     fi
