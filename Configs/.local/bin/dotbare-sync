@@ -163,7 +163,7 @@ while read -r rel_path; do
       fi
     fi
   fi
-done < <(git --git-dir="$DOTBARE_DIR" ls-files)
+done < <(git --git-dir="$DOTBARE_DIR" --work-tree="$HOME" ls-files)
 
 if (( diff_found == 0 )); then
   print_log -g "[sync-back]" -b " :: " "Todos los archivos rastreados están sincronizados con el repositorio."
