@@ -141,6 +141,9 @@ P|${HOME}/.config|code-flags.conf|visual-studio-code-bin
 P|${HOME}/.config|codium-flags.conf|vscodium
 P|${HOME}/.config|electron-flags.conf|electron
 
+ Browser 
+S|${HOME}/.config/google-chrome|userChrome.css|google-chrome
+
  Notifications 
 S|${HOME}/.config|dunst|dunst
 
