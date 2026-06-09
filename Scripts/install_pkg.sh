@@ -19,13 +19,13 @@ fi
 # 2. Define la sección de bitácora para logs como "package".
 # 3. Invoca la instalación del asistente de AUR (install_aur.sh) usando la variable getAur.
 # 4. Verifica el helper de AUR instalado para guardarlo en la variable aurhlpr.
-# 5. Define el archivo origen de la lista de paquetes (por defecto pkg_core.lst si no se pasa como parámetro).
+# 5. Define el archivo origen de la lista de paquetes (por defecto install_pkg.lst si no se pasa como parámetro).
 flg_DryRun=${flg_DryRun:-0}
 export log_section="package"
 
 "${scrDir}/install_aur.sh" "${getAur}" 2>&1
 chk_list "aurhlpr" "${aurList[@]}"
-listPkg="${1:-"${scrDir}/pkg_core.lst"}"
+listPkg="${1:-"${scrDir}/install_pkg.lst"}"
 archPkg=()
 aurhPkg=()
 ofs=$IFS

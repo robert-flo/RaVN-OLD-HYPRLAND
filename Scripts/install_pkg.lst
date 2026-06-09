@@ -21,6 +21,7 @@ wttrbar                                                # for weather
 python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
 libqalculate                                           # terminal calculator
+konsole                                                # terminal emulator
 
 # --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
@@ -74,6 +75,7 @@ brave-origin-beta-bin                                  # browser
 google-chrome                                          # browser
 microsoft-edge-stable-bin                              # browser 
 kitty                                                  # terminal
+konsole                                                # terminal
 dolphin                                                # kde file manager
 ark                                                    # kde file archiver
 unzip                                                  # extracting zip files
@@ -145,7 +147,6 @@ tree                                                  # Provide a directory tree
 # --------------------------------------------------- // mise
 libyaml                                               # YAML 1.1 library
 mise                                                  # The front-end to your dev env
-#user packages
 
 # --------------------------------------------------- // fonts
 ttf-firacode-nerd

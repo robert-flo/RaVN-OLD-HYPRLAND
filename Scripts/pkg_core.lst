@@ -20,6 +20,8 @@ udiskie                                                # manage removable media
 wttrbar                                                # for weather
 python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
+libqalculate                                           # terminal calculator
+konsole                                                # terminal emulator
 
 # --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
@@ -73,13 +75,15 @@ brave-origin-beta-bin                                  # browser
 google-chrome                                          # browser
 microsoft-edge-stable-bin                              # browser 
 kitty                                                  # terminal
+konsole                                                # terminal
 dolphin                                                # kde file manager
 ark                                                    # kde file archiver
 unzip                                                  # extracting zip files
 vim                                                    # terminal text editor
-# code                                                   # ide text editor
+# code                                                 # ide text editor
 nwg-displays                                           # monitor management utility
 fzf                                                    # Command-line fuzzy finder
+alacritty                                              # GPU-accelerated terminal emulator
 
 # --------------------------------------------------- // Shell
 starship|zsh                                           # customizable shell prompt written in Rust
@@ -130,6 +134,7 @@ libva-utils
 github-cli                                            # The GitHub CLI tool  
 gitkraken                                             # The intuitive, fast, and beautiful cross-platform Git client
 gitkraken-cli                                         # The intuitive, fast, and beautiful cross-platform Git client  
+lazygit                                               # Simple terminal UI for git commands
 
 # --------------------------------------------------- // Dotbare
 dotbare                                               # Manage your dotfiles interactively with fzf
@@ -142,3 +147,6 @@ tree                                                  # Provide a directory tree
 # --------------------------------------------------- // mise
 libyaml                                               # YAML 1.1 library
 mise                                                  # The front-end to your dev env
+
+# --------------------------------------------------- // fonts
+ttf-firacode-nerd
