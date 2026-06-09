@@ -69,6 +69,9 @@ O|${HOME}/.local/lib|hyde|hyprland
 O|${HOME}/.local/share|wallbash|bash imagemagick
 
 
+ Git 
+S|${HOME}/.config|git|git
+
  Editor 
 P|${HOME}/.config/Code - OSS/User|settings.json|code
 P|${HOME}/.config/Code/User|settings.json|visual-studio-code-bin

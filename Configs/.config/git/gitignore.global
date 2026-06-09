@@ -1,0 +1,34 @@
+# Mac Finder
+.DS_Store
+
+# asdf versions
+.tool-versions
+
+# rtx versions
+.rtx.toml
+
+# Worktrees
+.worktrees
+
+# tmuxinator configs
+.tmuxinator.yml
+.tmuxinator.yaml
+
+# env
+.env
+env
+
+# build
+/dist
+/build
+*.o
+\#*#
+
+# node
+/node_modules
+
+# Aider
+.aider*
+
+# claude settings
+.claude/settings.local.json
