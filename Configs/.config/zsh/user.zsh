@@ -20,11 +20,15 @@ fi
 # HYDE_ZSH_COMPINIT_CHECK=1 # Set 24 (hours) per compinit security check // lessens startup time
 # HYDE_ZSH_OMZ_DEFER=1 # Set to 1 to defer loading of oh-my-zsh plugins ONLY if prompt is already loaded
 
+zstyle :omz:plugins:ssh-agent lifetime 24h
+zstyle :omz:plugins:ssh-agent identities id_ed25519
+
 if [[ ${HYDE_ZSH_NO_PLUGINS} != "1" ]]; then
     #  OMZ Plugins 
     # manually add your oh-my-zsh plugins here
     plugins=(
         "sudo"
+        "ssh-agent"
     )
 fi
 

@@ -5,6 +5,7 @@
 
 git                                                     # alias and functions for git commands
 # sudo                                                    # press ESC key twice to execute command with sudo prefix
+ssh-agent                                               # automatically start ssh-agent and load ssh keys
 #python                                                 # alias for python
 zsh-interactive-cd                                     # press tab to change dir with fzf // Manually add this to your .zshrc
 https://github.com/chrissicool/zsh-256color             # enhance terminal environment with 256 colors
