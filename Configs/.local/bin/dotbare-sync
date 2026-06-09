@@ -9,8 +9,7 @@
 find_global_fn() {
   local search_dirs=(
     "$CLONE_DIR"
-    "/home/dominus/src/tries/2026-06-07-robert-flo-RaVN"
-    "$HOME/src/tries/2026-06-07-robert-flo-RaVN"
+    "$HOME/.local/share/ravn"
     "$HOME/src/RaVN"
     "$HOME/RaVN"
   )
