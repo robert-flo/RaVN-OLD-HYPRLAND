@@ -95,6 +95,8 @@ P|${HOME}/.config/starship|starship.toml|starship
 
 
 S|${HOME}|.zshenv|zsh
+S|${HOME}|.profile|bash
+S|${HOME}|.bashrc|bash
 S|${HOME}/.config/zsh|.zshenv|zsh
 S|${HOME}/.config/zsh/conf.d|hyde 00-hyde.zsh|zsh
 S|${HOME}/.config/zsh/functions|error-handlers.zsh|zsh

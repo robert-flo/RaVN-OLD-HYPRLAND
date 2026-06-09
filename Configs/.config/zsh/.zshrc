@@ -47,3 +47,7 @@ if typeset -f _dotbare_completion_cmd >/dev/null; then
   _dotbare_completion_cmd
 fi
 
+# Source shared profile
+if [ -f ~/.profile ]; then
+    . ~/.profile
+fi
