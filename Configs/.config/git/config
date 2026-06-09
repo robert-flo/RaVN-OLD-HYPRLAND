@@ -4,6 +4,9 @@
     signingkey = ~/.ssh/id_ed25519.pub
 
 [alias]
+    br = branch
+    ci = commit
+    st = status
     a = add
     # Ignores whitespace changes, code movement, and renames
     bl = blame -w -C -C -C --color-lines --color-by-age
@@ -42,6 +45,7 @@
 
 [commit]
     gpgSign = true
+    verbose = true
 
 [core]
     editor = nvim
@@ -55,6 +59,8 @@
 
 [diff]
     colorMoved = default
+    algorithm = histogram
+    mnemonicPrefix = true
 
 [fetch]
     prune = true
@@ -64,7 +70,7 @@
     autocorrect = 1
 
 [init]
-    defaultBranch = main
+    defaultBranch = master
 
 [interactive]
     diffFilter = delta --color-only --highlight-removed
@@ -98,11 +104,15 @@
     features = mantis-shrimp
 [rerere]
     enabled = true
+    autoupdate = true
 [column]
     ui = auto
 [branch]
     sort = -committerdate
 [gpg]
     format = ssh
+
+[tag]
+    sort = -version:refname
 
 # gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "Firma de commits (SSH)"
