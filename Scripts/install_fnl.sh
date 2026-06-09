@@ -159,6 +159,13 @@ setup_ravn() {
         if cd "$HOME/.local/share/ravn"; then
             print_log -g "[RAVN] " "Cambiando a la rama: ${ravn_ref}"
             git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}"
+            
+            # Cambiar origen a SSH si hay llaves SSH configuradas para facilitar los push
+            if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
+                print_log -g "[RAVN] " "Llave SSH detectada. Configurando el origen de git a SSH..."
+                git remote set-url origin "git@github.com:${ravn_repo}.git"
+            fi
+            
             cd - >/dev/null || true
         else
             print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio clonado."
