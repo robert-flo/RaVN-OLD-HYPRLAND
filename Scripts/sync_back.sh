@@ -84,13 +84,13 @@ show_menu() {
   return 0
 }
 
-# Preguntar si se desea comparar el árbol completo en Meld directamente
+# Preguntar si se desea comparar el directorio .config en Meld directamente
 if (( has_meld == 1 )); then
-  print_log -g "[sync]" -b " :: " "¿Deseas comparar todo el árbol de Configs con tu \$HOME en Meld? (y/N)"
+  print_log -g "[sync]" -b " :: " "¿Deseas comparar el directorio .config del repositorio con tu ~/.config en Meld? (y/N)"
   read -r ans
   if [[ $ans == [Yy] ]]; then
     print_log -g "[meld]" -b " :: " "Abriendo comparación de directorios..."
-    meld "$CfgDir" "$HOME" &
+    meld "$CfgDir/.config" "$HOME/.config" &
     exit 0
   fi
 fi
