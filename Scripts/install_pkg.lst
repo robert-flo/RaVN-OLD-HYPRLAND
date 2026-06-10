@@ -22,8 +22,8 @@ python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
 libqalculate                                           # terminal calculator
 konsole                                                # terminal emulator
-
-# --------------------------------------------------- // Display Manager
+gum                                                    # A tool for glamorous shell scripts
+ --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
 qt5-quickcontrols                                      # for sddm theme ui elements
 qt5-quickcontrols2                                     # for sddm theme ui elements
