@@ -178,7 +178,7 @@ setup_ravn() {
 }
 
 # Ejecutar configuración de RaVN
-setup_ravn
+# setup_ravn
 
 
 
@@ -200,13 +200,26 @@ setup_npm_tools() {
 
   if [[ -x $npx_installer ]]; then
     if (( flg_DryRun != 1 )); then
-      "$npx_installer" @openai/codex codex
-      "$npx_installer" @google/gemini-cli gemini
-      "$npx_installer" @github/copilot copilot
-      "$npx_installer" opencode-ai opencode
-      "$npx_installer" playwright playwright-cli
-      "$npx_installer" @earendil-works/pi-coding-agent pi
-      "$npx_installer" @kitlangton/ghui ghui
+      local tools=(
+        "@openai/codex:codex"
+        "@google/gemini-cli:gemini"
+        "@github/copilot:copilot"
+        "opencode-ai:opencode"
+        "playwright:playwright-cli"
+        "@earendil-works/pi-coding-agent:pi"
+        "@kitlangton/ghui:ghui"
+      )
+
+      for tool in "${tools[@]}"; do
+        local pkg="${tool%%:*}"
+        local cmd="${tool##*:}"
+        print_log -b "  -> " "Configurando ${pkg} como '${cmd}'..."
+        if "$npx_installer" "${pkg}" "${cmd}"; then
+          print_log -g "     [OK] " "Instalado correctamente en ~/.local/bin/${cmd}"
+        else
+          print_log -r "     [FAIL] " "Fallo al instalar ${pkg}"
+        fi
+      done
     else
       print_log -y "[NPM-NPX] " -b " :: " "Simulación: Se omite la instalación de herramientas npm"
     fi
