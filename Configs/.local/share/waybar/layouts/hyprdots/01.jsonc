@@ -13,7 +13,8 @@
     ],
     "modules-left": [
         "group/pill#left1",
-        "group/pill#left2"
+        "group/pill#left2",
+        "group/pill#spotify"
     ],
     "group/pill#left1": {
         "orientation": "inherit",
@@ -89,4 +90,11 @@
         ],
         "orientation": "inherit"
     },
+
+    "group/pill#spotify": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/spotify"
+        ]
+    }
 }

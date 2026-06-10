@@ -12,7 +12,8 @@
         "$XDG_CONFIG_HOME/waybar/includes/includes.json" 
     ],
     "modules-left": [
-        "group/pill#left"
+        "group/pill#left",
+        "group/pill#spotify"
     ],
     "modules-center": [
         "group/pill#center"
@@ -74,4 +75,11 @@
         ],
         "orientation": "inherit"
     },
+
+    "group/pill#spotify": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/spotify"
+        ]
+    }
 }

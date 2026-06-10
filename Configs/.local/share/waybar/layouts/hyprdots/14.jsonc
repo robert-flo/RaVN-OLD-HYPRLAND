@@ -16,7 +16,8 @@
     // positions generated based on config.ctl //
     "modules-left": [
         "group/pill#left1",
-        "group/pill#left2"
+        "group/pill#left2",
+        "group/pill#spotify"
     ],
     "group/pill#left1": {
         "orientation": "inherit",
@@ -33,8 +34,7 @@
         "orientation": "inherit",
         "modules": [
             "idle_inhibitor",
-            "clock",
-            "custom/spotify"
+            "clock"
         ]
     },
     "modules-center": [
@@ -80,4 +80,11 @@
         ],
         "orientation": "inherit"
     },
+
+    "group/pill#spotify": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/spotify"
+        ]
+    }
 }
