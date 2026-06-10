@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Lyricify
+Comment=Terminal tool to display synced Spotify lyrics
+Exec=kitty --class=lyricify --title="Lyricify" -e lyricify
+Terminal=false
+Icon=spotify
+Categories=AudioVideo;Audio;
+Keywords=Lyrics;Spotify;Music;
+StartupNotify=false
