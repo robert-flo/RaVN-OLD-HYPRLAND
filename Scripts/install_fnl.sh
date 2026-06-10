@@ -45,23 +45,34 @@ setup_omarchy() {
         print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la instalación de git"
     fi
 
-    # 2. Clonar e inicializar el repositorio
-    print_log -g "[OMARCHY] " "Clonando Omarchy desde: https://github.com/${omarchy_repo}.git"
-
-    if [[ ${flg_DryRun} -ne 1 ]]; then
-        rm -rf "$HOME/.local/share/omarchy/"
+    # 2. Clonar/Actualizar e inicializar el repositorio
+    if (( flg_DryRun != 1 )); then
+      if [[ -d $HOME/.local/share/omarchy/.git ]]; then
+        print_log -g "[OMARCHY] " "Actualizando repositorio Omarchy existente..."
+        if cd "$HOME/.local/share/omarchy"; then
+          git remote set-url origin "https://github.com/${omarchy_repo}.git"
+          print_log -g "[OMARCHY] " "Obteniendo cambios de la rama: ${omarchy_ref}"
+          git fetch origin "${omarchy_ref}" && git checkout "${omarchy_ref}" && git reset --hard "origin/${omarchy_ref}"
+          cd - >/dev/null || true
+        else
+          print_log -warn "OMARCHY" "No se pudo acceder al directorio del repositorio existente."
+          return 1
+        fi
+      else
+        print_log -g "[OMARCHY] " "Clonando Omarchy desde: https://github.com/${omarchy_repo}.git"
         git clone "https://github.com/${omarchy_repo}.git" "$HOME/.local/share/omarchy" >/dev/null
 
         if cd "$HOME/.local/share/omarchy"; then
-            print_log -g "[OMARCHY] " "Cambiando a la rama: ${omarchy_ref}"
-            git fetch origin "${omarchy_ref}" && git checkout "${omarchy_ref}"
-            cd - >/dev/null || true
+          print_log -g "[OMARCHY] " "Cambiando a la rama: ${omarchy_ref}"
+          git fetch origin "${omarchy_ref}" && git checkout "${omarchy_ref}"
+          cd - >/dev/null || true
         else
-            print_log -warn "OMARCHY" "No se pudo acceder al directorio del repositorio clonado."
-            return 1
+          print_log -warn "OMARCHY" "No se pudo acceder al directorio del repositorio clonado."
+          return 1
         fi
+      fi
     else
-        print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la clonación de Omarchy"
+      print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la clonación/actualización de Omarchy"
     fi
 
     # 3. Integrar el repositorio [omarchy] en /etc/pacman.conf sin pisar la configuración actual
@@ -150,30 +161,46 @@ setup_ravn() {
         print_log -y "[RAVN] " -b " :: " "Simulación: Se omite la instalación de git"
     fi
 
-    # 2. Clonar e inicializar el repositorio
-    print_log -g "[RAVN] " "Clonando RaVN desde: https://github.com/${ravn_repo}.git"
-
-    if [[ ${flg_DryRun} -ne 1 ]]; then
-        rm -rf "$HOME/.local/share/ravn/"
+    # 2. Clonar/Actualizar e inicializar el repositorio
+    if (( flg_DryRun != 1 )); then
+      if [[ -d $HOME/.local/share/ravn/.git ]]; then
+        print_log -g "[RAVN] " "Actualizando repositorio RaVN existente..."
+        if cd "$HOME/.local/share/ravn"; then
+          # Configurar el origen de git a SSH si hay llaves, o HTTPS de lo contrario
+          if [[ -f $HOME/.ssh/id_ed25519 || -f $HOME/.ssh/id_rsa ]]; then
+            git remote set-url origin "git@github.com:${ravn_repo}.git"
+          else
+            git remote set-url origin "https://github.com/${ravn_repo}.git"
+          fi
+          print_log -g "[RAVN] " "Obteniendo cambios de la rama: ${ravn_ref}"
+          git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}" && git reset --hard "origin/${ravn_ref}"
+          cd - >/dev/null || true
+        else
+          print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio existente."
+          return 1
+        fi
+      else
+        print_log -g "[RAVN] " "Clonando RaVN desde: https://github.com/${ravn_repo}.git"
         git clone "https://github.com/${ravn_repo}.git" "$HOME/.local/share/ravn" >/dev/null
 
         if cd "$HOME/.local/share/ravn"; then
-            print_log -g "[RAVN] " "Cambiando a la rama: ${ravn_ref}"
-            git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}"
+          print_log -g "[RAVN] " "Cambiando a la rama: ${ravn_ref}"
+          git fetch origin "${ravn_ref}" && git checkout "${ravn_ref}"
 
-            # Cambiar origen a SSH si hay llaves SSH configuradas para facilitar los push
-            if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
-                print_log -g "[RAVN] " "Llave SSH detectada. Configurando el origen de git a SSH..."
-                git remote set-url origin "git@github.com:${ravn_repo}.git"
-            fi
+          # Cambiar origen a SSH si hay llaves SSH configuradas para facilitar los push
+          if [[ -f $HOME/.ssh/id_ed25519 || -f $HOME/.ssh/id_rsa ]]; then
+            print_log -g "[RAVN] " "Llave SSH detectada. Configurando el origen de git a SSH..."
+            git remote set-url origin "git@github.com:${ravn_repo}.git"
+          fi
 
-            cd - >/dev/null || true
+          cd - >/dev/null || true
         else
-            print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio clonado."
-            return 1
+          print_log -warn "RAVN" "No se pudo acceder al directorio del repositorio clonado."
+          return 1
         fi
+      fi
     else
-        print_log -y "[RAVN] " -b " :: " "Simulación: Se omite la clonación de RaVN"
+      print_log -y "[RAVN] " -b " :: " "Simulación: Se omite la clonación/actualización de RaVN"
     fi
 }
 
