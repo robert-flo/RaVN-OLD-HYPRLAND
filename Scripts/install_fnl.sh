@@ -279,22 +279,40 @@ setup_spicetify() {
         touch "$HOME/.config/spotify/prefs"
       fi
 
-      # Configurar rutas en spicetify y crear directorio de temas
+      # Configurar rutas en spicetify y crear directorio de temas y extensiones
       mkdir -p "$HOME/.config/spicetify/Themes"
+      mkdir -p "$HOME/.config/spicetify/Extensions"
       spicetify config spotify_path "/opt/spotify" prefs_path "$HOME/.config/spotify/prefs" || true
 
-      if [[ -f $cloneDir/Source/arcs/Spotify_Sleek.tar.gz ]]; then
-        tar -xzf "$cloneDir/Source/arcs/Spotify_Sleek.tar.gz" -C "$HOME/.config/spicetify/Themes/"
+      # Asegurar la existencia de los temas y extensiones
+      # (Si no se restauraron por alguna razón, los creamos o descargamos como fallback)
+      if [[ ! -d $HOME/.config/spicetify/Themes/Sleek ]]; then
+        if [[ -f $cloneDir/Source/arcs/Spotify_Sleek.tar.gz ]]; then
+          print_log -g "[SPICETIFY] " "Extrayendo tema Sleek desde el archivo comprimido (fallback)..."
+          tar -xzf "$cloneDir/Source/arcs/Spotify_Sleek.tar.gz" -C "$HOME/.config/spicetify/Themes/"
+        else
+          print_log -warn "SPICETIFY" "No se encontró el tema Sleek en ~/.config/spicetify/Themes/Sleek."
+        fi
+      fi
+
+      if [[ ! -f $HOME/.config/spicetify/Extensions/adblock.js ]]; then
+        print_log -g "[SPICETIFY] " "Descargando extensión adblock (fallback)..."
+        curl -fsSL https://raw.githubusercontent.com/rxri/spicetify-extensions/main/adblock/adblock.js -o "$HOME/.config/spicetify/Extensions/adblock.js" || true
+      fi
+
+      # Aplicar spicetify si el tema existe
+      if [[ -d $HOME/.config/spicetify/Themes/Sleek ]]; then
         # Inicializar spicetify si es la primera vez
         if [[ ! -d $HOME/.config/spicetify/Backup ]]; then
           spicetify backup apply || true
         fi
         spicetify config current_theme Sleek || true
         spicetify config color_scheme Catppuccin || true
+        spicetify config extensions adblock.js || true
         spicetify apply || true
-        print_log -g "[SPICETIFY] " "Tema Sleek de Spotify configurado y aplicado correctamente."
+        print_log -g "[SPICETIFY] " "Tema Sleek de Spotify (Catppuccin) y adblock configurados y aplicados correctamente."
       else
-        print_log -warn "SPICETIFY" "No se encontró el archivo Spotify_Sleek.tar.gz en Source/arcs."
+        print_log -r "[SPICETIFY] [FAIL] " "No se pudo aplicar el tema Sleek porque el directorio del tema no existe."
       fi
     else
       print_log -y "[SPICETIFY] " -b " :: " "Simulación: Se omite la configuración del tema de Spotify"

@@ -137,6 +137,7 @@ P|${HOME}/.config|libinput-gestures.conf|libinput-gestures
 
  Wayland 
 P|${HOME}/.config|spotify-flags.conf|spotify
+S|${HOME}/.config|spicetify|spicetify-cli
 P|${HOME}/.config|code-flags.conf|code
 P|${HOME}/.config|code-flags.conf|visual-studio-code-bin
 P|${HOME}/.config|codium-flags.conf|vscodium
