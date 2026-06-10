@@ -23,7 +23,11 @@ ncdu                                                   # Terminal Disk Usage Ana
 libqalculate                                           # terminal calculator
 konsole                                                # terminal emulator
 gum                                                    # A tool for glamorous shell scripts
- --------------------------------------------------- // Display Manager
+ripgrep                                                # A search tool that combines the usability of ag with the raw speed of grep
+ripgrep-all                                            # A search tool that combines the usability of ag with the raw speed of grep
+
+
+# --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
 qt5-quickcontrols                                      # for sddm theme ui elements
 qt5-quickcontrols2                                     # for sddm theme ui elements
