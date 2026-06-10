@@ -183,13 +183,40 @@ setup_ravn
 
 
 # ==============================================================================
-# 2. Instalar gemas de Ruby
+# 2. Instalar gemas de Ruby (Desactivado/Ejemplo)
 # ==============================================================================
-# Ejemplo:
 # if pkg_installed ruby; then
 #     print_log -g "[RUBY GEMS] " "Instalando gemas necesarias..."
 #     [ ${flg_DryRun} -eq 1 ] || gem install bundler jekyll
 # fi
+
+# ==============================================================================
+# 2b. Instalar herramientas npm vía omarchy-npx-install
+# ==============================================================================
+setup_npm_tools() {
+  print_log -g "[NPM-NPX] " -b " :: " "Instalando herramientas globales vía omarchy-npx-install..."
+
+  local npx_installer="$HOME/.local/share/omarchy/bin/omarchy-npx-install"
+
+  if [[ -x $npx_installer ]]; then
+    if (( flg_DryRun != 1 )); then
+      "$npx_installer" @openai/codex codex
+      "$npx_installer" @google/gemini-cli gemini
+      "$npx_installer" @github/copilot copilot
+      "$npx_installer" opencode-ai opencode
+      "$npx_installer" playwright playwright-cli
+      "$npx_installer" @earendil-works/pi-coding-agent pi
+      "$npx_installer" @kitlangton/ghui ghui
+    else
+      print_log -y "[NPM-NPX] " -b " :: " "Simulación: Se omite la instalación de herramientas npm"
+    fi
+  else
+    print_log -warn "NPM-NPX" "No se encontró el instalador de npx en ${npx_installer}"
+  fi
+}
+
+setup_npm_tools
+
 
 # ==============================================================================
 # 3. Tweaks finales y otros comandos
