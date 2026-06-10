@@ -108,7 +108,7 @@ gamemode                                               # daemon and library for 
 cava                                                   # audio visualizer
 spotify                                                # proprietary music streaming service
 spicetify-cli                                          # cli to customize spotify client
-lyricify                                               # terminal tool to display synced spotify lyrics
+lyricify                                               # cli to fetch lyrics from Spotify  
 
 # --------------------------------------------------- // Apps
 # neovim                                               # vim based text editor
