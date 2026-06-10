@@ -209,3 +209,240 @@ print_log() {
         cat
     fi
 }
+
+# ==============================================================================
+# Utilidades Profesionales de Instalación (Inspirado en Grok, Starship, Homebrew)
+# ==============================================================================
+
+# ─── Constantes de color con tput (degradación graceful) ─────────────────────
+# Usa tput para portabilidad; si no hay terminal, degrada a string vacío.
+# Referencia: https://github.com/starship/starship/blob/master/install/install.sh
+if [[ -t 1 ]]; then
+    _BOLD="$(tput bold 2>/dev/null || printf '')"
+    _DIM="$(tput dim 2>/dev/null || printf '')"
+    _UNDERLINE="$(tput smul 2>/dev/null || printf '')"
+    _RED="$(tput setaf 1 2>/dev/null || printf '')"
+    _GREEN="$(tput setaf 2 2>/dev/null || printf '')"
+    _YELLOW="$(tput setaf 3 2>/dev/null || printf '')"
+    _BLUE="$(tput setaf 4 2>/dev/null || printf '')"
+    _MAGENTA="$(tput setaf 5 2>/dev/null || printf '')"
+    _CYAN="$(tput setaf 6 2>/dev/null || printf '')"
+    _RESET="$(tput sgr0 2>/dev/null || printf '')"
+else
+    _BOLD="" _DIM="" _UNDERLINE="" _RED="" _GREEN="" _YELLOW=""
+    _BLUE="" _MAGENTA="" _CYAN="" _RESET=""
+fi
+
+# ─── Funciones de logging con iconos Unicode ─────────────────────────────────
+# Patrón Starship: funciones semánticas con indicadores visuales claros.
+info()      { printf '%s\n' "  ${_BOLD}${_CYAN}▸${_RESET} $*"; }
+success()   { printf '%s\n' "  ${_GREEN}✓${_RESET} $*"; }
+warn_msg()  { printf '%s\n' "  ${_YELLOW}⚠${_RESET} $*" >&2; }
+error_msg() { printf '%s\n' "  ${_RED}✗${_RESET} $*" >&2; }
+step()      { printf '%s\n' "${_BOLD}${_BLUE}==>${_RESET}${_BOLD} $*${_RESET}"; }
+
+# ─── Spinner animado con caracteres braille ──────────────────────────────────
+# Muestra una animación mientras un proceso se ejecuta en segundo plano.
+# Uso: long_command & spin $! "Mensaje de operación..."
+# Al terminar, muestra ✓ (éxito) o ✗ (fallo) según el exit code.
+spin() {
+    local pid=$1 msg="${2:-Working...}"
+    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local i=0
+
+    # Si no hay terminal interactiva, solo esperar sin animación
+    if [[ ! -t 1 ]]; then
+        wait "$pid" 2>/dev/null
+        return $?
+    fi
+
+    # Ocultar cursor durante la animación
+    tput civis 2>/dev/null || true
+
+    while kill -0 "$pid" 2>/dev/null; do
+        local char="${spinstr:$i:1}"
+        printf "\r  ${_CYAN}%s${_RESET} %s" "$char" "$msg"
+        i=$(( (i + 1) % ${#spinstr} ))
+        sleep 0.08
+    done
+
+    # Restaurar cursor
+    tput cnorm 2>/dev/null || true
+
+    wait "$pid" 2>/dev/null
+    local exit_code=$?
+
+    if [[ $exit_code -eq 0 ]]; then
+        printf "\r  ${_GREEN}✓${_RESET} %s\n" "$msg"
+    else
+        printf "\r  ${_RED}✗${_RESET} %s\n" "$msg"
+    fi
+    return $exit_code
+}
+
+# ─── Ejecutar con indicador de estado ────────────────────────────────────────
+# Ejecuta un comando con spinner animado. Respeta el modo dry-run.
+# Si el comando usa sudo, pre-valida las credenciales antes de backgroundear
+# para evitar que el spinner sobreescriba el prompt de contraseña.
+# Uso: run_with_status "Sincronizando pacman" sudo pacman -Fy
+run_with_status() {
+    local msg="$1"; shift
+
+    if [[ ${flg_DryRun:-0} -eq 1 ]]; then
+        printf "  ${_YELLOW}⊘${_RESET} ${_DIM}%s (dry-run)${_RESET}\n" "$msg"
+        return 0
+    fi
+
+    # Pre-cachar credenciales de sudo antes de backgroundear el proceso,
+    # para que el prompt de contraseña no pelee con el spinner.
+    if [[ "$1" == "sudo" ]]; then
+        sudo -v 2>/dev/null || true
+    fi
+
+    "$@" &>/dev/null &
+    spin $! "$msg"
+}
+
+# ─── Retry con backoff exponencial ───────────────────────────────────────────
+# Patrón Homebrew: reintenta un comando N veces, duplicando la pausa cada vez.
+# Uso: retry 3 git clone https://github.com/...
+retry() {
+    local max_tries="$1" n="$1" pause=2
+    shift
+
+    if "$@"; then
+        return 0
+    fi
+
+    while (( --n > 0 )); do
+        warn_msg "Reintentando en ${pause}s (${n} intentos restantes): $*"
+        sleep "$pause"
+        (( pause *= 2 ))
+        if "$@"; then
+            return 0
+        fi
+    done
+
+    error_msg "Falló después de ${max_tries} intentos: $*"
+    return 1
+}
+
+# ─── Abstracción de descarga curl/wget ───────────────────────────────────────
+# Patrón Grok: detecta automáticamente el downloader disponible y abstrae
+# las diferencias de interfaz entre curl y wget.
+# Uso: download_file "https://url" "/path/to/output"
+#      download_file "https://url"  # stdout
+download_file() {
+    local url="$1" output="${2:-}"
+
+    if command -v curl &>/dev/null; then
+        if [[ -n "$output" ]]; then
+            curl -fsSL -o "$output" "$url"
+        else
+            curl -fsSL "$url"
+        fi
+    elif command -v wget &>/dev/null; then
+        if [[ -n "$output" ]]; then
+            wget -q -O "$output" "$url"
+        else
+            wget -q -O - "$url"
+        fi
+    else
+        error_msg "Se requiere curl o wget, pero ninguno está instalado"
+        return 1
+    fi
+}
+
+# ─── Clonar o actualizar un repositorio Git ──────────────────────────────────
+# Función genérica que unifica la lógica duplicada de clone/update.
+# Soporta: detección de repo existente, cambio de remote URL, retry automático.
+# Uso: clone_or_update_repo "NOMBRE" "user/repo" "/path/dest" "branch" [ssh]
+clone_or_update_repo() {
+    local name="$1"
+    local repo="$2"
+    local dest="$3"
+    local ref="${4:-master}"
+    local prefer_ssh="${5:-}"  # Pasa "ssh" para preferir SSH si hay llaves
+
+    local remote_url="https://github.com/${repo}.git"
+
+    # Determinar URL de remote (SSH si se solicita y hay llaves)
+    if [[ "$prefer_ssh" == "ssh" ]]; then
+        if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
+            remote_url="git@github.com:${repo}.git"
+            info "Llave SSH detectada. Usando protocolo SSH para ${name}."
+        fi
+    fi
+
+    if [[ ${flg_DryRun:-0} -eq 1 ]]; then
+        printf "  ${_YELLOW}⊘${_RESET} ${_DIM}Clonar/actualizar ${name} (dry-run)${_RESET}\n"
+        return 0
+    fi
+
+    if [[ -d "${dest}/.git" ]]; then
+        info "Actualizando ${name} existente..."
+        git -C "$dest" remote set-url origin "$remote_url" &>/dev/null || true
+        if retry 3 git -C "$dest" fetch origin "$ref" &>/dev/null \
+            && git -C "$dest" checkout "$ref" &>/dev/null \
+            && git -C "$dest" reset --hard "origin/${ref}" &>/dev/null; then
+            success "${name} sincronizado en la rama ${ref}."
+        else
+            error_msg "No se pudo sincronizar ${name}."
+            return 1
+        fi
+    else
+        info "Clonando ${name} desde: ${remote_url}"
+        if retry 3 git clone "$remote_url" "$dest" &>/dev/null; then
+            git -C "$dest" fetch origin "$ref" &>/dev/null \
+                && git -C "$dest" checkout "$ref" &>/dev/null
+
+            # Post-clone: cambiar a SSH si aplica
+            if [[ "$prefer_ssh" == "ssh" ]] && [[ "$remote_url" == git@* ]]; then
+                git -C "$dest" remote set-url origin "$remote_url"
+            fi
+            success "${name} sincronizado en la rama ${ref}."
+        else
+            error_msg "No se pudo clonar ${name}."
+            return 1
+        fi
+    fi
+}
+
+# ─── Contadores de instalación ───────────────────────────────────────────────
+# Llevar registro del estado de cada operación para el resumen final.
+_install_ok=0
+_install_fail=0
+_install_skip=0
+
+count_ok()   { (( _install_ok++   )) || true; }
+count_fail() { (( _install_fail++ )) || true; }
+count_skip() { (( _install_skip++ )) || true; }
+
+# ─── Resumen final tipo dashboard ────────────────────────────────────────────
+# Imprime un resumen visual con bordes Unicode y colores.
+# Calcula dinámicamente el ancho del box para centrar el título.
+print_summary() {
+    local label="${1:-Installation}"
+    local total=$(( _install_ok + _install_fail + _install_skip ))
+
+    # Ancho fijo del contenido interior (39 caracteres visibles)
+    local w=39
+    local title="RaVN ${label} Summary"
+    local title_len=${#title}
+    local pad_left=$(( (w - title_len) / 2 ))
+    local pad_right=$(( w - title_len - pad_left ))
+    local border
+    border=$(printf '─%.0s' $(seq 1 $w))
+
+    echo ""
+    echo "  ${_DIM}┌${border}┐${_RESET}"
+    printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
+    echo "  ${_DIM}├${border}┤${_RESET}"
+    printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:  %-24s${_DIM}│${_RESET}\n" "$_install_ok"
+    printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:  %-24s${_DIM}│${_RESET}\n" "$_install_fail"
+    printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:  %-24s${_DIM}│${_RESET}\n" "$_install_skip"
+    printf "  ${_DIM}│${_RESET}%*s${_DIM}│${_RESET}\n" "$w" ""
+    printf "  ${_DIM}│${_RESET}  Total:      %-25s${_DIM}│${_RESET}\n" "$total"
+    echo "  ${_DIM}└${border}┘${_RESET}"
+    echo ""
+}
