@@ -257,6 +257,56 @@ setup_npm_tools() {
 
 setup_npm_tools
 
+# ==============================================================================
+# 2c. Configurar tema Sleek para Spotify vía Spicetify
+# ==============================================================================
+setup_spicetify() {
+  if pkg_installed spotify && pkg_installed spicetify-cli; then
+    print_log -g "[SPICETIFY] " -b " :: " "Configurando tema Sleek para Spotify..."
+    if (( flg_DryRun != 1 )); then
+      # Asegurar permisos de escritura en la carpeta de Spotify
+      if [[ -d /opt/spotify ]]; then
+        if [[ ! -w /opt/spotify || ! -w /opt/spotify/Apps ]]; then
+          print_log -g "[SPICETIFY] " "Solicitando permisos de escritura para /opt/spotify..."
+          sudo chmod a+wr /opt/spotify
+          sudo chmod a+wr /opt/spotify/Apps -R
+        fi
+      fi
+
+      # Crear archivo dummy de preferencias si no existe
+      mkdir -p "$HOME/.config/spotify"
+      if [[ ! -f $HOME/.config/spotify/prefs ]]; then
+        touch "$HOME/.config/spotify/prefs"
+      fi
+
+      # Configurar rutas en spicetify y crear directorio de temas
+      mkdir -p "$HOME/.config/spicetify/Themes"
+      spicetify config spotify_path "/opt/spotify" prefs_path "$HOME/.config/spotify/prefs" || true
+
+      if [[ -f $cloneDir/Source/arcs/Spotify_Sleek.tar.gz ]]; then
+        tar -xzf "$cloneDir/Source/arcs/Spotify_Sleek.tar.gz" -C "$HOME/.config/spicetify/Themes/"
+        # Inicializar spicetify si es la primera vez
+        if [[ ! -d $HOME/.config/spicetify/Backup ]]; then
+          spicetify backup apply || true
+        fi
+        spicetify config current_theme Sleek || true
+        spicetify config color_scheme Catppuccin || true
+        spicetify apply || true
+        print_log -g "[SPICETIFY] " "Tema Sleek de Spotify configurado y aplicado correctamente."
+      else
+        print_log -warn "SPICETIFY" "No se encontró el archivo Spotify_Sleek.tar.gz en Source/arcs."
+      fi
+    else
+      print_log -y "[SPICETIFY] " -b " :: " "Simulación: Se omite la configuración del tema de Spotify"
+    fi
+  else
+    print_log -y "[SPICETIFY] " -b " :: " "Spotify o Spicetify-cli no están instalados. Omitiendo..."
+  fi
+}
+
+setup_spicetify
+
+
 
 # ==============================================================================
 # 3. Tweaks finales y otros comandos
