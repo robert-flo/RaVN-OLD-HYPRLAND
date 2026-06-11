@@ -233,9 +233,9 @@ setup_spicetify() {
 
       # Aplicar spicetify si el tema existe
       if [[ -d $HOME/.config/spicetify/Themes/Sleek ]]; then
-        # Inicializar spicetify si es la primera vez
+        # Inicializar backup de Spicetify (comando actualizado para v2.x)
         if [[ ! -d $HOME/.config/spicetify/Backup ]]; then
-          spicetify backup apply &>/dev/null || true
+          run_with_status "Creando backup de Spicetify" spicetify backup
         fi
         spicetify config current_theme Sleek &>/dev/null || true
         spicetify config color_scheme Catppuccin &>/dev/null || true
