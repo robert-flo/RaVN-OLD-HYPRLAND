@@ -22,6 +22,10 @@ python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
 libqalculate                                           # terminal calculator
 konsole                                                # terminal emulator
+gum                                                    # A tool for glamorous shell scripts
+ripgrep                                                # A search tool that combines the usability of ag with the raw speed of grep
+ripgrep-all                                            # A search tool that combines the usability of ag with the raw speed of grep
+
 
 # --------------------------------------------------- // Display Manager
 sddm                                                   # display manager for KDE plasma
@@ -104,6 +108,7 @@ gamemode                                               # daemon and library for 
 cava                                                   # audio visualizer
 spotify                                                # proprietary music streaming service
 spicetify-cli                                          # cli to customize spotify client
+lyricify                                               # cli to fetch lyrics from Spotify  
 
 # --------------------------------------------------- // Apps
 # neovim                                               # vim based text editor

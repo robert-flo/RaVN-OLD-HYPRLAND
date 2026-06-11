@@ -136,9 +136,7 @@ setup_ravn() {
 }
 
 # Ejecutar configuración de RaVN
-# setup_ravn
-
-
+setup_ravn
 
 # ==============================================================================
 # 2. Instalar gemas de Ruby (Desactivado/Ejemplo)
