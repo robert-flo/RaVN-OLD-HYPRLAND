@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Hermes Web
+Comment=Hermes Web Dashboard
+Exec=omarchy-launch-webapp http://127.0.0.1:9119
+Terminal=false
+Icon=/home/dominus/.local/share/applications/icons/Hermes.png
+StartupNotify=true
+Path=/home/dominus
