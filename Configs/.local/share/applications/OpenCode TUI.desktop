@@ -7,4 +7,4 @@ Exec=xdg-terminal-exec --app-id=TUI.tile -e opencode
 Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/OpenCode.png
 StartupNotify=true
-Path=/home/dominus/Work
+Path=/home/dominus/src

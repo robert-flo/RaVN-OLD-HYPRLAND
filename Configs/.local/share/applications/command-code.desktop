@@ -7,4 +7,4 @@ Exec=xdg-terminal-exec --app-id=TUI.tile -e cmd
 Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/command-code.png
 StartupNotify=true
-Path=/home/dominus/Work
+Path=/home/dominus/src

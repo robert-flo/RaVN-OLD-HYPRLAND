@@ -10,4 +10,4 @@ StartupNotify=true
 StartupWMClass=opencode-desktop
 MimeType=x-scheme-handler/opencode;
 Categories=Development;
-Path=/home/dominus/Work
+Path=/home/dominus/src
