@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Grok Build
+Comment=Grok Build CLI / xAI Agent
+Exec=xdg-terminal-exec --app-id=TUI.tile -e grok
+Terminal=false
+Icon=/home/dominus/.local/share/applications/icons/Grok AI.png
+StartupNotify=true
+Path=/home/dominus/Work
