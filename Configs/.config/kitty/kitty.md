@@ -16,4 +16,6 @@ Kitty is a fast, feature-rich, GPU-based terminal emulator. [find out more](http
 | <kbd>Ctrl</kbd> + <kbd>Alt + Enter</kbd> | Split Horizontally (hsplit) |
 | <kbd>Ctrl</kbd> + <kbd>Alt + S</kbd> | Split Vertically (vsplit) |
 | <kbd>Ctrl</kbd> + <kbd>Alt + R</kbd> | Rotate Layout |
+| <kbd>Ctrl</kbd> + <kbd>Alt + Left/Right/Up/Down</kbd> | Navigate splits (Arrows) |
+| <kbd>Ctrl</kbd> + <kbd>Alt + H/J/K/L</kbd> | Navigate splits (Vim keys) |
 | <kbd>F11</kbd> / <kbd>Super</kbd> + <kbd>Enter</kbd> | Toggle Fullscreen |

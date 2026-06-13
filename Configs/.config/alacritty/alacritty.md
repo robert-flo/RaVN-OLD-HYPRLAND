@@ -21,3 +21,8 @@ Alacritty is a cross-platform, GPU-accelerated terminal emulator. [find out more
 | <kbd>Ctrl</kbd> + <kbd>Tab</kbd>           | Next Tab        |
 | <kbd>F11</kbd> / <kbd>Super</kbd> + <kbd>Enter</kbd> | Toggle Fullscreen |
 
+> [!NOTE]
+> **División de Ventanas (Splits):**
+> A diferencia de Kitty, Alacritty no tiene soporte nativo para dividir la pantalla en paneles. Si deseas usar atajos para navegar entre paneles (`Ctrl` + `Alt` + `H/J/K/L` o `Flechas`), debes usar un multiplexor de terminal como **tmux** o **zellij**
+
+
