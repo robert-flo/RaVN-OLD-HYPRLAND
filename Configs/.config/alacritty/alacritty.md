@@ -19,3 +19,5 @@ Alacritty is a cross-platform, GPU-accelerated terminal emulator. [find out more
 | <kbd>Ctrl</kbd> + <kbd>Shift + Space</kbd> | Vi mode         |
 | <kbd>Ctrl</kbd> + <kbd>Shift + Tab</kbd>   | Previous Tab    |
 | <kbd>Ctrl</kbd> + <kbd>Tab</kbd>           | Next Tab        |
+| <kbd>F11</kbd> / <kbd>Super</kbd> + <kbd>Enter</kbd> | Toggle Fullscreen |
+
