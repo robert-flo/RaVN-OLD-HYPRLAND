@@ -25,6 +25,8 @@ konsole                                                # terminal emulator
 gum                                                    # A tool for glamorous shell scripts
 ripgrep                                                # A search tool that combines the usability of ag with the raw speed of grep
 ripgrep-all                                            # A search tool that combines the usability of ag with the raw speed of grep
+ufw                                                    # Uncomplicated Firewall
+
 
 
 # --------------------------------------------------- // Display Manager
@@ -111,6 +113,8 @@ spicetify-cli                                          # cli to customize spotif
 lyricify                                               # cli to fetch lyrics from Spotify  
 
 # --------------------------------------------------- // Apps
+localsend                                              # Share files and folders locally
+nautilus-python                                        # Python bindings for Nautilus
 # neovim                                               # vim based text editor
 
 # --------------------------------------------------- // zsh

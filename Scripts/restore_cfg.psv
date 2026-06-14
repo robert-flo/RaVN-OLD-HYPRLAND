@@ -131,6 +131,8 @@ S|${HOME}/.config|kdeglobals|dolphin
 S|${HOME}/.local/share/kio/servicemenus|hydewallpaper.desktop|dolphin
 S|${HOME}/.local/share/kxmlgui5|dolphin|dolphin
 S|${HOME}/.local/share|dolphin|dolphin
+S|${HOME}/.local/share/nautilus-python/extensions|localsend.py|localsend nautilus-python
+
 
  Input 
 P|${HOME}/.config|libinput-gestures.conf|libinput-gestures

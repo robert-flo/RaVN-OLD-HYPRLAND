@@ -266,6 +266,32 @@ setup_spicetify
 # ==============================================================================
 step "Tweaks del sistema"
 
+setup_firewall() {
+  info "Configurando reglas de firewall UFW para LocalSend..."
+  if command -v ufw &>/dev/null; then
+    if (( flg_DryRun != 1 )); then
+      # Validamos si el servicio ufw está activo
+      if systemctl is-active --quiet ufw; then
+        run_with_status "Permitiendo puerto 53317/udp para localsend" sudo ufw allow 53317/udp
+        run_with_status "Permitiendo puerto 53317/tcp para localsend" sudo ufw allow 53317/tcp
+        success "Reglas de firewall configuradas correctamente para localsend."
+        count_ok
+      else
+        warn_msg "UFW está instalado pero el servicio no está activo."
+        count_skip
+      fi
+    else
+      print_log -y "[UFW] " -b " :: " "Simulación: Se omite la configuración del firewall"
+      count_skip
+    fi
+  else
+    info "UFW no está instalado. Omitiendo configuración de firewall."
+    count_skip
+  fi
+}
+
+setup_firewall
+
 info "Habilitando socket de ssh-agent para el usuario..."
 if [[ ${flg_DryRun} -ne 1 ]]; then
     if systemctl --user enable --now ssh-agent.socket 2>/dev/null; then
