@@ -172,3 +172,6 @@ P|${HOME}/.config/hypr|hypridle.conf|hypridle
 
  Bluelight filter daemon 
 P|${HOME}/.config/hypr|hyprsunset.conf|hyprsunset
+
+ Fontconfig Emoji Fallback 
+S|${HOME}/.config|fontconfig|noto-fonts-emoji
