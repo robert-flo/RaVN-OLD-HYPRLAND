@@ -25,3 +25,9 @@ style = "Regular"
 
 [selection]
 save_to_clipboard = true
+
+[scrolling]
+history = 10000
+
+[bell]
+duration = 0
