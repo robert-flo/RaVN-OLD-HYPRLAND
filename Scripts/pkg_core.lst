@@ -22,7 +22,7 @@ python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
 libqalculate                                           # terminal calculator
 konsole                                                # terminal emulator
-gum                                                    # A tool for glamorous shell scripts
+gum                                                    # Used for interactive menus, spinners, and styling the UI
 ripgrep                                                # A search tool that combines the usability of ag with the raw speed of grep
 ripgrep-all                                            # A search tool that combines the usability of ag with the raw speed of grep
 ufw                                                    # Uncomplicated Firewall
@@ -90,6 +90,8 @@ vim                                                    # terminal text editor
 nwg-displays                                           # monitor management utility
 fzf                                                    # Command-line fuzzy finder
 alacritty                                              # GPU-accelerated terminal emulator
+yt-dlp                                                 # The media downloading engine
+ffmpeg                                                 # Required by yt-dlp to merge audio/video streams and extract MP3
 
 # --------------------------------------------------- // Shell
 starship|zsh                                           # customizable shell prompt written in Rust

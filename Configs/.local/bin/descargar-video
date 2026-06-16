@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#
+# Script: descargar-video
+# Description: Interactive media downloader using yt-dlp and gum.
+# Dependencies:
+#   - yt-dlp : The media downloading engine
+#   - gum    : Used for interactive menus, spinners, and styling the UI
+#   - ffmpeg : Required by yt-dlp to merge audio/video streams and extract MP3
+#
+# Usage:
+#   descargar-video <VIDEO_URL>
+#
+# Flow:
+#   1. Check if a URL argument is provided.
+#   2. Ensure $HOME/Videos exists.
+#   3. Present a styled interactive prompt to select Video (MKV) or Audio (MP3).
+#   4. Execute download via yt-dlp with progress output, embedding metadata & thumbnails.
+#
+
+# 1. Validar que se pasó un argumento (el enlace)
+if [ -z "$1" ]; then
+    gum style --foreground 210 "✕ Error: Debes pasar la URL del video como parámetro."
+    echo "Uso: $(basename "$0") <URL_DEL_VIDEO>"
+    exit 1
+fi
+
+URL="$1"
+TARGET_DIR="$HOME/Videos"
+
+# 2. Crear la carpeta ~/Videos si no existe
+if [ ! -d "$TARGET_DIR" ]; then
+    gum spin --spinner dot --title "Creando la carpeta $TARGET_DIR..." -- sleep 1
+    mkdir -p "$TARGET_DIR"
+fi
+
+# 3. Preguntar al usuario qué formato prefiere usando gum choose
+gum style --foreground 99 "═ Descargador de Medios ════════════════"
+OPTION=$(gum choose --cursor.foreground=99 "1. Video Completo (Máxima Calidad)" "2. Solo Audio (MP3 Extraído)")
+
+# 4. Ejecutar la descarga según la opción elegida
+cd "$TARGET_DIR" || exit 1
+
+if [[ "$OPTION" == *"Video Completo"* ]]; then
+    gum style --foreground 46 "➜ Descargando video en máxima calidad..."
+    
+    # Ejecutamos yt-dlp. Pasamos el progreso limpio a gum para que se vea estético
+    yt-dlp -f "bv*+ba/best" \
+           --continue \
+           --embed-metadata \
+           --embed-thumbnail \
+           --merge-output-format mkv \
+           "$URL"
+
+elif [[ "$OPTION" == *"Solo Audio"* ]]; then
+    gum style --foreground 46 "➜ Descargando y convirtiendo a MP3..."
+    
+    yt-dlp -f "ba/best" \
+           --continue \
+           --extract-audio \
+           --audio-format mp3 \
+           --audio-quality 0 \
+           --embed-metadata \
+           --embed-thumbnail \
+           "$URL"
+fi
+
+# 5. Mensaje de éxito
+if [ $? -eq 0 ]; then
+    gum style --foreground 46 --bold "✔ ¡Descarga completada con éxito en $TARGET_DIR!"
+else
+    gum style --foreground 196 --bold "✕ Algo salió mal durante la descarga."
+fi
