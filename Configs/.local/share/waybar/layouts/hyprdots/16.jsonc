@@ -60,6 +60,7 @@
             "custom/cpuinfo",
             "custom/sensorsinfo",
             "custom/swaync",
+            "custom/screenrecording",
             "custom/hyde-menu"
         ]
     },

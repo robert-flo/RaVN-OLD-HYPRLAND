@@ -84,6 +84,7 @@
         "orientation": "inherit",
         "modules": [
             "custom/cliphist",
+            "custom/screenrecording",
             "custom/hyde-menu",
             "custom/power"
         ]

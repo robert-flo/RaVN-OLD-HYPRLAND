@@ -57,11 +57,19 @@
       "custom/sensorsinfo",
       "custom/swaync",
       "custom/dunst",
+      "custom/screenrecording",
       "custom/hyde-menu"
     ]
   },
   "group/pill-in#clipboard": {
     "orientation": "inherit",
     "modules": ["custom/clipboard"]
+  },
+  "custom/screenrecording": {
+    "exec": "pgrep -f '^gpu-screen-recorder' >/dev/null && echo '{\"text\": \"󰻂\", \"tooltip\": \"Recording... Click to Stop\", \"class\": \"active\"}' || echo '{\"text\": \"\", \"tooltip\": \"Left: Record Menu | Right: Capture Menu\"}'",
+    "return-type": "json",
+    "interval": 2,
+    "on-click": "pgrep -f '^gpu-screen-recorder' >/dev/null && omarchy-capture-screenrecording || omarchy-menu screenrecord",
+    "on-click-right": "omarchy-menu capture"
   }
 }
