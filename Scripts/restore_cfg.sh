@@ -61,7 +61,7 @@ deploy_list() {
 					[[ ${flg_DryRun} -ne 1 ]] && mkdir -p "${BkpDir}${tgt}"
 				fi
 
-				if [ "${ovrWrte}" == "Y" ]; then
+				if [ "${ovrWrte}" == "Y" ] || [ "${flg_Overwrite}" -eq 1 ]; then
 					[[ ${flg_DryRun} -ne 1 ]] && mv "${pth}/${cfg_chk}" "${BkpDir}${tgt}"
 				else
 
@@ -78,7 +78,7 @@ deploy_list() {
 			if [ ! -f "${pth}/${cfg_chk}" ]; then
 				[[ ${flg_DryRun} -ne 1 ]] && cp -r "${CfgDir}${tgt}/${cfg_chk}" "${pth}"
 				echo -e "\033[0;32m[restore]\033[0m ${pth} <-- ${CfgDir}${tgt}/${cfg_chk}..."
-			elif [ "${ovrWrte}" == "Y" ]; then
+			elif [ "${ovrWrte}" == "Y" ] || [ "${flg_Overwrite}" -eq 1 ]; then
 				[[ ${flg_DryRun} -ne 1 ]] && cp -r "${CfgDir}${tgt}/${cfg_chk}" "${pth}"
 				echo -e "\033[0;33m[overwrite]\033[0m ${pth} <-- ${CfgDir}${tgt}/${cfg_chk}..."
 			else
@@ -120,6 +120,10 @@ deploy_psv() {
 		pth=$(eval "echo ${pth}")
 		cfg=$(awk -F '|' '{print $3}' <<<"${lst}")
 		pkg=$(awk -F '|' '{print $4}' <<<"${lst}")
+
+		if [ "${flg_Overwrite}" -eq 1 ] && [ "${ctlFlag}" = "P" ]; then
+			ctlFlag="S"
+		fi
 
 		if [[ "${ctlFlag}" = "I" ]]; then
 			print_log -r "[ignore] :: " "${pth}/${cfg}"
@@ -356,6 +360,7 @@ uv_hook() {
 # 7. Resguardo de la información de versión y registros de cambios (CHANGELOG).
 log_section="deploy"
 flg_DryRun=${flg_DryRun:-0}
+flg_Overwrite=${flg_Overwrite:-0}
 
 scrDir=$(dirname "$(realpath "$0")")
 if ! source "${scrDir}/global_fn.sh"; then

@@ -52,9 +52,10 @@ flg_DryRun=0
 flg_Shell=0
 flg_Nvidia=1
 flg_ThemeInstall=1
+flg_Overwrite=0
 
 # A continuación, recorre los argumentos pasados por la línea de comandos usando un ciclo:
-# while getopts idrstmnh RunStep; do:
+# while getopts idrstmnho RunStep; do:
 #
 # -i : Activa la instalación (flg_Install=1).
 # -d : Activa la instalación y define use_default="--noconfirm" para proceder sin confirmación del usuario.
@@ -64,9 +65,10 @@ flg_ThemeInstall=1
 # -h : Activa la reevaluación de la shell (flg_Shell=1) y lo registra.
 # -t : Activa el modo simulación (flg_DryRun=1).
 # -m : Desactiva la reinstalación de temas (flg_ThemeInstall=0).
+# -o : Fuerza la sobreescritura de los archivos de destino (flg_Overwrite=1).
 # Cualquier otra opción: Muestra un menú de ayuda (Usage) detallando las opciones disponibles
 # y las combinaciones correctas de argumentos, y finaliza el script con código de salida 1.
-while getopts idrstmnh RunStep; do
+while getopts idrstmnho RunStep; do
 	case $RunStep in
 	i) flg_Install=1 ;;
 	d)
@@ -87,6 +89,7 @@ while getopts idrstmnh RunStep; do
 		;;
 	t) flg_DryRun=1 ;;
 	m) flg_ThemeInstall=0 ;;
+	o) flg_Overwrite=1 ;;
 	*)
 		cat <<EOF
 Usage: $0 [options]
@@ -94,10 +97,11 @@ Usage: $0 [options]
             d : install hyprland [d]efaults without configs --noconfirm
             r : [r]estore config files
             s : enable system [s]ervices
-            n : ignore/[n]o [n]vidia actions (-irsn to ignore nvidia)
+            n : ignore/[n]o [n]nvidia actions (-irsn to ignore nvidia)
             h : re-evaluate S[h]ell
             m : no the[m]e reinstallations
             t : [t]est run without executing (-irst to dry run all)
+            o : [o]verwrite target files always
 
 NOTE:
         running without args is equivalent to -irs
@@ -116,7 +120,7 @@ done
 # Define la variable RAVN_LOG con la marca de tiempo actual y exporta las banderas 
 # de configuración y log para que estén disponibles en subprocesos externos.
 RAVN_LOG="$(date +'%y%m%d_%Hh%Mm%Ss')"
-export flg_DryRun flg_Nvidia flg_Shell flg_Install flg_ThemeInstall RAVN_LOG
+export flg_DryRun flg_Nvidia flg_Shell flg_Install flg_ThemeInstall RAVN_LOG flg_Overwrite
 
 # Gestiona el comportamiento de ejecución basándose en los argumentos provistos:
 # - Si se especificó el modo de prueba (dry-run), se imprime un mensaje de estado.
@@ -124,7 +128,13 @@ export flg_DryRun flg_Nvidia flg_Shell flg_Install flg_ThemeInstall RAVN_LOG
 #   defecto los procesos de instalación, restauración y activación de servicios.
 if [ "${flg_DryRun}" -eq 1 ]; then
 	print_log -n "[test-run] " -b "enabled :: " "Testing without executing"
-elif [ $OPTIND -eq 1 ]; then
+fi
+
+if [ "${flg_Overwrite}" -eq 1 ]; then
+	print_log -y "[overwrite] " -b "enabled :: " "Always overwriting target files"
+fi
+
+if [ $OPTIND -eq 1 ]; then
 	flg_Install=1
 	flg_Restore=1
 	flg_Service=1
