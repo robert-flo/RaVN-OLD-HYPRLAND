@@ -24,7 +24,7 @@
 
 RaVN relies on `dotbare` for tracking active dotfiles in `$HOME`, with clean versions mirrored in the `Configs/` subdirectory of the repository.
 
-1. **Adding files to tracking:** To add a configuration target to the restore system, insert a row in [restore_cfg.psv](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/Scripts/restore_cfg.psv) using the format:
+1. **Adding files to tracking:** To add a configuration target to the restore system, insert a row in [restore_cfg.psv](Scripts/restore_cfg.psv) using the format:
    ```text
    Flag|${HOME}/path/to/directory|file_name|dependency
    ```
@@ -36,11 +36,11 @@ RaVN relies on `dotbare` for tracking active dotfiles in `$HOME`, with clean ver
    - `I` (Install/Import) - Imports or configures associated packages.
 
 2. **Committing active changes:** Use `dotbare` commands (e.g., `dotbare fstat`, `dotbare commit`, `dotbare push`) to commit system-level configurations to the playthrough bare repo.
-3. **Syncing back to the repository:** Use `dotbare-sync` (or [sync_back.sh](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/Scripts/sync_back.sh)) to copy modifications from active `$HOME` back to `RaVN/Configs/` templates. Verify additions with `git diff` inside the RaVN repo.
+3. **Syncing back to the repository:** Use `dotbare-sync` (or [sync_back.sh](Scripts/sync_back.sh)) to copy modifications from active `$HOME` back to `RaVN/Configs/` templates. Verify additions with `git diff` inside the RaVN repo.
 
 # Helper Functions
 
-Always prioritize the helper functions imported from [global_fn.sh](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/Scripts/global_fn.sh) over raw shell commands:
+Always prioritize the helper functions imported from [global_fn.sh](Scripts/global_fn.sh) over raw shell commands:
 
 - **Logging:** Use `info`, `success`, `warn_msg`, `error_msg`, `step`, and `print_log` for unified, semantic output with visual indicators.
 - **Process Feedback:** Wrap long actions in `spin <pid> [msg]` or run them directly using `run_with_status "message" <command>` to show an interactive Braille spinner.
@@ -60,7 +60,7 @@ Always prioritize the helper functions imported from [global_fn.sh](file:///home
 
 # Branching & Release Policy
 
-Refer to [RELEASE_POLICY.md](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/RELEASE_POLICY.md) for details:
+Refer to [RELEASE_POLICY.md](RELEASE_POLICY.md) for details:
 - **`dev`**: The active branch for all features and PRs.
 - **`rc`** (Release Candidate): Receives a merge from `dev` on the penúltimo Friday of the month. Frozen for regression testing and bug fixes only.
 - **`master`**: Receives a merge from `rc` on the last Friday of the month for the official monthly version release (tagged as `YY.M`).
@@ -148,7 +148,7 @@ When the user requests a durable behavior change, record it here or in the relev
 
 ## Child DOX Index
 
-- [Configs/AGENTS.md](file:///home/dominus/.local/share/ravn/Configs/AGENTS.md) - Configuration templates and restore definitions.
-- [Scripts/AGENTS.md](file:///home/dominus/.local/share/ravn/Scripts/AGENTS.md) - Automation, package install, and update scripts.
-  - [Scripts/ravnvm/AGENTS.md](file:///home/dominus/.local/share/ravn/Scripts/ravnvm/AGENTS.md) - NixOS virtualization environment settings.
-- [Source/AGENTS.md](file:///home/dominus/.local/share/ravn/Source/AGENTS.md) - Binary archives, themes, fonts, and graphical assets.
+- [Configs/AGENTS.md](Configs/AGENTS.md) - Configuration templates and restore definitions.
+- [Scripts/AGENTS.md](Scripts/AGENTS.md) - Automation, package install, and update scripts.
+  - [Scripts/ravnvm/AGENTS.md](Scripts/ravnvm/AGENTS.md) - NixOS virtualization environment settings.
+- [Source/AGENTS.md](Source/AGENTS.md) - Binary archives, themes, fonts, and graphical assets.

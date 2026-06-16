@@ -54,4 +54,4 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 
 # Child DOX Index
 
-- [ravnvm/AGENTS.md](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/Scripts/ravnvm/AGENTS.md) — NixOS VM tool for contributor testing.
+- [ravnvm/AGENTS.md](ravnvm/AGENTS.md) — NixOS VM tool for contributor testing.

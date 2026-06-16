@@ -9,7 +9,7 @@ Owned by the RaVN installer pipeline. Changes here propagate to user systems on 
 # Local Contracts
 
 - **Mirror layout**: Directory structure under `Configs/` must match the target path relative to `$HOME`. If a file deploys to `$HOME/.config/hypr/hyprland.conf`, it lives at `Configs/.config/hypr/hyprland.conf`.
-- **Tracking**: Every deployable file or directory must have a corresponding row in [restore_cfg.psv](file:///home/dominus/src/tries/2026-06-16-robert-flo-RaVN/Scripts/restore_cfg.psv) with the appropriate flag (`P`, `S`, `O`, `B`, or `I`).
+- **Tracking**: Every deployable file or directory must have a corresponding row in [restore_cfg.psv](../Scripts/restore_cfg.psv) with the appropriate flag (`P`, `S`, `O`, `B`, or `I`).
 - **Sync direction**: Active system configs flow back here via `dotbare-sync` / `sync_back.sh`. Never hand-edit a config in `Configs/` if the live version in `$HOME` is the authoritative copy — sync it back first.
 - **No runtime artifacts**: This directory holds only clean template state. Do not commit generated caches, sockets, or runtime data.
 
