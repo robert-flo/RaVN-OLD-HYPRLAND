@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#
+# Script: descargar-video-x
+# Description: Descargador interactivo de medios para la red social X (Twitter) usando yt-dlp y gum.
+# Dependencies:
+#   - yt-dlp : El motor de descarga de medios
+#   - gum    : Utilizado para menús interactivos y estilos de la interfaz de usuario
+#   - ffmpeg : Requerido por yt-dlp para fusionar flujos y extraer MP3
+#
+# Usage:
+#   descargar-video-x <X_POST_URL>
+#
+
+# 1. Validar que se pasó un argumento (el enlace de X)
+if [ -z "$1" ]; then
+    gum style --foreground 210 "✕ Error: Debes pasar la URL del post de X como parámetro."
+    echo "Uso: $(basename "$0") <URL_DE_X>"
+    exit 1
+fi
+
+URL="$1"
+TARGET_DIR="$HOME/Videos"
+
+# 2. Crear la carpeta ~/Videos si no existe
+if [ ! -d "$TARGET_DIR" ]; then
+    gum spin --spinner dot --title "Creando la carpeta $TARGET_DIR..." -- sleep 1
+    mkdir -p "$TARGET_DIR"
+fi
+
+# 3. Preguntar al usuario qué formato prefiere usando gum choose
+gum style --foreground 117 "═ Descargador para X (Twitter) ══════════"
+OPTION=$(gum choose --cursor.foreground=117 "1. Video Completo (Máxima Calidad MP4)" "2. Solo Audio (MP3 Extraído)")
+
+# 4. Ejecutar la descarga según la opción elegida
+cd "$TARGET_DIR" || exit 1
+
+if [[ "$OPTION" == *"Video Completo"* ]]; then
+    gum style --foreground 46 "➜ Descargando video de X en máxima calidad..."
+    
+    # Ejecutamos yt-dlp usando cookies de Chrome y forzando la mejor combinación en MP4
+    yt-dlp --cookies-from-browser chrome \
+           -f "bestvideo+bestaudio/best" \
+           --continue \
+           --embed-metadata \
+           --embed-thumbnail \
+           --merge-output-format mp4 \
+           "$URL"
+
+elif [[ "$OPTION" == *"Solo Audio"* ]]; then
+    gum style --foreground 46 "➜ Descargando audio de X y convirtiendo a MP3..."
+    
+    # Útil para Spaces de X o clips musicales
+    yt-dlp --cookies-from-browser chrome \
+           -f "bestaudio/best" \
+           --continue \
+           --extract-audio \
+           --audio-format mp3 \
+           --audio-quality 0 \
+           --embed-metadata \
+           --embed-thumbnail \
+           "$URL"
+fi
+
+# 5. Mensaje de éxito o error
+if [ $? -eq 0 ]; then
+    gum style --foreground 46 --bold "✔ ¡Descarga de X completada con éxito en $TARGET_DIR!"
+else
+    gum style --foreground 196 --bold "✕ Algo salió mal. Asegúrate de tener Chrome abierto o con la sesión de X iniciada."
+fi
+
