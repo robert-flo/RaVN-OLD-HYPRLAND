@@ -353,6 +353,24 @@ download_file() {
     fi
 }
 
+# ─── Descarga silenciosa con spinner braille ─────────────────────────────────
+# Descarga un archivo desde una URL mostrando el spinner braille de estado.
+# Uso: download_with_spinner "https://url" "/path/to/output" ["Mensaje del spinner"]
+#
+# Ejemplos:
+#   # Uso estándar (mostrará "Descargando...")
+#   download_with_spinner "https://url-del-archivo" "/ruta/salida"
+#
+#   # Uso con mensaje personalizado
+#   download_with_spinner "https://url-del-archivo" "/ruta/salida" "Descargando recursos gráficos..."
+download_with_spinner() {
+  local url="$1" output="$2" msg="${3:-Descargando...}"
+
+  download_file "$url" "$output" &>/dev/null &
+  spin $! "$msg"
+}
+
+
 # ─── Clonar o actualizar un repositorio Git ──────────────────────────────────
 # Función genérica que unifica la lógica duplicada de clone/update.
 # Soporta: detección de repo existente, cambio de remote URL, retry automático.
