@@ -7,3 +7,5 @@ Exec=omarchy-launch-webapp http://127.0.0.1:18789
 Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/OpenClaw.png
 StartupNotify=true
+Categories=WebApps;Network;
+Keywords=web;webapp;browser;

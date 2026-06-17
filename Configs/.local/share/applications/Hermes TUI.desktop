@@ -8,3 +8,5 @@ Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/Hermes.png
 StartupNotify=true
 Path=/home/dominus
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;

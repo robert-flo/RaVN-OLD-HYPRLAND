@@ -7,3 +7,5 @@ Terminal=false
 Type=Application
 Icon=/home/dominus/.local/share/applications/icons/Disk Usage.png
 StartupNotify=true
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;

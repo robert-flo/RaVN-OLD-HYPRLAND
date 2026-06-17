@@ -8,3 +8,5 @@ Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/Antigravity CLI.png
 StartupNotify=true
 Path=/home/dominus/src
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;

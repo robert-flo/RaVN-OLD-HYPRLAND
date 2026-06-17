@@ -7,3 +7,5 @@ Terminal=false
 Type=Application
 Icon=/home/dominus/.local/share/applications/icons/Figma.png
 StartupNotify=true
+Categories=WebApps;Network;
+Keywords=web;webapp;browser;

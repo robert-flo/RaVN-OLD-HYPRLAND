@@ -7,3 +7,5 @@ Exec=omarchy-launch-webapp https://aistudio.xiaomimimo.com/#/c
 Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/mimo.png
 StartupNotify=true
+Categories=WebApps;Network;
+Keywords=web;webapp;browser;

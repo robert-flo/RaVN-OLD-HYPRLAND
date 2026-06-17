@@ -7,3 +7,5 @@ Exec=xdg-terminal-exec --app-id=TUI.tile -e openclaw tui --session main
 Terminal=false
 Icon=/home/dominus/.local/share/applications/icons/OpenClaw.png
 StartupNotify=true
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;

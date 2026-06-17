@@ -7,3 +7,5 @@ Terminal=false
 Type=Application
 Icon=/home/dominus/.local/share/applications/icons/Docker.png
 StartupNotify=true
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;
