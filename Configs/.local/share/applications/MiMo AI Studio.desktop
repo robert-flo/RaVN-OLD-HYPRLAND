@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=MiMo AI Studio
+Comment=MiMo AI Studio Web App
+Exec=omarchy-launch-webapp https://aistudio.xiaomimimo.com/#/c
+Terminal=false
+Icon=/home/dominus/.local/share/applications/icons/mimo.png
+StartupNotify=true
