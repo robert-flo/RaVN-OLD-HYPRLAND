@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Qwen Coder
+Comment=Qwen Coder
+Exec=omarchy-launch-webapp https://coder.qwen.ai/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/Qwen ai.png
+StartupNotify=true
