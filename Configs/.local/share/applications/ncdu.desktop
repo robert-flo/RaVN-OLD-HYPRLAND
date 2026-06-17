@@ -6,6 +6,6 @@ Exec=kitty --class=ncdu --title="Disk Usage Analyzer" -e ncdu
 Terminal=false
 Type=Application
 Keywords=Storage;Disk;Space;Analyzer;
-Icon=harddisk
+Icon=/home/dominus/.local/share/applications/icons/ncdu.png
 Categories=Utility;System;
 StartupNotify=false
