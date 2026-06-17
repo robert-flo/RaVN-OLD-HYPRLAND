@@ -25,6 +25,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 | `install_pre.sh` | Pre-install checks and setup |
 | `install_pkg.sh` | Package installation logic |
 | `install_pst.sh` | Post-install tweaks |
+| `install_custom.sh` | Custom installers runner — runs curl \| bash external installers (Option C) |
 | `install_fnl.sh` | Final setup and cleanup |
 | `install_aur.sh` | AUR helper bootstrap |
 | `chaotic_aur.sh` | Chaotic-AUR mirror configuration |
