@@ -1,6 +1,0 @@
-# RaVN Framework v1 — Configuration
-# Global settings for the bootstrap pipeline.
-
-dry_run = false
-parallel = false
-max_retries = 3

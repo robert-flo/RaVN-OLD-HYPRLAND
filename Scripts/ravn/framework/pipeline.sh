@@ -20,6 +20,15 @@ run_task() {
   local name="${PACKAGE:-$(basename "$file" .sh)}"
   local log="${log_dir}/${name}.log"
 
+  # ── Configuration registry gate: skip if disabled in packages.conf ──
+  if [[ -f "${RAVN_DIR}/config/packages.conf" ]]; then
+    if grep -q "^${name}=false" "${RAVN_DIR}/config/packages.conf"; then
+      info "${name}: Deshabilitado en la configuración. Omitiendo."
+      count_skip "$name"
+      return 0
+    fi
+  fi
+
   # ── Interactive gate ──
   if [[ $INTERACTIVE == true ]]; then
     prompt_timer 10 "¿Instalar ${name}? (${DESCRIPTION:-sin descripción}) [y/N]"

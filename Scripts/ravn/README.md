@@ -31,8 +31,8 @@ ravn/
 │   └── 30-system/              # System tweaks (firewall, SSH) — runs last
 │
 ├── config/                     # Configuration files
-│   ├── ravn.toml               # Framework settings
-│   └── packages.toml           # Package enable/disable (future)
+│   ├── ravn.conf               # Framework settings
+│   └── packages.conf           # Package enable/disable (active)
 │
 ├── cache/                      # Runtime data (gitignored)
 │   ├── logs/                   # Per-package log files
