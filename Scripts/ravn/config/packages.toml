@@ -1,0 +1,8 @@
+# RaVN Framework v1 — Package Registry
+# Reserved for future enable/disable of individual task modules.
+#
+# Example:
+#   [packages]
+#   omarchy = true
+#   spicetify = true
+#   nvim-lazyman = false
