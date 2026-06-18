@@ -471,20 +471,31 @@ print_item_list() {
     return
   fi
 
-  local clean_prefix
-  clean_prefix=$(echo -e "$prefix" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')
-  local indent_len=${#clean_prefix}
-
-  printf "%s %s" "$prefix" "${items[0]}"
-  local i
-  for (( i = 1; i < total_items; i++ )); do
-    if (( i % 4 == 0 )); then
-      printf ",\n%*s%s" $(( indent_len + 1 )) "" "${items[i]}"
-    else
-      printf ", %s" "${items[i]}"
-    fi
-  done
-  printf "\n"
+  if (( total_items <= 3 )); then
+    local list_str=""
+    local item
+    for item in "${items[@]}"; do
+      if [[ -z $list_str ]]; then
+        list_str="$item"
+      else
+        list_str="$list_str, $item"
+      fi
+    done
+    printf "%s %s\n" "$prefix" "$list_str"
+  else
+    printf "%s\n" "$prefix"
+    local indent="      "
+    printf "%s%s" "$indent" "${items[0]}"
+    local i
+    for (( i = 1; i < total_items; i++ )); do
+      if (( i % 4 == 0 )); then
+        printf ",\n%s%s" "$indent" "${items[i]}"
+      else
+        printf ", %s" "${items[i]}"
+      fi
+    done
+    printf "\n"
+  fi
 }
 
 # ─── Resumen final tipo dashboard ────────────────────────────────────────────
@@ -507,11 +518,11 @@ print_summary() {
   echo "  ${_DIM}┌${border}┐${_RESET}"
   printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
   echo "  ${_DIM}├${border}┤${_RESET}"
-  printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:  %-24s${_DIM}│${_RESET}\n" "$_install_ok"
-  printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:  %-24s${_DIM}│${_RESET}\n" "$_install_fail"
-  printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:  %-24s${_DIM}│${_RESET}\n" "$_install_skip"
-  printf "  ${_DIM}│${_RESET}%*s${_DIM}│${_RESET}\n" "$w" ""
-  printf "  ${_DIM}│${_RESET}  Total:      %-25s${_DIM}│${_RESET}\n" "$total"
+  printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:%25s ${_DIM}│${_RESET}\n" "$_install_ok"
+  printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:%25s ${_DIM}│${_RESET}\n" "$_install_fail"
+  printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:%25s ${_DIM}│${_RESET}\n" "$_install_skip"
+  echo "  ${_DIM}├${border}┤${_RESET}"
+  printf "  ${_DIM}│${_RESET}  Total:${_BOLD}%30s${_RESET} ${_DIM}│${_RESET}\n" "$total"
   echo "  ${_DIM}└${border}┘${_RESET}"
   echo ""
 
