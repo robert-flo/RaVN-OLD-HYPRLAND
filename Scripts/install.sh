@@ -438,8 +438,7 @@ if (( flg_Install == 1 )) && (( flg_Restore == 1 )); then
 
 EOF
 
-	"${scrDir}/install_fnl.sh"
-	"${scrDir}/install_custom.sh"
+	"${scrDir}/ravn/setup.sh"
 fi
 
 # ==============================================================================

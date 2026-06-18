@@ -118,18 +118,26 @@ nvidia_detect() {
 #   Si se pulsa cualquier tecla, detiene la espera inmediatamente. Finalmente exporta la variable
 #   PROMPT_INPUT con el carácter ingresado y reestablece el modo seguro (set -e).
 prompt_timer() {
-    set +e
-    unset PROMPT_INPUT
-    local timsec=$1
-    local msg=$2
-    while [[ ${timsec} -ge 0 ]]; do
-        echo -ne "\r :: ${msg} (${timsec}s) : "
-        read -rt 1 -n 1 PROMPT_INPUT && break
-        ((timsec--))
-    done
-    export PROMPT_INPUT
-    echo ""
-    set -e
+  set +e
+  unset PROMPT_INPUT
+  local timsec=$1
+  local msg=$2
+  local use_tty=0
+  if [[ -t 0 ]] && { true < /dev/tty; } 2>/dev/null; then
+    use_tty=1
+  fi
+  while [[ ${timsec} -ge 0 ]]; do
+    echo -ne "\r :: ${msg} (${timsec}s) : "
+    if (( use_tty )); then
+      read -rt 1 -n 1 PROMPT_INPUT < /dev/tty && break
+    else
+      read -rt 1 -n 1 PROMPT_INPUT && break
+    fi
+    ((timsec--))
+  done
+  export PROMPT_INPUT
+  echo ""
+  set -e
 }
 print_log() {
     local executable="${0##*/}"
@@ -431,36 +439,104 @@ clone_or_update_repo() {
 _install_ok=0
 _install_fail=0
 _install_skip=0
+_install_ok_list=()
+_install_fail_list=()
+_install_skip_list=()
 
-count_ok()   { (( _install_ok++   )) || true; }
-count_fail() { (( _install_fail++ )) || true; }
-count_skip() { (( _install_skip++ )) || true; }
+count_ok() {
+  (( _install_ok++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_ok_list+=("$1")
+  fi
+}
+count_fail() {
+  (( _install_fail++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_fail_list+=("$1")
+  fi
+}
+count_skip() {
+  (( _install_skip++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_skip_list+=("$1")
+  fi
+}
+
+print_item_list() {
+  local prefix="$1"
+  shift
+  local items=("$@")
+  local total_items=${#items[@]}
+  if (( total_items == 0 )); then
+    return
+  fi
+
+  if (( total_items <= 3 )); then
+    local list_str=""
+    local item
+    for item in "${items[@]}"; do
+      if [[ -z $list_str ]]; then
+        list_str="$item"
+      else
+        list_str="$list_str, $item"
+      fi
+    done
+    printf "%s %s\n" "$prefix" "$list_str"
+  else
+    printf "%s\n" "$prefix"
+    local indent="      "
+    printf "%s%s" "$indent" "${items[0]}"
+    local i
+    for (( i = 1; i < total_items; i++ )); do
+      if (( i % 4 == 0 )); then
+        printf ",\n%s%s" "$indent" "${items[i]}"
+      else
+        printf ", %s" "${items[i]}"
+      fi
+    done
+    printf "\n"
+  fi
+}
 
 # ─── Resumen final tipo dashboard ────────────────────────────────────────────
 # Imprime un resumen visual con bordes Unicode y colores.
 # Calcula dinámicamente el ancho del box para centrar el título.
 print_summary() {
-    local label="${1:-Installation}"
-    local total=$(( _install_ok + _install_fail + _install_skip ))
+  local label="${1:-Installation}"
+  local total=$(( _install_ok + _install_fail + _install_skip ))
 
-    # Ancho fijo del contenido interior (39 caracteres visibles)
-    local w=39
-    local title="RaVN ${label} Summary"
-    local title_len=${#title}
-    local pad_left=$(( (w - title_len) / 2 ))
-    local pad_right=$(( w - title_len - pad_left ))
-    local border
-    border=$(printf '─%.0s' $(seq 1 $w))
+  # Ancho fijo del contenido interior (39 caracteres visibles)
+  local w=39
+  local title="RaVN ${label} Summary"
+  local title_len=${#title}
+  local pad_left=$(( (w - title_len) / 2 ))
+  local pad_right=$(( w - title_len - pad_left ))
+  local border
+  border=$(printf '─%.0s' $(seq 1 $w))
 
+  echo ""
+  echo "  ${_DIM}┌${border}┐${_RESET}"
+  printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
+  echo "  ${_DIM}├${border}┤${_RESET}"
+  printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:%25s ${_DIM}│${_RESET}\n" "$_install_ok"
+  printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:%25s ${_DIM}│${_RESET}\n" "$_install_fail"
+  printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:%25s ${_DIM}│${_RESET}\n" "$_install_skip"
+  echo "  ${_DIM}├${border}┤${_RESET}"
+  printf "  ${_DIM}│${_RESET}  Total:${_BOLD}%30s${_RESET} ${_DIM}│${_RESET}\n" "$total"
+  echo "  ${_DIM}└${border}┘${_RESET}"
+  echo ""
+
+  if (( total > 0 )); then
+    echo "  ${_BOLD}Detalles:${_RESET}"
+    if (( ${#_install_ok_list[@]} > 0 )); then
+      print_item_list "    ${_GREEN}✓${_RESET} ${_BOLD}Exitosos (${#_install_ok_list[@]}):${_RESET}" "${_install_ok_list[@]}"
+    fi
+    if (( ${#_install_fail_list[@]} > 0 )); then
+      print_item_list "    ${_RED}✗${_RESET} ${_BOLD}Fallidos (${#_install_fail_list[@]}):${_RESET}" "${_install_fail_list[@]}"
+    fi
+    if (( ${#_install_skip_list[@]} > 0 )); then
+      print_item_list "    ${_YELLOW}⊘${_RESET} ${_BOLD}Omitidos (${#_install_skip_list[@]}):${_RESET}" "${_install_skip_list[@]}"
+    fi
     echo ""
-    echo "  ${_DIM}┌${border}┐${_RESET}"
-    printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
-    echo "  ${_DIM}├${border}┤${_RESET}"
-    printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:  %-24s${_DIM}│${_RESET}\n" "$_install_ok"
-    printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:  %-24s${_DIM}│${_RESET}\n" "$_install_fail"
-    printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:  %-24s${_DIM}│${_RESET}\n" "$_install_skip"
-    printf "  ${_DIM}│${_RESET}%*s${_DIM}│${_RESET}\n" "$w" ""
-    printf "  ${_DIM}│${_RESET}  Total:      %-25s${_DIM}│${_RESET}\n" "$total"
-    echo "  ${_DIM}└${border}┘${_RESET}"
-    echo ""
+  fi
 }

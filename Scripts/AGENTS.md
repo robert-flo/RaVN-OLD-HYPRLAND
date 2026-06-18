@@ -10,7 +10,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 
 - **Shebang rule**: Standard scripts use `#!/usr/bin/env bash`. Migration scripts under `migrations/` use `#!/usr/bin/env sh` (POSIX compliant).
 - **Custom Installers (`installers/`)**: Modular, unattended installer scripts placed under `installers/` (e.g. `02-tui/`) that define `PACKAGE`, `CHECK` (the executable name checkable by `command -v`), and an `install()` function.
-- **Pipeline Order**: Core integrations (e.g., Omarchy, RaVN) must be set up first in `install_fnl.sh`. Asynchronous custom package installations must run next in `install_custom.sh` to ensure package dependency helpers (like `omarchy-npx-install`) are already in place.
+- **Pipeline Order**: Final configuration is handled by `ravn/setup.sh`, which replaces the monolithic `install_fnl.sh` + `install_custom.sh`. It auto-discovers task modules under `ravn/tasks/` and runs them through the framework lifecycle pipeline. Core integrations (Omarchy, RaVN) run first via sorted numeric prefixes in `ravn/tasks/core/`.
 - **Spinner Safe Invocation**: In scripts with `set -e` enabled, wrap `spin` invocations using `spin "$pid" "msg" || status=$?` to capture the exit status without triggering premature shell termination.
 - **Restore system**: `restore_cfg.psv` is the tracking manifest for config deployment. `restore_cfg.sh` reads it. See root AGENTS.md § Configuration Tracking for flag semantics.
 - **Version metadata**: `version.sh` exports repo metadata (`RAVN_VERSION`, `RAVN_BRANCH`, etc.) from git tags and commits.
@@ -26,8 +26,9 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 | `install_pre.sh` | Pre-install checks and setup |
 | `install_pkg.sh` | Package installation logic |
 | `install_pst.sh` | Post-install tweaks |
-| `install_custom.sh` | Custom installers runner — runs curl \| bash external installers (Option C) |
-| `install_fnl.sh` | Final system configuration tweaks and core integrations (Omarchy, RaVN) |
+| `install_custom.sh` | Custom installers runner — runs curl \| bash external installers (Option C). Superseded by `ravn/setup.sh` |
+| `install_fnl.sh` | Final system configuration tweaks (legacy). Superseded by `ravn/setup.sh` |
+| `ravn/setup.sh` | RaVN Framework v1 entrypoint — modular bootstrap pipeline. See child DOX |
 | `install_aur.sh` | AUR helper bootstrap |
 | `chaotic_aur.sh` | Chaotic-AUR mirror configuration |
 | `restore_cfg.sh` | Config deployment from `Configs/` via `restore_cfg.psv` |
@@ -44,6 +45,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 
 - `extra/` — Optional scripts: Flatpak install (`install_fpk.sh`), kernel module install (`install_mod.sh`), app restore (`restore_app.sh`), desktop link restore (`restore_lnk.sh`), drive mount helper (`drivext_mnt.sh`).
 - `migrations/` — Version-tagged POSIX scripts run by `install.sh` during updates. Named `v<semver>.sh`.
+- `ravn/` — RaVN Framework v1: modular bootstrap framework with auto-discovered task modules. See child DOX.
 - `ravnvm/` — NixOS-based VM tool for testing RaVN branches. See child DOX.
 
 ## Adding a migration
@@ -56,4 +58,5 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 
 # Child DOX Index
 
+- [ravn/AGENTS.md](ravn/AGENTS.md) — RaVN Framework v1: modular bootstrap pipeline and task modules.
 - [ravnvm/AGENTS.md](ravnvm/AGENTS.md) — NixOS VM tool for contributor testing.
