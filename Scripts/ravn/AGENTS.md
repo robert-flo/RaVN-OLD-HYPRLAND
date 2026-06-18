@@ -41,7 +41,7 @@ Owned by the RaVN installer pipeline. Called by `install.sh` as a replacement fo
 - `tasks/10-apps/` — Application configs and CLI tools (Spicetify, Dotbare, TUI CLIs via npx)
 - `tasks/20-shell/` — Shell environment modules (reserved)
 - `tasks/30-system/` — System tweaks (firewall, SSH agent, SSH config). Runs last.
-- `config/` — TOML configuration files
+- `config/` — Configuration files (`.conf` format)
 - `cache/logs/` — Per-package log output (gitignored)
 - `cache/state/` — Persistent state data (gitignored)
 - `docs/` — Documentation

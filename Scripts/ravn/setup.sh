@@ -17,8 +17,15 @@ export scrDir
 # shellcheck disable=SC1091
 source "${RAVN_DIR}/global_fn.sh"
 
-# ─── Inherit flags from parent installer ─────────────────────────────────────
-flg_DryRun=${flg_DryRun:-0}
+# ─── Inherit flags from parent installer or load from configuration ──────────
+if [[ -z ${flg_DryRun:-} ]]; then
+  if [[ -f "${RAVN_DIR}/config/ravn.conf" ]] && grep -q "^dry_run=true" "${RAVN_DIR}/config/ravn.conf"; then
+    flg_DryRun=1
+  else
+    flg_DryRun=0
+  fi
+fi
+export flg_DryRun
 
 # ─── Source framework modules ────────────────────────────────────────────────
 for fw in "${RAVN_DIR}"/framework/*.sh; do
