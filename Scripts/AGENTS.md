@@ -9,8 +9,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 # Local Contracts
 
 - **Shebang rule**: Standard scripts use `#!/usr/bin/env bash`. Migration scripts under `migrations/` use `#!/usr/bin/env sh` (POSIX compliant).
-- **Custom Installers (`installers/`)**: Modular, unattended installer scripts placed under `installers/` (e.g. `02-tui/`) that define `PACKAGE`, `CHECK` (the executable name checkable by `command -v`), and an `install()` function.
-- **Pipeline Order**: Final configuration is handled by `ravn/setup.sh`, which replaces the monolithic `install_fnl.sh` + `install_custom.sh`. It auto-discovers task modules under `ravn/tasks/` and runs them through the framework lifecycle pipeline. Core integrations (Omarchy, RaVN) run first via sorted numeric prefixes in `ravn/tasks/core/`.
+- **Pipeline Order**: Final configuration is handled by `ravn/setup.sh`, which replaces the legacy monolithic scripts (`install_fnl.sh` and `install_custom.sh`). It auto-discovers task modules under `ravn/tasks/` and runs them through the framework lifecycle pipeline. Core integrations (Omarchy, RaVN) run first via sorted numeric prefixes in `ravn/tasks/00-core/`.
 - **Spinner Safe Invocation**: In scripts with `set -e` enabled, wrap `spin` invocations using `spin "$pid" "msg" || status=$?` to capture the exit status without triggering premature shell termination.
 - **Restore system**: `restore_cfg.psv` is the tracking manifest for config deployment. `restore_cfg.sh` reads it. See root AGENTS.md § Configuration Tracking for flag semantics.
 - **Version metadata**: `version.sh` exports repo metadata (`RAVN_VERSION`, `RAVN_BRANCH`, etc.) from git tags and commits.
@@ -26,7 +25,6 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 | `install_pre.sh` | Pre-install checks and setup |
 | `install_pkg.sh` | Package installation logic |
 | `install_pst.sh` | Post-install tweaks |
-| `install_custom.sh` | Custom installers runner — runs curl \| bash external installers (Option C). Superseded by `ravn/setup.sh` |
 | `install_fnl.sh` | Final system configuration tweaks (legacy). Superseded by `ravn/setup.sh` |
 | `ravn/setup.sh` | RaVN Framework v1 entrypoint — modular bootstrap pipeline. See child DOX |
 | `install_aur.sh` | AUR helper bootstrap |
