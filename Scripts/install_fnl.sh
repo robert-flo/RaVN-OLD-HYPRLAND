@@ -147,46 +147,7 @@ setup_ravn
 # fi
 
 # ==============================================================================
-# 2b. Instalar herramientas npm vía omarchy-npx-install
-# ==============================================================================
-setup_npm_tools() {
-  step "Instalando herramientas globales vía omarchy-npx-install"
 
-  local npx_installer="$HOME/.local/share/omarchy/bin/omarchy-npx-install"
-
-  if [[ -x $npx_installer ]]; then
-    if (( flg_DryRun != 1 )); then
-      local tools=(
-        "@openai/codex:codex"
-        "@google/gemini-cli:gemini"
-        "@github/copilot:copilot"
-        "opencode-ai:opencode"
-        "playwright:playwright-cli"
-        "@earendil-works/pi-coding-agent:pi"
-        "@kitlangton/ghui:ghui"
-      )
-
-      for tool in "${tools[@]}"; do
-        local pkg="${tool%%:*}"
-        local cmd="${tool##*:}"
-        if run_with_status "Configurando ${pkg} → ${cmd}" "$npx_installer" "${pkg}" "${cmd}"; then
-          count_ok
-        else
-          error_msg "Fallo al instalar ${pkg}"
-          count_fail
-        fi
-      done
-    else
-      print_log -y "[NPM-NPX] " -b " :: " "Simulación: Se omite la instalación de herramientas npm"
-      count_skip
-    fi
-  else
-    warn_msg "No se encontró el instalador de npx en ${npx_installer}"
-    count_skip
-  fi
-}
-
-setup_npm_tools
 
 # ==============================================================================
 # 2c. Configurar tema Sleek para Spotify vía Spicetify

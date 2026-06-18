@@ -9,8 +9,9 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 # Local Contracts
 
 - **Shebang rule**: Standard scripts use `#!/usr/bin/env bash`. Migration scripts under `migrations/` use `#!/usr/bin/env sh` (POSIX compliant).
-- **Shared library**: Source `global_fn.sh` via `source "${scrDir}/global_fn.sh"` at the top of every script that needs logging, spinners, or package helpers. Do not redefine those utilities locally.
-- **Package lists**: `pkg_core.lst` and `pkg_extra.lst` define installable packages. `install_pkg.lst` is the resolved list consumed at install time. Use `install_pkg.sh` to process them.
+- **Custom Installers (`installers/`)**: Modular, unattended installer scripts placed under `installers/` (e.g. `02-tui/`) that define `PACKAGE`, `CHECK` (the executable name checkable by `command -v`), and an `install()` function.
+- **Pipeline Order**: Core integrations (e.g., Omarchy, RaVN) must be set up first in `install_fnl.sh`. Asynchronous custom package installations must run next in `install_custom.sh` to ensure package dependency helpers (like `omarchy-npx-install`) are already in place.
+- **Spinner Safe Invocation**: In scripts with `set -e` enabled, wrap `spin` invocations using `spin "$pid" "msg" || status=$?` to capture the exit status without triggering premature shell termination.
 - **Restore system**: `restore_cfg.psv` is the tracking manifest for config deployment. `restore_cfg.sh` reads it. See root AGENTS.md § Configuration Tracking for flag semantics.
 - **Version metadata**: `version.sh` exports repo metadata (`RAVN_VERSION`, `RAVN_BRANCH`, etc.) from git tags and commits.
 
@@ -26,7 +27,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 | `install_pkg.sh` | Package installation logic |
 | `install_pst.sh` | Post-install tweaks |
 | `install_custom.sh` | Custom installers runner — runs curl \| bash external installers (Option C) |
-| `install_fnl.sh` | Final setup and cleanup |
+| `install_fnl.sh` | Final system configuration tweaks and core integrations (Omarchy, RaVN) |
 | `install_aur.sh` | AUR helper bootstrap |
 | `chaotic_aur.sh` | Chaotic-AUR mirror configuration |
 | `restore_cfg.sh` | Config deployment from `Configs/` via `restore_cfg.psv` |

@@ -13,121 +13,76 @@ mkdir -p "$LOG_DIR"
 
 TASKS=()
 
-INSTALLED=0
-SKIPPED=0
-FAILED=0
-
 discover_tasks() {
-
-    mapfile -t TASKS < <(
-        find "${scrDir}/installers" \
-            -type f \
-            -name "*.sh" |
-            sort
-    )
-
-}
-
-spinner() {
-
-    local pid=$1
-    local delay=.08
-
-    local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
-
-    while kill -0 "$pid" 2>/dev/null; do
-        for frame in "${frames[@]}"; do
-            printf "\r%s " "$frame"
-            sleep "$delay"
-        done
-    done
+  mapfile -t TASKS < <(
+    find "${scrDir}/installers" \
+      -type f \
+      -name "*.sh" |
+      sort
+  )
 }
 
 run_task() {
+  local file="$1"
 
-    local file="$1"
+  unset PACKAGE
+  unset CHECK
 
-    unset PACKAGE
-    unset CHECK
+  source "$file"
 
-    source "$file"
+  local name="$PACKAGE"
 
-    local name="$PACKAGE"
+  if command -v "$CHECK" &>/dev/null; then
+    success "$name: skipped"
+    count_skip
+    return
+  fi
 
-    printf "%-18s" "$name"
+  local log="${LOG_DIR}/${name}.log"
 
-    if command -v "$CHECK" &>/dev/null; then
-        success "󰄬 skipped"
-        ((++SKIPPED))
-        return
-    fi
+  local start
+  start=$(date +%s)
 
-    local log="${LOG_DIR}/${name}.log"
+  (
+    install
+  ) >"$log" 2>&1 &
 
-    local start
-    start=$(date +%s)
+  local pid=$!
 
-    (
-        install
-    ) >"$log" 2>&1 &
+  local status=0
+  spin "$pid" "Installing $name" || status=$?
 
-    local pid=$!
+  local end
+  end=$(date +%s)
+  local elapsed=$((end-start))
 
-    spinner "$pid"
-
-    wait "$pid"
-
-    local status=$?
-    local end
-    end=$(date +%s)
-    local elapsed=$((end-start))
-
-    if ((status == 0)); then
-        printf "\r"
-        success "󰄬 ${elapsed}s"
-        ((++INSTALLED))
-    else
-        printf "\r"
-        error_msg "󰄲 failed"
-        info "󰈔 ${log}"
-        ((++FAILED))
-    fi
+  if ((status == 0)); then
+    info "Installed $name in ${elapsed}s"
+    count_ok
+  else
+    info "Log: ${log}"
+    count_fail
+  fi
 }
 
 run_pipeline() {
+  local start
+  start=$(date +%s)
 
-    local start
-    start=$(date +%s)
+  echo
+  info "Bootstrap started"
+  echo
 
-    echo
-    info "󰋼 Bootstrap started"
-    echo
+  for file in "${TASKS[@]}"; do
+    run_task "$file"
+  done
 
-    for file in "${TASKS[@]}"; do
-        run_task "$file"
-    done
+  local end
+  end=$(date +%s)
 
-    local end
-    end=$(date +%s)
+  print_summary "Bootstrap"
 
-    echo
-    echo "────────────────────────────"
-    echo
-
-    info "󱐋 Summary"
-    echo
-
-    success "󰄬 Installed : $INSTALLED"
-    success "󰄬 Skipped   : $SKIPPED"
-
-    if ((FAILED)); then
-        error_msg "󰄲 Failed    : $FAILED"
-    else
-        success "󰄬 Failed    : 0"
-    fi
-
-    echo
-    info "Completed in $((end-start))s"
+  info "Completed in $((end-start))s"
 }
 
 main() {
