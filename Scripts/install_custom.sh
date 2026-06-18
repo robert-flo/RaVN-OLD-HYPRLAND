@@ -1,46 +1,138 @@
 #!/usr/bin/env bash
 
-# Setup working directory and source global functions
-scrDir="$(dirname "$(realpath "$0")")"
+set -Eeuo pipefail
+
+scrDir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 source "${scrDir}/global_fn.sh"
 
-# ==============================================================================
-# Custom Installers (Option C)
-# ==============================================================================
+CACHE_DIR="${HOME}/.cache/bootstrap"
+LOG_DIR="${CACHE_DIR}/logs"
 
-install_mimo() {
-  if ! command -v mimo &>/dev/null; then
-    step "Instalando MiMoCode..."
-    # Descargamos y ejecutamos con el paso de argumentos específico
-    curl -fsSL https://mimo.xiaomi.com/install | bash -s -- --no-modify-path
-  else
-    success "MiMoCode ya está instalado, saltando."
-  fi
+mkdir -p "$LOG_DIR"
+
+TASKS=()
+
+INSTALLED=0
+SKIPPED=0
+FAILED=0
+
+discover_tasks() {
+
+    mapfile -t TASKS < <(
+        find "${scrDir}/installers" \
+            -type f \
+            -name "*.sh" |
+            sort
+    )
+
 }
 
-# Ejemplo de otro instalador personalizado:
-# install_rust() {
-#   if ! command -v rustc &>/dev/null; then
-#     step "Instalando Rust..."
-#     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
-#   else
-#     success "Rust ya está instalado, saltando."
-#   fi
-# }
+spinner() {
 
-# ==============================================================================
-# Execution Registry
-# ==============================================================================
+    local pid=$1
+    local delay=.08
 
-custom_installers=(
-  install_mimo
-)
+    local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
 
-# Loop and run each installer
-for installer in "${custom_installers[@]}"; do
-  if declare -f "$installer" >/dev/null; then
-    $installer
-  else
-    error_msg "Instalador no definido: $installer"
-  fi
-done
+    while kill -0 "$pid" 2>/dev/null; do
+        for frame in "${frames[@]}"; do
+            printf "\r%s " "$frame"
+            sleep "$delay"
+        done
+    done
+}
+
+run_task() {
+
+    local file="$1"
+
+    unset PACKAGE
+    unset CHECK
+
+    source "$file"
+
+    local name="$PACKAGE"
+
+    printf "%-18s" "$name"
+
+    if command -v "$CHECK" &>/dev/null; then
+        success "󰄬 skipped"
+        ((++SKIPPED))
+        return
+    fi
+
+    local log="${LOG_DIR}/${name}.log"
+
+    local start
+    start=$(date +%s)
+
+    (
+        install
+    ) >"$log" 2>&1 &
+
+    local pid=$!
+
+    spinner "$pid"
+
+    wait "$pid"
+
+    local status=$?
+    local end
+    end=$(date +%s)
+    local elapsed=$((end-start))
+
+    if ((status == 0)); then
+        printf "\r"
+        success "󰄬 ${elapsed}s"
+        ((++INSTALLED))
+    else
+        printf "\r"
+        error_msg "󰄲 failed"
+        info "󰈔 ${log}"
+        ((++FAILED))
+    fi
+}
+
+run_pipeline() {
+
+    local start
+    start=$(date +%s)
+
+    echo
+    info "󰋼 Bootstrap started"
+    echo
+
+    for file in "${TASKS[@]}"; do
+        run_task "$file"
+    done
+
+    local end
+    end=$(date +%s)
+
+    echo
+    echo "────────────────────────────"
+    echo
+
+    info "󱐋 Summary"
+    echo
+
+    success "󰄬 Installed : $INSTALLED"
+    success "󰄬 Skipped   : $SKIPPED"
+
+    if ((FAILED)); then
+        error_msg "󰄲 Failed    : $FAILED"
+    else
+        success "󰄬 Failed    : 0"
+    fi
+
+    echo
+    info "Completed in $((end-start))s"
+}
+
+main() {
+    discover_tasks
+    run_pipeline
+}
+
+main "$@"
