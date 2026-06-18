@@ -118,18 +118,26 @@ nvidia_detect() {
 #   Si se pulsa cualquier tecla, detiene la espera inmediatamente. Finalmente exporta la variable
 #   PROMPT_INPUT con el carácter ingresado y reestablece el modo seguro (set -e).
 prompt_timer() {
-    set +e
-    unset PROMPT_INPUT
-    local timsec=$1
-    local msg=$2
-    while [[ ${timsec} -ge 0 ]]; do
-        echo -ne "\r :: ${msg} (${timsec}s) : "
-        read -rt 1 -n 1 PROMPT_INPUT && break
-        ((timsec--))
-    done
-    export PROMPT_INPUT
-    echo ""
-    set -e
+  set +e
+  unset PROMPT_INPUT
+  local timsec=$1
+  local msg=$2
+  local use_tty=0
+  if [[ -t 0 ]] && { true < /dev/tty; } 2>/dev/null; then
+    use_tty=1
+  fi
+  while [[ ${timsec} -ge 0 ]]; do
+    echo -ne "\r :: ${msg} (${timsec}s) : "
+    if (( use_tty )); then
+      read -rt 1 -n 1 PROMPT_INPUT < /dev/tty && break
+    else
+      read -rt 1 -n 1 PROMPT_INPUT && break
+    fi
+    ((timsec--))
+  done
+  export PROMPT_INPUT
+  echo ""
+  set -e
 }
 print_log() {
     local executable="${0##*/}"
