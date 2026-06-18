@@ -471,7 +471,7 @@ print_item_list() {
     return
   fi
 
-  if (( total_items <= 3 )); then
+  if (( total_items <= 5 )); then
     local list_str=""
     local item
     for item in "${items[@]}"; do
