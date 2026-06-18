@@ -462,17 +462,29 @@ count_skip() {
   fi
 }
 
-join_list() {
-  local res=""
-  local item
-  for item in "$@"; do
-    if [[ -z $res ]]; then
-      res="$item"
+print_item_list() {
+  local prefix="$1"
+  shift
+  local items=("$@")
+  local total_items=${#items[@]}
+  if (( total_items == 0 )); then
+    return
+  fi
+
+  local clean_prefix
+  clean_prefix=$(echo -e "$prefix" | sed 's/\x1b\[[0-9;]*[a-zA-Z]//g')
+  local indent_len=${#clean_prefix}
+
+  printf "%s %s" "$prefix" "${items[0]}"
+  local i
+  for (( i = 1; i < total_items; i++ )); do
+    if (( i % 4 == 0 )); then
+      printf ",\n%*s%s" $(( indent_len + 1 )) "" "${items[i]}"
     else
-      res="$res, $item"
+      printf ", %s" "${items[i]}"
     fi
   done
-  echo "$res"
+  printf "\n"
 }
 
 # ─── Resumen final tipo dashboard ────────────────────────────────────────────
@@ -506,13 +518,13 @@ print_summary() {
   if (( total > 0 )); then
     echo "  ${_BOLD}Detalles:${_RESET}"
     if (( ${#_install_ok_list[@]} > 0 )); then
-      printf "    ${_GREEN}✓${_RESET} ${_BOLD}Exitosos (${#_install_ok_list[@]}):${_RESET} %s\n" "$(join_list "${_install_ok_list[@]}")"
+      print_item_list "    ${_GREEN}✓${_RESET} ${_BOLD}Exitosos (${#_install_ok_list[@]}):${_RESET}" "${_install_ok_list[@]}"
     fi
     if (( ${#_install_fail_list[@]} > 0 )); then
-      printf "    ${_RED}✗${_RESET} ${_BOLD}Fallidos (${#_install_fail_list[@]}):${_RESET} %s\n" "$(join_list "${_install_fail_list[@]}")"
+      print_item_list "    ${_RED}✗${_RESET} ${_BOLD}Fallidos (${#_install_fail_list[@]}):${_RESET}" "${_install_fail_list[@]}"
     fi
     if (( ${#_install_skip_list[@]} > 0 )); then
-      printf "    ${_YELLOW}⊘${_RESET} ${_BOLD}Omitidos (${#_install_skip_list[@]}):${_RESET} %s\n" "$(join_list "${_install_skip_list[@]}")"
+      print_item_list "    ${_YELLOW}⊘${_RESET} ${_BOLD}Omitidos (${#_install_skip_list[@]}):${_RESET}" "${_install_skip_list[@]}"
     fi
     echo ""
   fi
