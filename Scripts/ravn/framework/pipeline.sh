@@ -25,7 +25,7 @@ run_task() {
     prompt_timer 10 "¿Instalar ${name}? (${DESCRIPTION:-sin descripción}) [y/N]"
     if [[ "${PROMPT_INPUT,,}" != "y" ]]; then
       info "${name}: Omitido por el usuario."
-      count_skip
+      count_skip "$name"
       return 0
     fi
   fi
@@ -33,7 +33,7 @@ run_task() {
   # ── Check: skip if already installed ──
   if check; then
     info "${name}: Ya instalado. Omitiendo."
-    count_skip
+    count_skip "$name"
     return 0
   fi
 
@@ -64,10 +64,10 @@ run_task() {
   # ── Report result ──
   if (( status == 0 )); then
     success "${name} instalado en ${elapsed}s"
-    count_ok
+    count_ok "$name"
   else
     error_msg "${name} falló (${elapsed}s). Log: ${log}"
-    count_fail
+    count_fail "$name"
   fi
 
   return $status

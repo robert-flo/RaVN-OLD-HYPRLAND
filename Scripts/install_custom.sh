@@ -34,7 +34,7 @@ run_task() {
 
   if command -v "$CHECK" &>/dev/null; then
     success "$name: skipped"
-    count_skip
+    count_skip "$name"
     return
   fi
 
@@ -58,10 +58,10 @@ run_task() {
 
   if ((status == 0)); then
     info "Installed $name in ${elapsed}s"
-    count_ok
+    count_ok "$name"
   else
     info "Log: ${log}"
-    count_fail
+    count_fail "$name"
   fi
 }
 

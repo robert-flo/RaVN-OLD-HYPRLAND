@@ -439,36 +439,81 @@ clone_or_update_repo() {
 _install_ok=0
 _install_fail=0
 _install_skip=0
+_install_ok_list=()
+_install_fail_list=()
+_install_skip_list=()
 
-count_ok()   { (( _install_ok++   )) || true; }
-count_fail() { (( _install_fail++ )) || true; }
-count_skip() { (( _install_skip++ )) || true; }
+count_ok() {
+  (( _install_ok++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_ok_list+=("$1")
+  fi
+}
+count_fail() {
+  (( _install_fail++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_fail_list+=("$1")
+  fi
+}
+count_skip() {
+  (( _install_skip++ )) || true
+  if [[ -n ${1:-} ]]; then
+    _install_skip_list+=("$1")
+  fi
+}
+
+join_list() {
+  local res=""
+  local item
+  for item in "$@"; do
+    if [[ -z $res ]]; then
+      res="$item"
+    else
+      res="$res, $item"
+    fi
+  done
+  echo "$res"
+}
 
 # ─── Resumen final tipo dashboard ────────────────────────────────────────────
 # Imprime un resumen visual con bordes Unicode y colores.
 # Calcula dinámicamente el ancho del box para centrar el título.
 print_summary() {
-    local label="${1:-Installation}"
-    local total=$(( _install_ok + _install_fail + _install_skip ))
+  local label="${1:-Installation}"
+  local total=$(( _install_ok + _install_fail + _install_skip ))
 
-    # Ancho fijo del contenido interior (39 caracteres visibles)
-    local w=39
-    local title="RaVN ${label} Summary"
-    local title_len=${#title}
-    local pad_left=$(( (w - title_len) / 2 ))
-    local pad_right=$(( w - title_len - pad_left ))
-    local border
-    border=$(printf '─%.0s' $(seq 1 $w))
+  # Ancho fijo del contenido interior (39 caracteres visibles)
+  local w=39
+  local title="RaVN ${label} Summary"
+  local title_len=${#title}
+  local pad_left=$(( (w - title_len) / 2 ))
+  local pad_right=$(( w - title_len - pad_left ))
+  local border
+  border=$(printf '─%.0s' $(seq 1 $w))
 
+  echo ""
+  echo "  ${_DIM}┌${border}┐${_RESET}"
+  printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
+  echo "  ${_DIM}├${border}┤${_RESET}"
+  printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:  %-24s${_DIM}│${_RESET}\n" "$_install_ok"
+  printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:  %-24s${_DIM}│${_RESET}\n" "$_install_fail"
+  printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:  %-24s${_DIM}│${_RESET}\n" "$_install_skip"
+  printf "  ${_DIM}│${_RESET}%*s${_DIM}│${_RESET}\n" "$w" ""
+  printf "  ${_DIM}│${_RESET}  Total:      %-25s${_DIM}│${_RESET}\n" "$total"
+  echo "  ${_DIM}└${border}┘${_RESET}"
+  echo ""
+
+  if (( total > 0 )); then
+    echo "  ${_BOLD}Detalles:${_RESET}"
+    if (( ${#_install_ok_list[@]} > 0 )); then
+      printf "    ${_GREEN}✓${_RESET} ${_BOLD}Exitosos (${#_install_ok_list[@]}):${_RESET} %s\n" "$(join_list "${_install_ok_list[@]}")"
+    fi
+    if (( ${#_install_fail_list[@]} > 0 )); then
+      printf "    ${_RED}✗${_RESET} ${_BOLD}Fallidos (${#_install_fail_list[@]}):${_RESET} %s\n" "$(join_list "${_install_fail_list[@]}")"
+    fi
+    if (( ${#_install_skip_list[@]} > 0 )); then
+      printf "    ${_YELLOW}⊘${_RESET} ${_BOLD}Omitidos (${#_install_skip_list[@]}):${_RESET} %s\n" "$(join_list "${_install_skip_list[@]}")"
+    fi
     echo ""
-    echo "  ${_DIM}┌${border}┐${_RESET}"
-    printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
-    echo "  ${_DIM}├${border}┤${_RESET}"
-    printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:  %-24s${_DIM}│${_RESET}\n" "$_install_ok"
-    printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:  %-24s${_DIM}│${_RESET}\n" "$_install_fail"
-    printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:  %-24s${_DIM}│${_RESET}\n" "$_install_skip"
-    printf "  ${_DIM}│${_RESET}%*s${_DIM}│${_RESET}\n" "$w" ""
-    printf "  ${_DIM}│${_RESET}  Total:      %-25s${_DIM}│${_RESET}\n" "$total"
-    echo "  ${_DIM}└${border}┘${_RESET}"
-    echo ""
+  fi
 }
