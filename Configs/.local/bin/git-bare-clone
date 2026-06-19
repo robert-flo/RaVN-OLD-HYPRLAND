@@ -140,7 +140,7 @@ parse_params() {
     done
 
     args=("$@")
-    [[ ${#args[@]} -eq 0 ]] && die "Missing required argument: repository URL"
+    [[ ${#args[@]} -eq 0 ]] && usage
 
     return 0
 }

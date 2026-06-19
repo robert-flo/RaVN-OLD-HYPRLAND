@@ -146,7 +146,7 @@ Default section order:
 
 ## User Preferences
 
-When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
+- **Live Synchronization**: Whenever making changes to a file inside the `Configs/` repository directory, the changes must immediately be synchronized to its corresponding live path in `$HOME` (e.g., by executing `restore_cfg.sh` or copying manually).
 
 ## Child DOX Index
 

@@ -147,7 +147,7 @@ parse_params() {
     done
 
     args=("$@")
-    [[ ${#args[@]} -eq 0 ]] && die "Missing required argument: worktree path"
+    [[ ${#args[@]} -eq 0 ]] && usage
 
     if [[ -z "$branch" ]]; then
         branch="${prefix}${args[0]}"

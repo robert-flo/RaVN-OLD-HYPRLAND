@@ -147,7 +147,7 @@ parse_params() {
     done
 
     args=("$@")
-    [[ ${#args[@]} -lt 2 ]] && die "Missing required arguments: <issue> <slug>"
+    [[ ${#args[@]} -lt 2 ]] && usage
 
     issue_num="${args[0]}"
     slug="${args[1]}"
