@@ -68,6 +68,18 @@ Refer to [RELEASE_POLICY.md](RELEASE_POLICY.md) for details:
 - **`master`**: Receives a merge from `rc` on the last Friday of the month for the official monthly version release (tagged as `YY.M`).
 
 
+# Git Worktree Workflow (Development)
+
+To protect the user's active system configurations from accidental resets or uncommitted code loss during development, and to maintain task isolation:
+
+- **Isolated Development in `~/Work`**: All active development work must be carried out inside worktrees under `~/Work/<repo>/` (which are created from the bare repository at `~/.local/share/git-bare/<repo>`).
+- **No Direct Modification in Live Clone**: Do not perform development or commit changes directly inside the live configuration clone located at `~/.local/share/ravn/` (except when updating tracking config files or executing system-wide scripts).
+- **Automation Utilities**: Always use the following tools (restored under `~/.local/bin/`):
+  - `git-create-worktree` for general feature/chore branches.
+  - `git-issue-worktree` for GitHub-tracked issues.
+- **Workflow Benefit**: Developing under `~/Work` isolates development changes from host configuration restoration processes. This eliminates the need to manually disable ravn tracking (e.g. setting `ravn=false` in `Scripts/ravn/config/packages.conf`) to protect local changes from being overwritten during installer or `restore_cfg.sh` runs.
+
+
 # DOX framework
 
 - DOX is highly performant AGENTS.md hierarchy installed here
