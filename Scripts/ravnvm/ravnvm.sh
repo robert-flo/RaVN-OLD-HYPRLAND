@@ -407,6 +407,7 @@ cd /home/arch
 if [ -d "RaVN" ]; then
     echo "   RaVN directory exists, updating..."
     cd RaVN
+    git remote set-url origin "$RAVN_REPO" 2>/dev/null || true
     git fetch origin
     git reset --hard HEAD  # Reset any local changes
 else
