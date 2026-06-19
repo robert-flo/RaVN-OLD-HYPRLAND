@@ -392,11 +392,15 @@ clone_or_update_repo() {
 
     local remote_url="https://github.com/${repo}.git"
 
-    # Determinar URL de remote (SSH si se solicita y hay llaves)
+    # Determinar URL de remote (SSH si se solicita y hay llaves autorizadas)
     if [[ "$prefer_ssh" == "ssh" ]]; then
-        if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
+        if { [[ -f "$HOME/.ssh/id_ed25519" ]] || [[ -f "$HOME/.ssh/id_rsa" ]]; } && ssh -T -o ConnectTimeout=3 -o BatchMode=yes git@github.com 2>&1 | grep -q "successfully authenticated"; then
             remote_url="git@github.com:${repo}.git"
-            info "Llave SSH detectada. Usando protocolo SSH para ${name}."
+            info "Llave SSH autorizada detectada. Usando protocolo SSH para ${name}."
+        else
+            if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
+                warn_msg "Llave SSH detectada pero no autorizada en GitHub. Usando protocolo HTTPS para ${name}."
+            fi
         fi
     fi
 

@@ -52,19 +52,22 @@ if [ -d "$2" ]; then
     THEME_DIR="$2"
 else
     git_repo=${2%/}
+    branch=""
     if echo "$git_repo" | grep -q "/tree/"; then
         branch=${git_repo#*tree/}
         git_repo=${git_repo%/tree/*}
     else
-        branches_array=$(curl -s "https://api.github.com/repos/${git_repo#*://*/}/branches" | jq -r '.[].name')
-        branches_array=($branches_array)
-        if [[ ${#branches_array[@]} -le 1 ]]; then
-            branch=${branches_array[0]}
-        else
-            echo "Select a Branch"
-            select branch in "${branches_array[@]}"; do
-                [[ -n $branch ]] && break || echo "Invalid selection. Please try again."
-            done
+        if [[ -t 0 ]]; then
+            branches_array=$(curl -s "https://api.github.com/repos/${git_repo#*://*/}/branches" | jq -r '.[].name' 2>/dev/null)
+            branches_array=($branches_array)
+            if [[ ${#branches_array[@]} -gt 1 ]]; then
+                echo "Select a Branch"
+                select branch in "${branches_array[@]}"; do
+                    [[ -n $branch ]] && break || echo "Invalid selection. Please try again."
+                done
+            elif [[ ${#branches_array[@]} -eq 1 ]]; then
+                branch=${branches_array[0]}
+            fi
         fi
     fi
     git_path=${git_repo#*://*/}
@@ -86,7 +89,12 @@ else
         fi
     else
         print_log "Directory $THEME_DIR does not exist. Cloning repository into new directory."
-        if ! git clone -b "$branch" --depth 1 "$git_repo" "$THEME_DIR" &>/dev/null; then
+        if [[ -n "$branch" ]]; then
+            clone_cmd=(git clone -b "$branch" --depth 1 "$git_repo" "$THEME_DIR")
+        else
+            clone_cmd=(git clone --depth 1 "$git_repo" "$THEME_DIR")
+        fi
+        if ! "${clone_cmd[@]}" &>/dev/null; then
             print_log "Git clone failed"
             exit 1
         fi
