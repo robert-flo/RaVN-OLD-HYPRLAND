@@ -112,16 +112,16 @@ get_gpg_key_id() {
   local key_id=""
 
   # Try by name
-  key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_NAME" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2)
+  key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_NAME" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
 
   # Try by email
   if [[ -z $key_id ]]; then
-    key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_EMAIL" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2)
+    key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_EMAIL" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
   fi
 
   # Try any RSA key
   if [[ -z $key_id ]]; then
-    key_id=$(gpg --list-secret-keys --keyid-format SHORT 2>/dev/null | grep "^sec" | grep "rsa4096" | head -1 | awk '{print $2}' | cut -d'/' -f2)
+    key_id=$(gpg --list-secret-keys --keyid-format SHORT 2>/dev/null | grep "^sec" | grep "rsa4096" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
   fi
 
   echo "$key_id"
@@ -613,14 +613,12 @@ configure_signing() {
   mkdir -p "$(dirname "$GIT_CONFIG_FILE")"
 
   if [[ $sign_choice == "1" ]]; then
-    setup_ssh_key
     git config --file "$GIT_CONFIG_FILE" gpg.format ssh
     git config --file "$GIT_CONFIG_FILE" user.signingkey "$HOME/.ssh/id_ed25519.pub"
     git config --file "$GIT_CONFIG_FILE" commit.gpgsign true
     git config --file "$GIT_CONFIG_FILE" tag.gpgsign true
     print_success "SSH signing configured in $GIT_CONFIG_FILE"
   elif [[ $sign_choice == "2" ]]; then
-    setup_gpg_key
     GPG_KEY_ID=$(get_gpg_key_id)
     if [[ -z $GPG_KEY_ID ]]; then
       print_error "No GPG key available!"
@@ -861,6 +859,8 @@ do_verify() {
 do_setup() {
   verify_dependencies
   setup_github_auth
+  setup_ssh_key
+  setup_gpg_key
   configure_signing
   configure_gpg_agent
 
@@ -907,7 +907,7 @@ do_clean() {
 
   # Get all GPG key IDs for the user
   local gpg_keys=""
-  gpg_keys=$(gpg --list-secret-keys --keyid-format LONG "$USER_EMAIL" 2>/dev/null | grep "^sec" | awk '{print $2}' | cut -d'/' -f2)
+  gpg_keys=$(gpg --list-secret-keys --keyid-format LONG "$USER_EMAIL" 2>/dev/null | grep "^sec" | awk '{print $2}' | cut -d'/' -f2 || true)
 
   if [[ -n $gpg_keys ]]; then
     for key_id in $gpg_keys; do
