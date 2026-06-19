@@ -122,6 +122,20 @@ done
 RAVN_LOG="$(date +'%y%m%d_%Hh%Mm%Ss')"
 export flg_DryRun flg_Nvidia flg_Shell flg_Install flg_ThemeInstall RAVN_LOG flg_Overwrite
 
+# Define la función de limpieza al salir del script para detener el keepalive de sudo
+# y resguardar la lista de paquetes de instalación en el directorio de logs.
+cleanup() {
+  if [[ -n $SUDO_KEEPALIVE_PID ]]; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
+  fi
+
+  if [[ -f $scrDir/install_pkg.lst ]]; then
+    mkdir -p "$cacheDir/logs/$RAVN_LOG"
+    mv "$scrDir/install_pkg.lst" "$cacheDir/logs/$RAVN_LOG/install_pkg.lst" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+
 # Gestiona el comportamiento de ejecución basándose en los argumentos provistos:
 # - Si se especificó el modo de prueba (dry-run), se imprime un mensaje de estado.
 # - Si el script se ejecutó sin ningún argumento (OPTIND=1), se habilitan por
@@ -138,6 +152,18 @@ if [ $OPTIND -eq 1 ]; then
 	flg_Install=1
 	flg_Restore=1
 	flg_Service=1
+fi
+
+#-----------------------#
+# sudo session keepalive #
+#-----------------------#
+# Si no es un dry-run, solicita la contraseña una vez al inicio
+# y mantiene activa la credencial en segundo plano.
+if (( flg_DryRun == 0 )); then
+  print_log -c "Sudo :: " "Validando credenciales para la instalación..."
+  sudo -v
+  while true; do sudo -n true; sleep 60; done 2>/dev/null &
+  SUDO_KEEPALIVE_PID=$!
 fi
 
 #--------------------#
@@ -188,9 +214,8 @@ EOF
 	custom_pkg=$1
 	cp "${scrDir}/pkg_core.lst" "${scrDir}/install_pkg.lst"
 
-	# Asegura la existencia del directorio de logs de la sesión antes de definir la trampa (trap).
+	# Asegura la existencia del directorio de logs de la sesión.
 	mkdir -p "${cacheDir}/logs/${RAVN_LOG}"
-	trap 'mv "${scrDir}/install_pkg.lst" "${cacheDir}/logs/${RAVN_LOG}/install_pkg.lst"' EXIT
 
 	echo -e "\n#user packages" >>"${scrDir}/install_pkg.lst" # Add a marker for user packages
 	if [ -f "${custom_pkg}" ] && [ -n "${custom_pkg}" ]; then
