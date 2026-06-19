@@ -86,9 +86,6 @@ Creates a worktree linked to a GitHub issue using `gh` CLI and parses context me
   # Creates worktree under ~/Work/myrepo/42-login-fix linked to branch <user>/issue/42-login-fix
   ```
 
-### 4. `crear-worktrees-simple.sh`
-Orchestrates simplified bare cloning and basic worktree creation for quick workspace bootstrapping.
-
 ---
 
 ## Decision Matrix: When to use which?
