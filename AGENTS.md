@@ -62,10 +62,10 @@ Always prioritize the helper functions imported from [global_fn.sh](Scripts/glob
 
 # Branching & Release Policy
 
-Refer to [RELEASE_POLICY.md](RELEASE_POLICY.md) for details:
-- **`dev`**: The active branch for all features and PRs.
-- **`rc`** (Release Candidate): Receives a merge from `dev` on the penúltimo Friday of the month. Frozen for regression testing and bug fixes only.
-- **`master`**: Receives a merge from `rc` on the last Friday of the month for the official monthly version release (tagged as `YY.M`).
+Refer to [RELEASE_POLICY.md](RELEASE_POLICY.md) for details. **The following rules are non-negotiable and must be strictly followed by all agents and developers:**
+- **`dev`**: The active branch for all features and PRs. **Under no circumstances should `dev` receive direct commits.** It must always be fed exclusively by auxiliary topic/feature branches created in isolated worktrees (e.g. via `git-create-worktree`) and merged in.
+- **`rc`** (Release Candidate): Receives a merge from `dev` on the penúltimo Friday of the month. Frozen for regression testing and bug fixes only. **`rc` only receives merges from `dev`.**
+- **`master`**: Receives a merge from `rc` on the last Friday of the month for the official monthly version release (tagged as `YY.M`). **`master` only receives merges from `rc`.**
 
 
 # Git Worktree Workflow (Development)
