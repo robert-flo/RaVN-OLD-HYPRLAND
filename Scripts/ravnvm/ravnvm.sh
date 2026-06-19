@@ -25,9 +25,9 @@ function detect_os() {
     if [ -f /etc/os-release ]; then
         # shellcheck source=/dev/null
         . /etc/os-release
-        if [[ "$ID" == "nixos" ]]; then
+        if [[ $ID == "nixos" ]]; then
             echo "nixos"
-        elif [[ "$ID" == "arch" ]]; then
+        elif [[ $ID == "arch" ]] || [[ ${ID_LIKE:-} == *arch* ]] || command -v pacman >/dev/null 2>&1; then
             echo "arch"
         else
             echo "unknown"
@@ -43,7 +43,7 @@ function detect_os() {
 
 function print_usage() {
     echo "RavnVM - Simplified VM tool for RaVN contributors"
-    echo "Supports: Arch Linux, NixOS"
+    echo "Supports: Arch Linux, Arch-based distros, NixOS"
     echo ""
     echo "Usage: ravnvm [OPTIONS] [BRANCH/COMMIT]"
     echo ""
@@ -101,21 +101,46 @@ function check_dependencies() {
             ;;
         *)
             echo "⚠️  Unsupported OS. This script supports Arch Linux and NixOS."
-            echo "   Please ensure qemu, curl, python, and git are installed."
-            return 0
+            check_common_commands
             ;;
     esac
+}
+
+function check_common_commands() {
+    local missing_commands=()
+
+    for cmd in qemu-system-x86_64 qemu-img curl git; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing_commands+=("$cmd")
+        fi
+    done
+
+    if ! command -v python3 >/dev/null 2>&1 && ! command -v python >/dev/null 2>&1; then
+        missing_commands+=("python")
+    fi
+
+    if [ ${#missing_commands[@]} -gt 0 ]; then
+        echo "❌ Missing required commands: ${missing_commands[*]}"
+        echo "   Please ensure qemu, curl, python, and git are installed."
+        return 1
+    fi
+
+    return 0
 }
 
 function check_nixos_dependencies() {
     local missing_commands=()
 
     # Check for required commands
-    for cmd in qemu-system-x86_64 curl python git; do
+    for cmd in qemu-system-x86_64 qemu-img curl git; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
             missing_commands+=("$cmd")
         fi
     done
+
+    if ! command -v python3 >/dev/null 2>&1 && ! command -v python >/dev/null 2>&1; then
+        missing_commands+=("python")
+    fi
 
     if [ ${#missing_commands[@]} -gt 0 ]; then
         echo "❌ Missing required commands: ${missing_commands[*]}"
