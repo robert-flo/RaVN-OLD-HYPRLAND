@@ -73,6 +73,7 @@ O|${HOME}/.local/share|wallbash|bash imagemagick
  Git 
 S|${HOME}/.config|git|git
 S|${HOME}/.config|lazygit|lazygit
+O|${HOME}/.local/bin|crear-worktrees-simple.sh git-bare-clone git-create-worktree git-issue-worktree|git
 
  Editor 
 P|${HOME}/.config/Code - OSS/User|settings.json|code
