@@ -16,9 +16,7 @@
 
     # ─── Sync & Remote ────────────────────────────────────────────────────────
     l  = pull
-    p  = push
-    pl = "!git pull origin $(git rev-parse --abbrev-ref HEAD)"
-    ps = "!git push origin $(git rev-parse --abbrev-ref HEAD)"
+    p  = "!git push origin $(git rev-parse --abbrev-ref HEAD)"
 
     # ─── History & Logs ───────────────────────────────────────────────────────
     lg   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
