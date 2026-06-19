@@ -296,34 +296,41 @@ verify_ssh() {
 
   # 5. Check if key is on GitHub
   if command_exists gh && gh auth status >/dev/null 2>&1; then
-    local key_fingerprint=""
-    key_fingerprint=$(ssh-keygen -lf "${key_path/#\~/$HOME}.pub" 2>/dev/null | awk '{print $2}' || echo "")
-    local gh_keys=""
-    gh_keys=$(gh ssh-key list 2>/dev/null || echo "")
+    local local_key=""
+    local_key=$(awk '{print $1" "$2}' "${key_path/#\~/$HOME}.pub" 2>/dev/null || echo "")
+    local key_title=""
 
-    if [[ -z $key_fingerprint ]]; then
-      print_warn "Could not read key fingerprint"
-    elif [[ -z $gh_keys ]] || ! echo "$gh_keys" | grep -q "$key_fingerprint" 2>/dev/null; then
+    if [[ -n $local_key ]]; then
+      # Check authentication keys
+      key_title=$(gh api user/keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2>/dev/null || echo "")
+      # If not found, check signing keys
+      if [[ -z $key_title ]]; then
+        key_title=$(gh api user/ssh_signing_keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2>/dev/null || echo "")
+        [[ -n $key_title ]] && key_title="$key_title (Signing)"
+      fi
+    fi
+
+    if [[ -z $local_key ]]; then
+      print_warn "Could not read local public key"
+    elif [[ -z $key_title ]]; then
       print_warn "Key not on GitHub"
       print_step "Uploading SSH key to GitHub..."
-      local key_title="ravn-$(hostname)-$(date +%Y%m%d)"
-      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --title "$key_title" 2>/dev/null; then
-        print_success "Authentication key uploaded: ${WHITE}$key_title${NC}"
+      local key_title_new="ravn-$(hostname)-$(date +%Y%m%d)"
+      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --title "$key_title_new" 2>/dev/null; then
+        print_success "Authentication key uploaded: ${WHITE}$key_title_new${NC}"
       else
         print_error "Failed to upload authentication key"
         print_info "Try manually: ${GRAY}gh ssh-key add ${key_path}.pub${NC}"
       fi
 
-      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --type signing --title "$key_title (Signing)" 2>/dev/null; then
-        print_success "Signing key uploaded: ${WHITE}$key_title (Signing)${NC}"
+      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --type signing --title "$key_title_new (Signing)" 2>/dev/null; then
+        print_success "Signing key uploaded: ${WHITE}$key_title_new (Signing)${NC}"
       else
         print_error "Failed to upload signing key"
       fi
     else
       print_success "Key registered on GitHub"
-      local key_title=""
-      key_title=$(echo "$gh_keys" | grep "$key_fingerprint" | awk '{print $1}' || echo "")
-      [[ -n $key_title ]] && print_info "Title: ${GRAY}$key_title${NC}"
+      print_info "Title: ${GRAY}$key_title${NC}"
     fi
   else
     print_warn "Cannot check GitHub keys ${GRAY}(gh not authenticated)${NC}"
@@ -389,9 +396,9 @@ verify_gpg() {
 
   # 5. Check if key is on GitHub
   if command_exists gh && gh auth status >/dev/null 2>&1; then
-    local gh_gpg_keys=""
-    gh_gpg_keys=$(gh gpg-key list 2>/dev/null || echo "")
-    if echo "$gh_gpg_keys" | grep -qi "$GPG_KEY_ID" 2>/dev/null; then
+    local key_found_gh=""
+    key_found_gh=$(gh api user/gpg_keys --jq ".[] | select(.key_id | ascii_upcase | endswith(\"${GPG_KEY_ID^^}\")) | .key_id" 2>/dev/null || echo "")
+    if [[ -n $key_found_gh ]]; then
       print_success "GPG key uploaded to GitHub"
     else
       print_warn "GPG key not on GitHub"
