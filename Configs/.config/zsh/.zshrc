@@ -66,3 +66,5 @@ add_to_path "$HOME/.luarocks/bin"
 
 # Limpiar el PATH de duplicados y entradas vacías
 export PATH=$(echo -n "$PATH" | awk -v RS=: '$0 != "" && !x[$0]++' | paste -sd:)
+# mimocode
+export PATH=/home/dominus/.mimocode/bin:$PATH

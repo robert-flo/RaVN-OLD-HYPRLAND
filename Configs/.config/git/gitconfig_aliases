@@ -1,0 +1,53 @@
+[alias]
+    # ─── Basic Operations ─────────────────────────────────────────────────────
+    a  = add
+    co = checkout
+    sw = switch
+    st = status
+    s  = status -s
+    br = branch
+    m  = merge
+
+    # ─── Commits ──────────────────────────────────────────────────────────────
+    ci   = commit
+    c    = commit -m
+    ca   = commit -am
+    fuck = commit --amend -m
+
+    # ─── Sync & Remote ────────────────────────────────────────────────────────
+    l  = pull
+    p  = push
+    pl = "!git pull origin $(git rev-parse --abbrev-ref HEAD)"
+    ps = "!git push origin $(git rev-parse --abbrev-ref HEAD)"
+
+    # ─── History & Logs ───────────────────────────────────────────────────────
+    lg   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    pi   = log -p
+    hist = log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all
+    llog = log --graph --name-status --pretty=format:\"%C(red)%h %C(reset)(%cd) %C(green)%an %Creset%s %C(yellow)%d%Creset\" --date=relative
+
+    # ─── Branch Management & Rebase ───────────────────────────────────────────
+    re  = rebase -i
+    reb = "!r() { git rebase -i HEAD~$1; }; r"
+    bye = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+
+    # ─── Stash & Tags ─────────────────────────────────────────────────────────
+    stash   = stash -all
+    unstash = stash pop
+    tag     = tag -s
+
+    # ─── Inspection & Diff ────────────────────────────────────────────────────
+    d  = diff --word-diff -M -C
+    bl = blame -w -C -C -C --color-lines --color-by-age
+
+    # ─── Search & Info ────────────────────────────────────────────────────────
+    alias        = config --get-regexp alias
+    contributors = shortlog --summary --numbered
+    # Find commits by source code
+    fc           = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+    # Find commits by commit message
+    fm           = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+    # ─── Interactive & Fuzzy ──────────────────────────────────────────────────
+    af = "!git add $(git ls-files -m -o --exclude-standard | fzf -m)"
+    df = "!git hist | peco | awk '{print $2}' | xargs -I {} git diff {}^ {}"

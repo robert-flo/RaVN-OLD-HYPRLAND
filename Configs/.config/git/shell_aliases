@@ -1,0 +1,6 @@
+#  Git & GitHub CLI Shell Aliases 
+alias g='git'
+alias ghco="gh pr checkout"
+alias ghpv="gh pr view"
+alias ghrv="gh repo view"
+alias ghis="gh issue status"

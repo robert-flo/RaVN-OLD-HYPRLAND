@@ -53,7 +53,7 @@ alias countdown-edit='${EDITOR:-nano} ~/.local/state/waybar/countdown.json'
 #  GitHub CLI Configuration 
 export GH_EDITOR="${EDITOR:-nvim}"
 export GH_PAGER="less -FR"
-alias ghco="gh pr checkout"
-alias ghpv="gh pr view"
-alias ghrv="gh repo view"
-alias ghis="gh issue status"
+# Source Git and GitHub CLI shell aliases
+if [[ -f ~/.config/git/shell_aliases ]]; then
+    source ~/.config/git/shell_aliases
+fi

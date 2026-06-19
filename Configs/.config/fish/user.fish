@@ -40,6 +40,11 @@ set EDITOR code
 # set aurhelper yay
 set aurhelper yay
 
+# Source Git and GitHub CLI shell aliases
+if test -f ~/.config/git/shell_aliases
+    source ~/.config/git/shell_aliases
+end
+
 
 
 

@@ -98,7 +98,7 @@ S|${HOME}/.local/share|konsole|konsole
 
  Shell 
 S|${HOME}/.config/fish|conf.d functions completions|fish
-P|${HOME}/.config/fish|config.fish|fish
+P|${HOME}/.config/fish|config.fish user.fish|fish
 P|${HOME}/.config/starship|starship.toml|starship
 
 
