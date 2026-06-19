@@ -8,6 +8,8 @@
 - Shebangs:
   - Standard bash scripts must use `#!/usr/bin/env bash` consistently (never `#!/usr/bin/env sh`).
   - Migration scripts executed via `sh` by the installer should use `#!/usr/bin/env sh` (or be POSIX compliant).
+- For scripts with strict error handling (`set -e` / `pipefail`), protect pipelines or command substitutions in variable assignments that might return a non-zero exit status (e.g., `grep` queries returning empty results) by appending `|| true` or `|| echo ""` to prevent premature shell termination.
+
 
 # Repository Structure & Purpose
 
