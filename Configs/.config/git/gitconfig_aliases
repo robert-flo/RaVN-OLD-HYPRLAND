@@ -19,9 +19,8 @@
     p  = "!git push origin $(git rev-parse --abbrev-ref HEAD)"
 
     # ─── History & Logs ───────────────────────────────────────────────────────
-    lg   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    lg   = log --color --graph --pretty=format:'%C(green)%h%C(reset) -%C(yellow)%d%C(reset) %s %C(green)(%cr)%C(reset) %C(bold blue)<%an>%Creset' --abbrev-commit --all
     pi   = log -p
-    hist = log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all
     llog = log --graph --name-status --pretty=format:\"%C(red)%h %C(reset)(%cd) %C(green)%an %Creset%s %C(yellow)%d%Creset\" --date=relative
 
     # ─── Branch Management & Rebase ───────────────────────────────────────────
@@ -48,4 +47,4 @@
 
     # ─── Interactive & Fuzzy ──────────────────────────────────────────────────
     af = "!git add $(git ls-files -m -o --exclude-standard | fzf -m)"
-    df = "!git hist | peco | awk '{print $2}' | xargs -I {} git diff {}^ {}"
+    df = "!git lg | peco | awk '{print $2}' | xargs -I {} git diff {}^ {}"
