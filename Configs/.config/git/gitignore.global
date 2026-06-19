@@ -32,3 +32,10 @@ env
 
 # claude settings
 .claude/settings.local.json
+
+# Nix and editor backups
+*~
+*.swp
+*result*
+.direnv
+*.log

@@ -49,3 +49,11 @@ alias countdown="~/.local/share/waybar/scripts/countdown/countdown.sh --show-tui
 # Direct raw JSON configuration edits
 alias todo-edit='${EDITOR:-nano} ~/.local/state/waybar/todo.json'
 alias countdown-edit='${EDITOR:-nano} ~/.local/state/waybar/countdown.json'
+
+#  GitHub CLI Configuration 
+export GH_EDITOR="${EDITOR:-nvim}"
+export GH_PAGER="less -FR"
+alias ghco="gh pr checkout"
+alias ghpv="gh pr view"
+alias ghrv="gh repo view"
+alias ghis="gh issue status"
