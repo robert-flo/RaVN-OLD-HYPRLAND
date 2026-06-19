@@ -24,4 +24,4 @@ Owned by the RaVN installer pipeline. Changes here propagate to user systems on 
 
 # Child DOX Index
 
-This directory has no child boundaries.
+- [.local/bin/AGENTS.md](.local/bin/AGENTS.md) — Local binaries, system controls, and Git worktree helper tools.
