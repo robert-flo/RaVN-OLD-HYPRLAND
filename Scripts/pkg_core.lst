@@ -90,6 +90,8 @@ dolphin                                                # kde file manager
 ark                                                    # kde file archiver
 unzip                                                  # extracting zip files
 vim                                                    # terminal text editor
+micro                                                  # modern terminal-based text editor
+baobab                                                 # graphical disk usage analyzer
 # code                                                 # ide text editor
 nwg-displays                                           # monitor management utility
 fzf                                                    # Command-line fuzzy finder
