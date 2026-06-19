@@ -189,10 +189,12 @@ print_success "git-create-worktree found"
 
 # Navigate to repository if specified
 if [[ -n "$repo_dir" ]]; then
-    if [[ ! -d "$repo_dir" ]]; then
-        die "Repository directory not found: ${GRAY}$repo_dir${NC}"
-    fi
-    cd "$repo_dir" || die "Failed to change to repository directory: ${GRAY}$repo_dir${NC}"
+  if [[ ! -d "$repo_dir" ]]; then
+    die "Repository directory not found: ${GRAY}$repo_dir${NC}"
+  fi
+  cd "$repo_dir" || die "Failed to change to repository directory: ${GRAY}$repo_dir${NC}"
+else
+  repo_dir="$(pwd)"
 fi
 
 # Verify we're in a git repository

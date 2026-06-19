@@ -178,18 +178,21 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     die "Not a git repository. Use ${CYAN}-r, --repo${NC} to specify the repository path."
 fi
 
+# Extract repository metadata for display before changing directories
+common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || pwd)
+common_dir="${common_dir%/.git}"
+repo_name=$(basename "$common_dir")
+
 # ── Check if we're in a worktree and navigate to parent if needed ──────────────
 # This ensures new worktrees are created at the same level, not nested
 is_bare=$(git rev-parse --is-bare-repository)
 if [[ "$is_bare" == "false" ]]; then
-    # We're in a worktree - navigate to the parent directory (where worktrees live)
-    cd .. || die "Failed to navigate to worktree parent directory"
+  # We're in a worktree - navigate to the parent directory (where worktrees live)
+  cd .. || die "Failed to navigate to worktree parent directory"
 fi
 
 print_header "${ICON_GIT} git-create-worktree"
 
-# Extract repository metadata for display
-repo_name=$(basename "$(git -C ./* rev-parse --show-toplevel 2>/dev/null | head -1 || echo "$(pwd)")")
 repo_path="$(pwd)"
 
 print_section "${ICON_GEAR} Configuration"
