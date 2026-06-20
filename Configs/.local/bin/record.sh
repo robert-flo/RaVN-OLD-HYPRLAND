@@ -20,7 +20,10 @@ restore_scale() {
 if pgrep -x wf-recorder >/dev/null; then
   notify-send "wf-recorder" "Recording stopped"
   pkill -INT wf-recorder
-  wait || true
+  # Wait for wf-recorder to fully terminate
+  while pgrep -x wf-recorder >/dev/null; do
+    sleep 0.1
+  done
 
   if [[ "$MODE" == "gif" && -f "$TMP" ]]; then
     GIF="$OUTDIR/recording-$TS.gif"
