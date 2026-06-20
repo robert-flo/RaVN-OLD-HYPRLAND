@@ -47,6 +47,7 @@ grim                                                   # screenshot tool
 hyprpicker                                             # color picker
 slurp                                                  # region select for screenshot/screenshare
 gpu-screen-recorder                                    # Screen recorder
+wf-recorder                                            # Screen recorder for wlroots-based compositors
 satty                                                  # Modern Screenshot Annotation
 tesseract                                              # OCR engine for text extraction
 tesseract-data-eng                                     # OCR English language data
