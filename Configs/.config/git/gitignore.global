@@ -39,3 +39,6 @@ env
 *result*
 .direnv
 *.log
+
+# VS Code Workspaces
+*.code-workspace
