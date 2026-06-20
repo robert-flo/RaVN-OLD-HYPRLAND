@@ -7,6 +7,16 @@ OUTDIR="$HOME/Videos"
 TS="$(date +'%Y-%m-%d_%H-%M-%S')"
 TMP="$OUTDIR/.recording_tmp.mp4"
 
+if ! command -v wf-recorder &>/dev/null; then
+  notify-send -u critical "wf-recorder" "Error: wf-recorder is not installed. Please install it."
+  exit 1
+fi
+
+if ! command -v slurp &>/dev/null; then
+  notify-send -u critical "wf-recorder" "Error: slurp is not installed. Please install it."
+  exit 1
+fi
+
 mkdir -p "$OUTDIR"
 
 # Detect focused monitor and scale
