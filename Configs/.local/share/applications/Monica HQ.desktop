@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Monica HQ
+Comment=Monica HQ
+Exec=omarchy-launch-webapp https://www.monicahq.com/
+Terminal=false
+Type=Application
+Icon=/home/dominus/.local/share/applications/icons/monica-hq.png
+StartupNotify=true
+Categories=WebApps;Network;
+Keywords=web;webapp;browser;
