@@ -71,7 +71,19 @@ while read -r lst; do
 
 done <"${scrDir}/restore_fnt.lst"
 
+# Copiar monitors.conf a la ruta live
+if [[ -f $cloneDir/Configs/.config/hypr/monitors.conf ]]; then
+  print_log -g "[copy]" -b " :: " "monitors.conf --> $HOME/.config/hypr/monitors.conf"
+  if (( flg_DryRun == 0 )); then
+    mkdir -p "$HOME/.config/hypr"
+    cp "$cloneDir/Configs/.config/hypr/monitors.conf" "$HOME/.config/hypr/monitors.conf"
+  fi
+fi
+
 # Reconstrucción de la caché de fuentes de Fontconfig en el sistema para registrar los nuevos elementos.
 echo ""
 print_log -stat "rebuild" "font cache"
-[ "${flg_DryRun}" -eq 1 ] || fc-cache -f
+if (( flg_DryRun == 0 )); then
+  fc-cache -f
+fi
+
