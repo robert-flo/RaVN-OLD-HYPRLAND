@@ -22,9 +22,22 @@ mkdir -p "$OUTDIR"
 # Detect focused monitor and scale
 MON_INFO="$(hyprctl monitors -j | jq -r '.[] | select(.focused)')"
 MON_NAME="$(jq -r '.name' <<<"$MON_INFO")"
+MON_WIDTH="$(jq -r '.width' <<<"$MON_INFO")"
+MON_HEIGHT="$(jq -r '.height' <<<"$MON_INFO")"
+MON_REFRESH="$(jq -r '.refreshRate' <<<"$MON_INFO")"
+MON_X="$(jq -r '.x' <<<"$MON_INFO")"
+MON_Y="$(jq -r '.y' <<<"$MON_INFO")"
+MON_SCALE="$(jq -r '.scale' <<<"$MON_INFO")"
 
 restore_scale() {
-  hyprctl keyword monitor "$MON_NAME,preferred,auto,1.5" >/dev/null
+  if [[ -f "/tmp/hyde_record_rule_$MON_NAME" ]]; then
+    local orig_rule
+    orig_rule=$(cat "/tmp/hyde_record_rule_$MON_NAME")
+    rm -f "/tmp/hyde_record_rule_$MON_NAME"
+    hyprctl keyword monitor "$orig_rule" >/dev/null
+  else
+    hyprctl keyword monitor "$MON_NAME,preferred,auto,1.5" >/dev/null
+  fi
 }
 
 if pgrep -x wf-recorder >/dev/null; then
@@ -53,8 +66,12 @@ if pgrep -x wf-recorder >/dev/null; then
 else
   notify-send "wf-recorder" "Recording started (scale → 1)"
 
-  # Force scale to 1
-  hyprctl keyword monitor "$MON_NAME,preferred,auto,1" >/dev/null
+  # Save the original monitor rule to a temp file before we change it
+  ORIG_RULE="${MON_NAME},${MON_WIDTH}x${MON_HEIGHT}@${MON_REFRESH},${MON_X}x${MON_Y},${MON_SCALE}"
+  echo "$ORIG_RULE" > "/tmp/hyde_record_rule_$MON_NAME"
+
+  # Force scale to 1 keeping original resolution and position
+  hyprctl keyword monitor "${MON_NAME},${MON_WIDTH}x${MON_HEIGHT}@${MON_REFRESH},${MON_X}x${MON_Y},1" >/dev/null
   sleep 0.25 # allow compositor to settle
 
   OUTFILE="$(
