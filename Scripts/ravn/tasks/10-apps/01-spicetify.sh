@@ -1,27 +1,43 @@
 #!/usr/bin/env bash
 # ─── RaVN Task: Spicetify (Sleek Theme) ─────────────────────────────────────
-# Extracted from install_fnl.sh::setup_spicetify()
-# Configures Sleek (Catppuccin) theme + adblock extension for Spotify.
-# Optimized for offline execution, dry-run safety, and auto-recovery.
+# Rewritten based on nix-dotfiles/spotify.sh
+# Configures Sleek theme with Wallbash color scheme for Spotify.
+# Supports system package manager, Flatpak, and spotify-launcher.
 
 PACKAGE="spicetify"
-DESCRIPTION="Spotify Sleek theme (Catppuccin) + adblock via Spicetify"
+DESCRIPTION="Spotify Sleek theme (Wallbash) via Spicetify"
 CATEGORY="apps"
 DEPENDS=()
 INTERACTIVE=false
 
 check() {
-  # Skip if neither Spotify nor Spicetify are installed
-  if ! pkg_installed spotify || ! pkg_installed spicetify-cli; then
-    # Not a failure — just not applicable
+  local spotify_path=""
+  local shareDir=${XDG_DATA_HOME:-$HOME/.local/share}
+
+  if [[ -n ${SPOTIFY_PATH:-} ]]; then
+    spotify_path="${SPOTIFY_PATH}"
+  elif [[ -d ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify ]]; then
+    spotify_path="${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify"
+  elif [[ -d /var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify ]]; then
+    spotify_path="/var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify"
+  elif [[ -f ${shareDir}/spotify-launcher/install/usr/bin/spotify ]]; then
+    spotify_path="${shareDir}/spotify-launcher/install/usr/share/spotify"
+  elif [[ -d /opt/spotify ]]; then
+    spotify_path="/opt/spotify"
+  fi
+
+  # Skip if spotify or spicetify is not installed/present
+  if ! { { pkg_installed spotify && pkg_installed spicetify-cli; } || [[ -e $spotify_path ]]; }; then
     return 0
   fi
 
-  # Skip if the theme and backup exist AND the config file is valid (not empty)
-  local config_file="$HOME/.config/spicetify/config-xpui.ini"
-  if [[ -d $HOME/.config/spicetify/Themes/Sleek ]] \
-    && [[ -d $HOME/.config/spicetify/Backup ]] \
-    && [[ -f $config_file && -s $config_file ]]; then
+  # Skip if already configured to Sleek theme and Wallbash color scheme
+  local current_theme
+  local color_scheme
+  current_theme=$(spicetify config 2>/dev/null | awk '{if ($1=="current_theme") print $2}') || true
+  color_scheme=$(spicetify config 2>/dev/null | awk '{if ($1=="color_scheme") print $2}') || true
+
+  if [[ $current_theme == "Sleek" && $color_scheme == "Wallbash" ]]; then
     return 0
   fi
 
@@ -34,86 +50,100 @@ install() {
     return 0
   fi
 
-  step "Configurando tema Sleek para Spotify"
+  local spotify_path=""
+  local shareDir=${XDG_DATA_HOME:-$HOME/.local/share}
+  local cache_dir="${cacheDir:-$XDG_CACHE_HOME/hyde}"
 
-  # Asegurar permisos de escritura en la carpeta de Spotify
-  if [[ -d /opt/spotify ]]; then
-    if [[ ! -w /opt/spotify || ! -w /opt/spotify/Apps ]]; then
-      info "Solicitando permisos de escritura para /opt/spotify..."
-      sudo chmod a+wr /opt/spotify
-      sudo chmod a+wr /opt/spotify/Apps -R
-    fi
+  # 1. Determine Spotify path and print logging
+  if [[ -n ${SPOTIFY_PATH:-} ]]; then
+    spotify_path="${SPOTIFY_PATH}"
+    cat <<EOF
+[warning]   using custom spotify path
+            ensure to have proper permissions for ${SPOTIFY_PATH}
+            run:
+            chmod a+wr ${SPOTIFY_PATH}
+            chmod a+wr -R ${SPOTIFY_PATH}/Apps
+
+            note: run with 'sudo' if only needed.
+EOF
+  elif [[ -d ${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify ]]; then
+    spotify_path="${XDG_DATA_HOME:-$HOME/.local/share}/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify"
+    print_log -sec "Spotify" " User Flatpak"
+  elif [[ -d /var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify ]]; then
+    spotify_path="/var/lib/flatpak/app/com.spotify.Client/x86_64/stable/active/files/extra/share/spotify"
+    print_log -sec "Spotify" " System Flatpak"
+  elif [[ -f ${shareDir}/spotify-launcher/install/usr/bin/spotify ]]; then
+    spotify_path="${shareDir}/spotify-launcher/install/usr/share/spotify"
+    print_log -sec "Spotify" " Spotify-launcher"
+  elif [[ -d /opt/spotify ]]; then
+    spotify_path="/opt/spotify"
+    print_log -sec "Spotify" " System Package Manager"
   fi
 
-  # Crear archivo dummy de preferencias si no existe
-  mkdir -p "$HOME/.config/spotify"
-  if [[ ! -f $HOME/.config/spotify/prefs ]]; then
+  if [[ -z $spotify_path ]]; then
+    warn_msg "No se pudo detectar la ruta de instalación de Spotify."
+    return 0
+  fi
+
+  # 2. Check/Set permissions
+  if [[ ! -w $spotify_path || ! -w $spotify_path/Apps ]]; then
+    notify-send -a "HyDE Alert" "Permission needed for Wallbash Spotify theme" || true
+    info "Solicitando permisos de escritura para $spotify_path..."
+    sudo chmod a+wr "$spotify_path" || true
+    sudo chmod a+wr -R "$spotify_path/Apps" || true
+  fi
+
+  if { { pkg_installed spotify && pkg_installed spicetify-cli; } || [[ -e $spotify_path ]]; }; then
+    print_log -sec "Spotify" -stat "path" " ${spotify_path}"
+
+    step "Configurando Spicetify"
+
+    # Initialize Spicetify config and prefs
+    spicetify &>/dev/null || true
+    mkdir -p "$HOME/.config/spotify"
     touch "$HOME/.config/spotify/prefs"
-  fi
 
-  # Crear directorios de configuración de Spicetify si no existen
-  mkdir -p "$HOME/.config/spicetify/Themes"
-  mkdir -p "$HOME/.config/spicetify/Extensions"
-
-  # Recuperar config-xpui.ini corrupto o vacío si aplica
-  local config_file="$HOME/.config/spicetify/config-xpui.ini"
-  if [[ ! -f $config_file || ! -s $config_file ]]; then
-    info "Inicializando archivo de configuración de Spicetify..."
-    rm -f "$config_file"
-    spicetify config &>/dev/null || true
-  fi
-
-  # Desactivar las búsquedas de actualizaciones automáticas para evitar timeouts de red
-  info "Desactivando búsqueda de actualizaciones en Spicetify..."
-  spicetify config check_spicetify_upgrade 0 &>/dev/null || true
-
-  # Configurar rutas locales básicas
-  spicetify config spotify_path "/opt/spotify" prefs_path "$HOME/.config/spotify/prefs" &>/dev/null || true
-
-  # Asegurar la existencia de los temas (fallback a local si falta)
-  if [[ ! -d $HOME/.config/spicetify/Themes/Sleek ]]; then
-    if [[ -f $cloneDir/Source/arcs/Spotify_Sleek.tar.gz ]]; then
-      info "Extrayendo tema Sleek desde el archivo comprimido local..."
-      tar -xzf "$cloneDir/Source/arcs/Spotify_Sleek.tar.gz" -C "$HOME/.config/spicetify/Themes/"
-    else
-      warn_msg "No se encontró el archivo del tema Sleek en la fuente."
-    fi
-  fi
-
-  # Asegurar la existencia de la extensión adblock (fallback a red con reintentos)
-  if [[ ! -f $HOME/.config/spicetify/Extensions/adblock.js ]]; then
-    info "Descargando extensión adblock..."
-    retry 3 download_file "https://raw.githubusercontent.com/rxri/spicetify-extensions/main/adblock/adblock.js" "$HOME/.config/spicetify/Extensions/adblock.js" || true
-  fi
-
-  # Aplicar tema y extensiones si el directorio Sleek es correcto
-  if [[ -d $HOME/.config/spicetify/Themes/Sleek ]]; then
-    # Inicializar backup de Spicetify si no existe
-    if [[ ! -d $HOME/.config/spicetify/Backup ]]; then
-      info "Creando copia de respaldo de Spotify..."
-      spicetify backup &>/dev/null || true
+    local spotify_conf
+    spotify_conf=$(spicetify -c 2>/dev/null) || true
+    if [[ -f $spotify_conf ]]; then
+      sed -i -e "/^prefs_path/ s+=.*$+= $HOME/.config/spotify/prefs+g" \
+             -e "/^spotify_path/ s+=.*$+= $spotify_path+g" \
+             -e "/^spotify_launch_flags/ s+=.*$+= --ozone-platform=wayland+g" "$spotify_conf"
     fi
 
-    # Configurar parámetros del tema
-    spicetify config current_theme Sleek &>/dev/null || true
-    spicetify config color_scheme Catppuccin &>/dev/null || true
-    spicetify config extensions adblock.js &>/dev/null || true
+    local spicetify_themes_dir="$HOME/.config/spicetify/Themes"
+    mkdir -p "$spicetify_themes_dir"
 
-    # Aplicar la configuración con auto-recuperación en caso de desajuste de versión/backup
-    info "Aplicando personalización a Spotify..."
-    if ! spicetify apply; then
-      warn_msg "spicetify apply falló. Intentando restaurar y regenerar backup..."
-      spicetify restore &>/dev/null || true
-      spicetify backup &>/dev/null || true
-      if ! spicetify apply; then
-        error_msg "No se pudo aplicar la personalización de Spicetify tras el intento de recuperación."
-        return 1
+    # Install Sleek theme if user.css doesn't exist
+    if [[ ! -f ${spicetify_themes_dir}/Sleek/user.css ]]; then
+      if [[ -f $cloneDir/Source/arcs/Spotify_Sleek.tar.gz ]]; then
+        info "Extrayendo tema Sleek desde el archivo comprimido local..."
+        tar -xzf "$cloneDir/Source/arcs/Spotify_Sleek.tar.gz" -C "$spicetify_themes_dir"
+      else
+        info "Descargando tema Sleek..."
+        mkdir -p "${cache_dir}/landing"
+        curl -L -o "${cache_dir}/landing/Spotify_Sleek.tar.gz" "https://github.com/HyDE-Project/HyDE/raw/master/Source/arcs/Spotify_Sleek.tar.gz"
+        tar -xzf "${cache_dir}/landing/Spotify_Sleek.tar.gz" -C "$spicetify_themes_dir"
       fi
     fi
 
-    success "Spotify: Tema Sleek (Catppuccin) y adblock configurados correctamente."
+    # Apply configuration
+    spicetify backup apply || true
+    spicetify config current_theme Sleek || true
+    spicetify config color_scheme Wallbash || true
+    spicetify config sidebar_config 0 || true
+    spicetify restore backup || true
+    spicetify backup apply || true
+
+    # If Spotify is running, run watcher
+    if pgrep -x spotify >/dev/null; then
+      pkill -x spicetify || true
+      spicetify -q watch -s &
+      disown
+    fi
+
+    success "Spotify: Tema Sleek (Wallbash) configurado correctamente."
   else
-    error_msg "No se pudo aplicar el tema Sleek porque el directorio del tema no existe."
-    return 1
+    warn_msg "Spotify o Spicetify no están instalados en el sistema."
   fi
 }
