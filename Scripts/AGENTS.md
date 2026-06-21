@@ -38,6 +38,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 | `diff_cfg.sh` | Diff local configs against repo templates |
 | `version.sh` | Git metadata and release-note generation |
 | `uninstall.sh` | Removal / cleanup |
+| `clean_test.sh` | VM test cleanup — deletes tracked configs and HyDE/RaVN remnants |
 
 ## Subdirectories
 
