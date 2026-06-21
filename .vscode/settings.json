@@ -8,6 +8,11 @@
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true
   },
+  "shellformat.path": "shfmt",
+  "shellformat.flag": "-i 2 -sr -kp -ci",
+  "shellformat.effectLanguages": [
+    "shellscript"
+  ],
 
   // ──── Shell: Linter (shellcheck) ────────────────────────────
   "shellcheck.enable": true,
