@@ -8,9 +8,7 @@ A deeply modified Arch Linux configuration based on [HyDE](https://github.com/Hy
 <a id="installation"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=INSTALLATION" width="450"/>
 
----
 
-## 🚀 Installation Options
 
 ### Full Installation (This Branch)
 Get the latest features and updates:
@@ -20,17 +18,14 @@ git clone --depth 1 https://github.com/robert-flo/RaVN ~/RaVN
 cd ~/RaVN/Scripts
 ./install.sh
 ```
+---
 
 <a id="updating"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
 
----
-
-## 🚀 Updating
-
 To update RaVN, you will need to pull the latest changes from GitHub and restore the configs by running the following commands:
 
-> [!WARNING]
+> [!CAUTION]
 > The following commands will discard any uncommitted local changes in the repository.
 
 ```shell
@@ -40,14 +35,14 @@ git reset --hard origin/master
 ./install.sh -r
 ```
 
-> [!IMPORTANT]
+> [!WARNING]
 > Please note that any configurations you made will be overwritten if listed to be done so as listed by `Scripts/restore_cfg.psv`.
 > However, all replaced configs are backed up and may be recovered from in `~/.config/cfg_backups`.
 
 
 ---
 
-HyDEVM is a script that allows you to run HyDE in a virtual machine for testing and development.
+RaVNVM is a script that allows you to run RaVN in a virtual machine for testing and development.
 
 ## Quick Start
 
