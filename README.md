@@ -20,6 +20,8 @@ cd ~/RaVN/Scripts
 ```
 ---
 
+<br> 
+
 <a id="updating"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
 
@@ -42,6 +44,11 @@ git reset --hard origin/master
 
 ---
 
+<br>
+<a id="ravnvm"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=RAVNVM" width="450"/>
+
+
 RaVNVM is a script that allows you to run RaVN in a virtual machine for testing and development.
 
 ## Quick Start
@@ -56,7 +63,13 @@ chmod +x ravnvm
 ```
 
 
-## See It in Action
+<br>
+
+
+<a id="See It in Action"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=See It in Action" width="450"/>
+
+
 
 <div align="center">
 
