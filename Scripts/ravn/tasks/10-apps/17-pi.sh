@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
-# ─── RaVN Task: Pi Coding Agent ──────────────────────────────────────────────
-# Migrated from installers/02-tui/pi.sh
-# Requires: omarchy-npx-install (provided by tasks/core/01-omarchy.sh)
+# shellcheck disable=SC2034
+# ─── RaVN Task: Oh My Pi Coding Agent ─────────────────────────────────────────
+# Requires: mise (provided by system package manager)
 
 PACKAGE="pi"
-DESCRIPTION="Earendil Pi Coding Agent via omarchy-npx-install"
+DESCRIPTION="Oh My Pi Coding Agent via mise"
 CATEGORY="apps"
 DEPENDS=()
 INTERACTIVE=false
 
 check() {
-  command -v pi &>/dev/null
+  local mise_shim_dir="${HOME}/.local/share/mise/shims"
+  if [[ -x ${mise_shim_dir}/omp || -x ${mise_shim_dir}/pi ]]; then
+    return 0
+  fi
+  command -v omp &> /dev/null || command -v pi &> /dev/null
 }
 
 install() {
-  local npx_installer="${HOME}/.local/share/omarchy/bin/omarchy-npx-install"
-  if [[ -x $npx_installer ]]; then
-    "$npx_installer" "@earendil-works/pi-coding-agent" "pi"
-  else
-    echo "Error: omarchy-npx-install not found at $npx_installer" >&2
+  if ! command -v mise &> /dev/null; then
+    echo "Error: mise not found" >&2
     return 1
   fi
+  mise use -g github:can1357/oh-my-pi
 }

@@ -12,7 +12,7 @@ Owned by the RaVN installer pipeline. Called by `install.sh` as a replacement fo
 - **Module contract**: Every task under `tasks/` must define `PACKAGE` and `install()`. Optional: `DESCRIPTION`, `CATEGORY`, `DEPENDS`, `INTERACTIVE`, `before()`, `check()`, `after()`, `cleanup()`. Defaults are provided by `framework/package.sh`.
 - **Discovery**: Modules are auto-discovered via `find tasks/ -name "*.sh" | sort`. No hardcoded arrays or registration functions.
 - **Naming**: Category directories and files both use numeric prefixes for ordering (e.g., `00-core/01-omarchy.sh`). Categories sort first, then files within each category.
-- **Dependency ordering**: `00-core/` runs before `10-apps/` by design. Modules in `10-apps/` that require `omarchy-npx-install` (codex, copilot, ghui, opencode, pi, playwright) depend on `00-core/01-omarchy.sh` completing first.
+- **Dependency ordering**: `00-core/` runs before `10-apps/` by design. Modules in `10-apps/` that require `omarchy-npx-install` (codex, copilot, ghui, opencode, playwright) depend on `00-core/01-omarchy.sh` completing first.
 - **Lifecycle order**: `before → check → install → after → cleanup`. The `check()` function returns 0 to skip, 1 to proceed.
 - **Interactive modules**: Set `INTERACTIVE=true` in the module header. The pipeline prompts for confirmation — modules must not prompt themselves.
 - **Logging**: Per-package logs go to `cache/logs/<package>.log`.
