@@ -240,6 +240,53 @@ endif
 	@printf "\n"
 
 # ═══════════════════════════════════════════════════════════════
+# 🚀 GIT-SETUP - Clone a repo and create all worktrees ready to push
+# ═══════════════════════════════════════════════════════════════
+# ──── Setup: bare clone + all worktrees + upstream tracking ──
+# ──── Usage: make git-setup REPO=git@github.com:user/repo.git ─
+#
+# Locations (can be overridden via environment variables):
+#   Bare objects:  $$BARE_HOME/<repo>       (default: ~/.local/share/git-bare/<repo>)
+#   Worktrees:     $$WORKTREES_HOME/<repo>  (default: ~/Work/<repo>)
+git-setup: ## Clone a repo as bare + create all worktrees with upstream (use REPO=url)
+	@printf "\n"
+	@printf "$(CYAN)🚀 git-setup · bare clone + worktrees$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@if [ -z "$(REPO)" ] || [ "$(REPO)" = "RaVN" ]; then \
+		printf "$(RED)  ✗ missing or invalid required argument$(NC)\n\n"; \
+		printf "  usage:  $(BLUE)make git-setup REPO=git@github.com:robert-flo/RaVN.git$(NC)\n\n"; \
+		printf "  override locations:\n"; \
+		printf "    $(DIM)BARE_HOME$(NC)       bare objects dir   (default: $(DIM)~/.local/share/git-bare$(NC))\n"; \
+		printf "    $(DIM)WORKTREES_HOME$(NC)  worktrees base dir (default: $(DIM)~/Work$(NC))\n\n"; \
+		exit 1; \
+	fi; \
+	if command -v git-bare-clone >/dev/null 2>&1; then \
+		SCRIPT="git-bare-clone"; \
+	elif [ -f "Configs/.local/bin/git-bare-clone" ]; then \
+		SCRIPT="./Configs/.local/bin/git-bare-clone"; \
+	else \
+		SCRIPT=""; \
+	fi; \
+	if [ -z "$$SCRIPT" ]; then \
+		printf "$(RED)  ✗ git-bare-clone not found$(NC)\n\n"; \
+		printf "  It should be present at Configs/.local/bin/git-bare-clone\n"; \
+		printf "  Ensure the file exists and is executable.\n\n"; \
+		exit 1; \
+	fi; \
+	if [ "$$DRY_RUN" = "1" ]; then \
+		printf "  ▶ [dry-run] $$SCRIPT $(REPO)\n"; \
+	else \
+		$$SCRIPT $(REPO); \
+	fi
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@REPO_NAME=$$(basename "$(REPO)" .git); \
+	WTHOME=$${WORKTREES_HOME:-$$HOME/Work}; \
+	printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"; \
+	printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"; \
+	printf "  • enter a worktree:  $(BLUE)cd $$WTHOME/$$REPO_NAME/<branch>$(NC)\n"; \
+	printf "  • check git status:  $(BLUE)make git-status$(NC)\n\n"
+
+# ═══════════════════════════════════════════════════════════════
 # 🔄 GIT-SYNC - Pull rebase + push all topic branches from dev
 # ═══════════════════════════════════════════════════════════════
 # ──── Sync: rebase each branch onto origin/dev, then push ────
