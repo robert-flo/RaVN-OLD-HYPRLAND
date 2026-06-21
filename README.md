@@ -2,6 +2,7 @@
 
 A deeply modified Arch Linux configuration based on [HyDE](https://github.com/HyDE-Project/HyDE), designed for power users seeking a scalable, professional, and complete development environment optimized for AI-assisted software development in 2026. Built with dotbare for selective dotfile tracking, automated installation scripts, and a comprehensive Makefile for seamless system administration. It integrates the modular RaVN bootstrap framework ([Scripts/ravn](Scripts/ravn)), custom CLI utilities ([Configs/.local/bin](Configs/.local/bin)), and a dedicated [git-setup.sh](git-setup.sh) script for streamlined Git and SSH configuration.
 
+---
 
 <br>
 
@@ -62,6 +63,7 @@ chmod +x ravnvm
 ./ravnvm
 ```
 
+---
 
 <br>
 
@@ -76,6 +78,11 @@ chmod +x ravnvm
 <https://github.com/user-attachments/assets/7f8fadc8-e293-4482-a851-e9c6464f5265>
 
 </div>
+
+---
+
+<br>
+
 
 Read more at [robert-flo.github.io/ravn](https://robert-flo.github.io/ravn).
 
