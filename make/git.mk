@@ -108,14 +108,20 @@ ifndef EMBEDDED
 endif
 	@BRANCH=$$(git branch --show-current); \
 	REMOTE=$$(git remote get-url origin 2>/dev/null | sed -E 's|.*github.com[:/]([^/]+/[^/]+)(\.git)?$$|\1|' | sed 's|\.git$$||'); \
-	UNPUSHED=$$(git log origin/$$BRANCH..HEAD --oneline 2>/dev/null | wc -l); \
 	printf "  $(DIM)branch:$(NC) $$BRANCH  $(DIM)remote:$(NC) $$REMOTE\n"; \
-	if [ $$UNPUSHED -gt 0 ]; then \
-		printf "\n  pushing $$UNPUSHED commit(s)...\n"; \
+	if git rev-parse --verify --quiet refs/remotes/origin/$$BRANCH >/dev/null 2>&1; then \
+		UNPUSHED=$$(git log origin/$$BRANCH..HEAD --oneline 2>/dev/null | wc -l); \
+		if [ $$UNPUSHED -gt 0 ]; then \
+			printf "\n  pushing $$UNPUSHED commit(s)...\n"; \
+			$(EXEC) git push || exit 1; \
+			printf "$(GREEN)  ✓ pushed to remote$(NC)\n"; \
+		else \
+			printf "$(GREEN)  ✓  everything up-to-date$(NC)\n"; \
+		fi; \
+	else \
+		printf "\n  pushing new branch $$BRANCH to remote...\n"; \
 		$(EXEC) git push || exit 1; \
 		printf "$(GREEN)  ✓ pushed to remote$(NC)\n"; \
-	else \
-		printf "$(GREEN)  ✓  everything up-to-date$(NC)\n"; \
 	fi
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
@@ -178,7 +184,7 @@ endif
 			fi; \
 		fi; \
 		printf "  $(DIM)recent commits:$(NC)\n"; \
-		git log --max-count=5 --pretty=format:"  %C(green)%h%C(reset)  %<(50,trunc)%s  %C(dim)%<(15)%ar%C(reset)" 2>/dev/null; \
+		git --no-pager log --max-count=5 --pretty=format:"  %C(green)%h%C(reset)  %<(50,trunc)%s  %C(dim)%<(15)%ar%C(reset)" 2>/dev/null; \
 		printf "\n"; \
 	else \
 		printf "$(YELLOW)  ⚠  not a git repository$(NC)\n"; \
@@ -238,7 +244,7 @@ ifndef EMBEDDED
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
 	@if git rev-parse --git-dir > /dev/null 2>&1; then \
-		git log --max-count=15 --pretty=format:"  %C(green)%h%C(reset)  %<(58,trunc)%s  %C(dim)%<(15)%ar%C(reset)" 2>/dev/null; \
+		git --no-pager log --max-count=15 --pretty=format:"  %C(green)%h%C(reset)  %<(58,trunc)%s  %C(dim)%<(15)%ar%C(reset)" 2>/dev/null; \
 	else \
 		printf "$(YELLOW)  ⚠  not a git repository$(NC)\n"; \
 	fi
