@@ -2,6 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
+            // ──── shellcheck: lint all shell scripts → Problems panel ──────────
             "label": "shellcheck: check",
             "type": "shell",
             "command": "find . -type f -name '*.sh' -not -path '*/.git/*' -exec shellcheck -f gcc {} + || true",
