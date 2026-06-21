@@ -1,0 +1,11 @@
+{
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    "python.languageServer": "Default",
+    "security.workspace.trust.untrustedFiles": "open",
+    "shellformat.path": "shfmt",
+    "shellformat.flag": "-i 2 -sr -kp -ci",
+    "shellformat.effectLanguages": [
+        "shellscript"
+    ]
+}
