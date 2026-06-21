@@ -19,7 +19,9 @@ else
   EXEC =
 endif
 
-.PHONY: git-add git-commit git-add-commit git-push git-status git-diff git-log git-setup git-sync
+RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
+
+.PHONY: git-add git-commit git-add-commit git-push git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here
 
 # ═══════════════════════════════════════════════════════════════
 # 💾 GIT-ADD - Stage all modified/new files for commit
@@ -371,3 +373,90 @@ git-sync: ## Rebase all topic branches onto dev and push (default REPO=RaVN)
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • verify status: $(BLUE)make git-status$(NC)\n"
 	@printf "  • view history:  $(BLUE)make git-log$(NC)\n\n"
+
+# ═══════════════════════════════════════════════════════════════
+# 🔄 GIT-DIFF-DEV - Compare dev worktree against rc worktree
+# ═══════════════════════════════════════════════════════════════
+# ──── Diff: Compare dev against rc using hunk patch ──────────
+git-diff-dev: ## Compare dev worktree against rc
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔄 git-diff-dev · compare dev against rc$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -d "$(RAVN_WTS_DIR)/rc" ] && [ -d "$(RAVN_WTS_DIR)/dev" ]; then \
+		printf "  comparing dev against rc...\n"; \
+		if command -v hunk >/dev/null 2>&1; then \
+			git diff --no-index "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/" | hunk patch; \
+		else \
+			git diff --no-index --color=always "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/"; \
+		fi; \
+	else \
+		printf "$(RED)  ✗ dev or rc worktree directory not found$(NC)\n"; \
+		exit 1; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • compare rc against master:            $(BLUE)make git-diff-rc$(NC)\n"
+	@printf "  • compare current worktree against dev: $(BLUE)make git-diff-here$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🔄 GIT-DIFF-RC - Compare rc worktree against master worktree
+# ═══════════════════════════════════════════════════════════════
+# ──── Diff: Compare rc against master using hunk patch ────────
+git-diff-rc: ## Compare rc worktree against master
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔄 git-diff-rc · compare rc against master$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -d "$(RAVN_WTS_DIR)/master" ] && [ -d "$(RAVN_WTS_DIR)/rc" ]; then \
+		printf "  comparing rc against master...\n"; \
+		if command -v hunk >/dev/null 2>&1; then \
+			git diff --no-index "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/" | hunk patch; \
+		else \
+			git diff --no-index --color=always "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/"; \
+		fi; \
+	else \
+		printf "$(RED)  ✗ rc or master worktree directory not found$(NC)\n"; \
+		exit 1; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • compare dev against rc:               $(BLUE)make git-diff-dev$(NC)\n"
+	@printf "  • compare current worktree against dev: $(BLUE)make git-diff-here$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🔄 GIT-DIFF-HERE - Compare current worktree against dev worktree
+# ═══════════════════════════════════════════════════════════════
+# ──── Diff: Compare current worktree against dev using hunk ───
+git-diff-here: ## Compare current worktree against dev
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔄 git-diff-here · compare current worktree against dev$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -d "$(RAVN_WTS_DIR)/dev" ] && [ -d "$(abspath $(RAVN_DIR))" ]; then \
+		printf "  comparing current worktree against dev...\n"; \
+		if command -v hunk >/dev/null 2>&1; then \
+			git diff --no-index "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/" | hunk patch; \
+		else \
+			git diff --no-index --color=always "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/"; \
+		fi; \
+	else \
+		printf "$(RED)  ✗ dev or current worktree directory not found$(NC)\n"; \
+		exit 1; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • compare dev against rc:    $(BLUE)make git-diff-dev$(NC)\n"
+	@printf "  • compare rc against master: $(BLUE)make git-diff-rc$(NC)\n\n"
+endif
