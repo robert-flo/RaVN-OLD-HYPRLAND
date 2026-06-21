@@ -238,3 +238,78 @@ endif
 		printf "$(YELLOW)  ⚠  not a git repository$(NC)\n"; \
 	fi
 	@printf "\n"
+
+# ═══════════════════════════════════════════════════════════════
+# 🔄 GIT-SYNC - Pull rebase + push all topic branches from dev
+# ═══════════════════════════════════════════════════════════════
+# ──── Sync: rebase each branch onto origin/dev, then push ────
+# ──── Usage: make git-sync [REPO=name] ────────────────────────
+#
+# Branches synced: Dynamically detected from ~/Work/<repo>/
+# Branches EXCLUDED: dev master rc (protected/base branches)
+#
+# Override worktrees location:
+#   WORKTREES_HOME=~/Projects make git-sync REPO=RaVN
+REPO ?= RaVN
+git-sync: ## Rebase all topic branches onto dev and push (default REPO=RaVN)
+	@printf "\n"
+	@printf "$(CYAN)🔄 git-sync · rebase all topic branches onto dev$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@if [ -z "$(REPO)" ]; then \
+		printf "$(RED)  ✗ missing required argument$(NC)\n\n"; \
+		printf "  usage:  $(BLUE)make git-sync REPO=RaVN$(NC)\n\n"; \
+		printf "  override location:\n"; \
+		printf "    $(DIM)WORKTREES_HOME$(NC)  worktrees base dir (default: $(DIM)~/Work$(NC))\n\n"; \
+		exit 1; \
+	fi
+	@WTHOME=$${WORKTREES_HOME:-$$HOME/Work}; \
+	REPO_DIR="$$WTHOME/$(REPO)"; \
+	if [ ! -d "$$REPO_DIR" ]; then \
+		printf "$(RED)  ✗ worktrees directory not found$(NC)\n\n"; \
+		printf "  looked in:  $(DIM)$$REPO_DIR$(NC)\n\n"; \
+		if [ -n "$$WORKTREES_HOME" ]; then \
+			printf "  $(YELLOW)WORKTREES_HOME$(NC) is set to $(DIM)$$WORKTREES_HOME$(NC)\n"; \
+			printf "  make sure $(BLUE)$(REPO)$(NC) worktrees exist there\n\n"; \
+		else \
+			printf "  $(DIM)WORKTREES_HOME$(NC) is not set — defaulting to $(DIM)~/Work$(NC)\n\n"; \
+			printf "  if your worktrees are elsewhere, override:\n"; \
+			printf "    $(BLUE)WORKTREES_HOME=<path> make git-sync REPO=$(REPO)$(NC)\n\n"; \
+			printf "  if the repo is not cloned yet:\n"; \
+			printf "    $(BLUE)make git-setup REPO=git@github.com:<user>/$(REPO).git$(NC)\n\n"; \
+		fi; \
+		exit 1; \
+	fi; \
+	FAILED=""; \
+	for branch_dir in "$$REPO_DIR"/*; do \
+		[ -d "$$branch_dir" ] || continue; \
+		[ -e "$$branch_dir/.git" ] || continue; \
+		branch=$$(basename "$$branch_dir"); \
+		if [ "$$branch" = "dev" ] || [ "$$branch" = "master" ] || [ "$$branch" = "rc" ] || [ "$$branch" = "imgbot" ]; then \
+			continue; \
+		fi; \
+		printf "  syncing $(BLUE)$$branch$(NC) ..."; \
+		if git -C "$$branch_dir" pull --rebase origin dev > /dev/null 2>&1; then \
+			if git -C "$$branch_dir" push > /dev/null 2>&1; then \
+				printf " $(GREEN)✓$(NC)\n"; \
+			else \
+				printf " $(YELLOW)⚠  push failed (may need --force-with-lease)$(NC)\n"; \
+				FAILED="$$FAILED $$branch"; \
+			fi; \
+		else \
+			printf " $(RED)✗  rebase conflict$(NC)\n"; \
+			git -C "$$branch_dir" rebase --abort > /dev/null 2>&1 || true; \
+			FAILED="$$FAILED $$branch"; \
+		fi; \
+	done; \
+	printf "\n$(DIM)  dev, master, rc, imgbot: skipped (protected/base branches)$(NC)\n"; \
+	if [ -n "$$FAILED" ]; then \
+		printf "\n$(RED)  ✗ failed:$$FAILED$(NC)\n"; \
+		printf "  resolve conflicts manually, then push with:\n"; \
+		printf "  $(BLUE)git -C $$REPO_DIR/<branch> push --force-with-lease$(NC)\n\n"; \
+		exit 1; \
+	fi
+	@printf "\n$(GREEN)  ✓ all branches synced$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • verify status: $(BLUE)make git-status$(NC)\n"
+	@printf "  • view history:  $(BLUE)make git-log$(NC)\n\n"
