@@ -16,6 +16,6 @@
 
   // ──── Shell: Linter (shellcheck) ────────────────────────────
   "shellcheck.enable": true,
-  "shellcheck.run": "onSave",
-  "shellcheck.executablePath": "shellcheck"
+  "shellcheck.run": "onType",
+  "shellcheck.executablePath": "/usr/bin/shellcheck"
 }

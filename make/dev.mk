@@ -44,6 +44,16 @@ dev-setup: ## Wire git hooks and prepare local dev environment
 	@command -v shfmt >/dev/null 2>&1 && printf "$(GREEN)✓$(NC)\n" || printf "$(YELLOW)⚠  not installed$(NC)\n"
 	@printf "  shellcheck...               "
 	@command -v shellcheck >/dev/null 2>&1 && printf "$(GREEN)✓$(NC)\n" || printf "$(YELLOW)⚠  not installed$(NC)\n"
+	@printf "  workspace .vscode...        "
+	@if [ -d "../.git" ] || [ -f "../.git" ]; then \
+		if [ ! -d "../.vscode" ]; then \
+			cp -r .vscode .. && printf "$(GREEN)✓$(NC)\n"; \
+		else \
+			printf "$(GREEN)✓ (already exists)$(NC)\n"; \
+		fi \
+	else \
+		printf "$(DIM)skipped (not in sub-workspace)$(NC)\n"; \
+	fi
 	@printf "  logs/ dir...                "
 	@mkdir -p logs && printf "$(GREEN)✓$(NC)\n"
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
