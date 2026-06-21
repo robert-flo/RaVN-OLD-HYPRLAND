@@ -104,8 +104,11 @@ ffmpeg                                                 # Required by yt-dlp to m
 starship|zsh                                           # customizable shell prompt written in Rust
 # starship-git                                         # The cross-shell prompt for astronauts
 starship|fish                                          # customizable shell prompt
+shfmt                                                  # Shell script formatter
+shellcheck                                             # Shell script static analysis tool
 
 fastfetch                                              # system information fetch tool
+
 
 # --------------------------------------------------- // RaVN
 hyprquery                                              # A CLI utility for querying configuration values from hypr-related configuration. Using native hyprlang lib.
