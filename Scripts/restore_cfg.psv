@@ -80,6 +80,7 @@ O|${HOME}/.local/bin|git-bare-clone git-create-worktree git-issue-worktree|git
 P|${HOME}/.config/Code - OSS/User|settings.json|code
 P|${HOME}/.config/Code/User|settings.json|visual-studio-code-bin
 P|${HOME}/.config/VSCodium/User|settings.json|vscodium
+P|${HOME}/.config/Antigravity IDE/User|settings.json|bash
 
  Bar 
 P|${HOME}/.config/waybar|user-style.css config.jsonc theme.css style.css|waybar

@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // ──── shellcheck: lint all shell scripts → Problems panel ──────────
+            "label": "shellcheck: check",
+            "type": "shell",
+            "command": "find . -type f -name '*.sh' -not -path '*/.git/*' -exec shellcheck -f gcc {} + || true",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": {
+                "owner": "shellcheck",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*?):(\\d+):(\\d+):\\s+(error|warning|info|style|note):\\s+(.*)\\s+\\[(SC\\d+)\\]$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5,
+                    "code": 6
+                }
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "runOn": "folderOpen"
+            }
+        }
+    ]
+}
