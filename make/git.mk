@@ -192,6 +192,35 @@ ifndef EMBEDDED
 	@printf "  • full history:     $(BLUE)make git-log$(NC)\n\n"
 endif
 
+# ═══════════════════════════════════════════════════════════════
+# 🔄 GIT-DIFF - Show uncommitted changes in the repository
+# ═══════════════════════════════════════════════════════════════
+# ──── Diff: All repository files — summary and full detail ────
+git-diff: ## Show uncommitted changes in the repository
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔄 git-diff · repository changes$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if git diff --quiet 2>/dev/null; then \
+		printf "$(GREEN)  ✓ no uncommitted changes in repository$(NC)\n"; \
+	else \
+		CHANGED_FILES=$$(git diff --name-only 2>/dev/null | wc -l); \
+		ADDED_LINES=$$(git diff --numstat 2>/dev/null | awk '{sum+=$$1} END {print sum+0}'); \
+		DELETED_LINES=$$(git diff --numstat 2>/dev/null | awk '{sum+=$$2} END {print sum+0}'); \
+		printf "  $(DIM)files:$(NC) $$CHANGED_FILES  $(GREEN)+$$ADDED_LINES$(NC)  $(RED)-$$DELETED_LINES$(NC)\n\n"; \
+		git diff --stat --color=always 2>/dev/null || git diff --stat; \
+		printf "\n"; \
+		git diff --color=always 2>/dev/null || git diff; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • stage and commit: $(BLUE)make git-add-commit$(NC)\n"
+	@printf "  • validate scripts: $(BLUE)make fmt-lint$(NC)\n"
+	@printf "  • test in RavnVM:   $(BLUE)make dev-vm$(NC)\n\n"
+endif
 
 # ═══════════════════════════════════════════════════════════════
 # 📜 GIT-LOG - Show recent commit history
