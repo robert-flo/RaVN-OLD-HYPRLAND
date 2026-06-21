@@ -49,6 +49,35 @@ ifndef EMBEDDED
 	@printf "  • inspect what changed: $(BLUE)make git-diff$(NC)\n\n"
 endif
 
+# ═══════════════════════════════════════════════════════════════
+# ☁️  GIT-PUSH - Sync local commits to remote repository
+# ═══════════════════════════════════════════════════════════════
+# ──── Push: Sends unpushed commits to origin via git push ────
+git-push: ## Push to remote
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)☁️  git-push · sync to remote$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@BRANCH=$$(git branch --show-current); \
+	REMOTE=$$(git remote get-url origin 2>/dev/null | sed -E 's|.*github.com[:/]([^/]+/[^/]+)(\.git)?$$|\1|' | sed 's|\.git$$||'); \
+	UNPUSHED=$$(git log origin/$$BRANCH..HEAD --oneline 2>/dev/null | wc -l); \
+	printf "  $(DIM)branch:$(NC) $$BRANCH  $(DIM)remote:$(NC) $$REMOTE\n"; \
+	if [ $$UNPUSHED -gt 0 ]; then \
+		printf "\n  pushing $$UNPUSHED commit(s)...\n"; \
+		$(EXEC) git push || exit 1; \
+		printf "$(GREEN)  ✓ pushed to remote$(NC)\n"; \
+	else \
+		printf "$(GREEN)  ✓  everything up-to-date$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • verify remote history: $(BLUE)make git-log$(NC)\n"
+	@printf "  • check repo state: $(BLUE)make git-status$(NC)\n"
+	@printf "  • apply system after push: $(BLUE)make sys-apply$(NC)\n\n"
+endif
 
 # ═══════════════════════════════════════════════════════════════
 # 📊 GIT-STATUS - Show repository state and recent commits
