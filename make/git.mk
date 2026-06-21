@@ -22,6 +22,35 @@ endif
 .PHONY: git-add git-commit git-add-commit git-push git-status git-diff git-log git-setup git-sync
 
 # ═══════════════════════════════════════════════════════════════
+# 💾 GIT-ADD - Stage all modified/new files for commit
+# ═══════════════════════════════════════════════════════════════
+# ──── Stage: Adds all modified/new files to the git index ────
+git-add: ## Stage all changes for git
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)💾 git-add · staging all changes$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@CHANGED=$$(git status --short | wc -l); \
+	if [ $$CHANGED -gt 0 ]; then \
+		printf "  adding $$CHANGED file(s) to staging area...\n"; \
+		$(EXEC) git add .; \
+		printf "$(GREEN)  ✓ staged $$CHANGED file(s)$(NC)\n\n"; \
+		git status --short | sed 's/^/  /'; \
+	else \
+		printf "$(GREEN)  ✓  nothing to stage — working tree is clean$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • commit staged changes: $(BLUE)make git-commit$(NC)\n"
+	@printf "  • stage and commit in one step: $(BLUE)make git-add-commit$(NC)\n"
+	@printf "  • inspect what changed: $(BLUE)make git-diff$(NC)\n\n"
+endif
+
+
+# ═══════════════════════════════════════════════════════════════
 # 📊 GIT-STATUS - Show repository state and recent commits
 # ═══════════════════════════════════════════════════════════════
 # ──── Status: Branch, remote, local changes, last 3 commits ─
