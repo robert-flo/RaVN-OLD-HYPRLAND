@@ -22,6 +22,73 @@ endif
 .PHONY: git-add git-commit git-add-commit git-push git-status git-diff git-log git-setup git-sync
 
 # ═══════════════════════════════════════════════════════════════
+# 📊 GIT-STATUS - Show repository state and recent commits
+# ═══════════════════════════════════════════════════════════════
+# ──── Status: Branch, remote, local changes, last 3 commits ─
+git-status: ## Show current repository state
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📊 git-status · repository overview$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@printf "  $(DIM)host:$(NC)  $(HOSTNAME)  $(DIM)flake:$(NC) $(PWD)\n"
+	@printf "  $(DIM)nixos:$(NC) $$(nixos-version 2>/dev/null | cut -d' ' -f1 || echo 'N/A')\n\n"
+	@if git rev-parse --git-dir > /dev/null 2>&1; then \
+		REMOTE_URL=$$(git remote get-url origin 2>/dev/null); \
+		REPO_NAME=$$(echo "$$REMOTE_URL" | sed -E 's|.*github.com[:/]([^/]+/[^/]+)(\.git)?$$|\1|' | sed 's|\.git$$||'); \
+		BRANCH=$$(git branch --show-current); \
+		AHEAD=$$(git rev-list --count @{u}..HEAD 2>/dev/null || echo 0); \
+		BEHIND=$$(git rev-list --count HEAD..@{u} 2>/dev/null || echo 0); \
+		STAGED=$$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' '); \
+		UNSTAGED=$$(git diff --name-only 2>/dev/null | wc -l | tr -d ' '); \
+		UNTRACKED=$$(git ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' '); \
+		printf "  $(DIM)repo:$(NC)   $$REPO_NAME\n"; \
+		printf "  $(DIM)branch:$(NC) $$BRANCH"; \
+		if [ "$$AHEAD" -gt 0 ] && [ "$$BEHIND" -gt 0 ]; then \
+			printf "  $(YELLOW)⇕ ↑$$AHEAD ↓$$BEHIND$(NC)"; \
+		elif [ "$$AHEAD" -gt 0 ]; then \
+			printf "  $(YELLOW)↑ $$AHEAD ahead$(NC)"; \
+		elif [ "$$BEHIND" -gt 0 ]; then \
+			printf "  $(RED)↓ $$BEHIND behind$(NC)"; \
+		fi; \
+		printf "\n\n"; \
+		if [ "$$STAGED" -eq 0 ] && [ "$$UNSTAGED" -eq 0 ] && [ "$$UNTRACKED" -eq 0 ]; then \
+			printf "  $(GREEN)✓ nothing to commit — working tree clean$(NC)\n"; \
+			printf "\n"; \
+		else \
+			if [ "$$STAGED" -gt 0 ]; then \
+				printf "  $(GREEN)staged:$(NC)    $$STAGED file(s)\n"; \
+				git diff --cached --name-only 2>/dev/null | while IFS= read -r f; do printf "    $(GREEN)+$(NC) $$f\n"; done; \
+				printf "\n"; \
+			fi; \
+			if [ "$$UNSTAGED" -gt 0 ]; then \
+				printf "  $(YELLOW)modified:$(NC)  $$UNSTAGED file(s)\n"; \
+				git diff --name-only 2>/dev/null | while IFS= read -r f; do printf "    $(YELLOW)~$(NC) $$f\n"; done; \
+				printf "\n"; \
+			fi; \
+			if [ "$$UNTRACKED" -gt 0 ]; then \
+				printf "  $(DIM)untracked:$(NC) $$UNTRACKED file(s)\n"; \
+				git ls-files --others --exclude-standard 2>/dev/null | while IFS= read -r f; do printf "    $(DIM)?$(NC) $$f\n"; done; \
+				printf "\n"; \
+			fi; \
+		fi; \
+		printf "  $(DIM)recent commits:$(NC)\n"; \
+		git log --max-count=5 --pretty=format:"  %C(green)%h%C(reset)  %<(50,trunc)%s  %C(dim)%<(15)%ar%C(reset)" 2>/dev/null; \
+		printf "\n"; \
+	else \
+		printf "$(YELLOW)  ⚠  not a git repository$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • stage and commit: $(BLUE)make git-add-commit$(NC)\n"
+	@printf "  • push changes:     $(BLUE)make git-push$(NC)\n"
+	@printf "  • full history:     $(BLUE)make git-log$(NC)\n\n"
+endif
+
+
+# ═══════════════════════════════════════════════════════════════
 # 📜 GIT-LOG - Show recent commit history
 # ═══════════════════════════════════════════════════════════════
 # ──── Log: Last 15 commits — short hash, message, age ────────
