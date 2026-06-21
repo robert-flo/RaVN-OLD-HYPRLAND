@@ -67,7 +67,7 @@ chmod +x ravnvm
 
 
 <a id="See It in Action"></a>
-<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=See It in Action" width="450"/>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=See%20It%20in%20Action" width="450"/>
 
 
 
