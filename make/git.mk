@@ -50,6 +50,53 @@ ifndef EMBEDDED
 endif
 
 # ═══════════════════════════════════════════════════════════════
+# 📝 GIT-COMMIT - Create a timestamped commit from staged changes
+# ═══════════════════════════════════════════════════════════════
+# ──── Commit: Stages all and creates commit with timestamp ───
+git-commit: ## Quick commit with timestamp
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📝 git-commit · timestamped snapshot$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		printf "  staging changes...\n"; \
+		$(EXEC) git add .; \
+		COMMIT_MSG="config: update $$(date '+%Y-%m-%d %H:%M:%S')"; \
+		printf "  commit: $(GREEN)$$COMMIT_MSG$(NC)\n\n"; \
+		$(EXEC) git commit -m "$$COMMIT_MSG" || exit 1; \
+		COMMIT_HASH=$$(git rev-parse --short HEAD); \
+		BRANCH=$$(git branch --show-current); \
+		printf "$(GREEN)  ✓ $(NC)$(DIM)$$COMMIT_HASH$(NC)  $$BRANCH\n"; \
+	else \
+		printf "$(GREEN)  ✓  nothing to commit — working tree is clean$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • push to remote: $(BLUE)make git-push$(NC)\n"
+	@printf "  • view recent history: $(BLUE)make git-log$(NC)\n"
+	@printf "  • check repo state:     $(BLUE)make git-status$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🔗 GIT-ADD-COMMIT - Stage and commit all changes in one step
+# ═══════════════════════════════════════════════════════════════
+# ──── Composite: Calls git-add then git-commit with EMBEDDED=1 ─
+git-add-commit: ## Stage and commit all changes together
+	@$(MAKE) -s git-add EMBEDDED=1
+	@$(MAKE) -s git-commit EMBEDDED=1
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • push to remote: $(BLUE)make git-push$(NC)\n"
+	@printf "  • check repo state:     $(BLUE)make git-status$(NC)\n"
+	@printf "  • view recent history: $(BLUE)make git-log$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
 # ☁️  GIT-PUSH - Sync local commits to remote repository
 # ═══════════════════════════════════════════════════════════════
 # ──── Push: Sends unpushed commits to origin via git push ────
