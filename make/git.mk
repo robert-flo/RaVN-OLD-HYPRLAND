@@ -205,13 +205,18 @@ endif
 	@if git diff --quiet 2>/dev/null; then \
 		printf "$(GREEN)  ✓ no uncommitted changes in repository$(NC)\n"; \
 	else \
+		if command -v hunk >/dev/null 2>&1; then \
+			hunk diff; \
+		else \
+			git diff --color=always 2>/dev/null || git diff; \
+		fi; \
+		printf "\n"; \
 		CHANGED_FILES=$$(git diff --name-only 2>/dev/null | wc -l); \
 		ADDED_LINES=$$(git diff --numstat 2>/dev/null | awk '{sum+=$$1} END {print sum+0}'); \
 		DELETED_LINES=$$(git diff --numstat 2>/dev/null | awk '{sum+=$$2} END {print sum+0}'); \
 		printf "  $(DIM)files:$(NC) $$CHANGED_FILES  $(GREEN)+$$ADDED_LINES$(NC)  $(RED)-$$DELETED_LINES$(NC)\n\n"; \
-		git diff --stat --color=always 2>/dev/null || git diff --stat; \
+		git --no-pager diff --stat --color=always 2>/dev/null || git --no-pager diff --stat; \
 		printf "\n"; \
-		git diff --color=always 2>/dev/null || git diff; \
 	fi
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"

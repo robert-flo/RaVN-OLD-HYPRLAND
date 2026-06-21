@@ -161,6 +161,7 @@ lazygit                                               # Simple terminal UI for g
 dotbare                                               # Manage your dotfiles interactively with fzf
 diff-so-fancy                                         # Fancy git diff preview
 git-delta                                             # Fancy git diff preview
+hunk-bin                                              # Review-first terminal diff viewer
 highlight                                             # Syntax highlighting when previewing files
 ruby-coderay                                          # highlighting when previewing files
 tree                                                  # Provide a directory tree view when finding directory
