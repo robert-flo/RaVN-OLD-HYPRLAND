@@ -13,6 +13,19 @@
 #    make dev-vm-clean   DRY_RUN=1   · skip cleaning cache
 #    make dev-vm-setup   DRY_RUN=1   · skip setup steps
 #    (dev-hosts, dev-search, dev-search-inst, dev-size, dev-vm-list, dev-vm-size are read-only)
+#
+# 💡 Usage Examples:
+#    make dev-vm                     · run vm on current active branch
+#    make dev-vm REF=dev             · run vm on specific branch 'dev'
+#    make dev-vm REF=500c083         · run vm on specific commit hash '500c083'
+#    make dev-vm-persist REF=dev     · run vm with persistent changes on 'dev'
+#    make dev-vm VM_MEMORY=8G        · run vm overriding memory allocation (8G)
+#    make dev-vm VM_CPUS=4           · run vm overriding CPU cores allocation (4)
+#    make dev-vm VM_EXTRA_ARGS="..." · run vm with extra QEMU arguments
+#    make dev-vm-list                · list available snapshots
+#    make dev-vm-clean               · clean all VM cache and snapshots
+#    make dev-vm-setup               · verify and install VM dependencies
+#    make dev-vm-size                · check VM disk usage and free space
 
 .PHONY: dev-hosts dev-search dev-search-inst dev-repl dev-shell dev-vm dev-size dev-vm-persist dev-vm-list dev-vm-clean dev-vm-setup dev-vm-size
 
