@@ -1,11 +1,11 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=omp TUI
+Name=oh my pi · the harness
 Comment=omp Terminal UI Agent
 Exec=xdg-terminal-exec --app-id=TUI.tile -e omp
 Terminal=false
-Icon=utilities-terminal
+Icon=/home/dominus/.local/share/applications/icons/omp.png
 StartupNotify=true
 Path=/home/dominus/src
 Categories=ConsoleOnly;TUI;Utility;
