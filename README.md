@@ -79,13 +79,25 @@ chmod +x ravnvm
 
 </div>
 
----
-
-<br>
 
 
 Read more at [robert-flo.github.io/ravn](https://robert-flo.github.io/ravn).
 
+---
+
+<br>
+
+<a id="contributing"></a>
+<img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=CONTRIBUTING" width="450"/>
+
+- I actual prefer a well written issue describing features/bugs u want rather than a vibe-coded PR
+- I review every line personally and will close if I feel like the quality is not up to standard
+
+---
+
+<br>
+
 ## License
 
 This configuration is released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
+
