@@ -311,7 +311,7 @@ git-setup: ## Clone a repo as bare + create all worktrees with upstream (use REP
 # Override worktrees location:
 #   WORKTREES_HOME=~/Projects make git-sync REPO=RaVN
 REPO ?= RaVN
-git-sync: ## Rebase all topic branches onto dev and push (default REPO=RaVN)
+git-sync: ## Rebase all topic branches onto dev (local only, default REPO=RaVN)
 	@printf "\n"
 	@printf "$(CYAN)🔄 git-sync · rebase all topic branches onto dev$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
@@ -348,15 +348,20 @@ git-sync: ## Rebase all topic branches onto dev and push (default REPO=RaVN)
 			continue; \
 		fi; \
 		printf "  syncing $(BLUE)$$branch$(NC) ..."; \
-		if git -C "$$branch_dir" pull --rebase origin dev > /dev/null 2>&1; then \
-			if git -C "$$branch_dir" push > /dev/null 2>&1; then \
-				printf " $(GREEN)✓$(NC)\n"; \
+		is_dirty=$$(git -C "$$branch_dir" status --porcelain 2>/dev/null); \
+		err_log=$$(git -C "$$branch_dir" pull --rebase --autostash origin dev 2>&1); \
+		if [ $$? -eq 0 ]; then \
+			if [ -n "$$is_dirty" ]; then \
+				printf " $(GREEN)✓$(NC) $(DIM)(autostashed)$(NC)\n"; \
 			else \
-				printf " $(YELLOW)⚠  push failed (may need --force-with-lease)$(NC)\n"; \
-				FAILED="$$FAILED $$branch"; \
+				printf " $(GREEN)✓$(NC)\n"; \
 			fi; \
 		else \
-			printf " $(RED)✗  rebase conflict$(NC)\n"; \
+			if echo "$$err_log" | grep -q "Conflict"; then \
+				printf " $(RED)✗  rebase conflict$(NC)\n"; \
+			else \
+				printf " $(RED)✗  rebase failed: $$(echo "$$err_log" | head -n 1)$(NC)\n"; \
+			fi; \
 			git -C "$$branch_dir" rebase --abort > /dev/null 2>&1 || true; \
 			FAILED="$$FAILED $$branch"; \
 		fi; \
@@ -364,11 +369,14 @@ git-sync: ## Rebase all topic branches onto dev and push (default REPO=RaVN)
 	printf "\n$(DIM)  dev, master, rc, imgbot: skipped (protected/base branches)$(NC)\n"; \
 	if [ -n "$$FAILED" ]; then \
 		printf "\n$(RED)  ✗ failed:$$FAILED$(NC)\n"; \
-		printf "  resolve conflicts manually, then push with:\n"; \
-		printf "  $(BLUE)git -C $$REPO_DIR/<branch> push --force-with-lease$(NC)\n\n"; \
+		printf "  resolve conflicts manually with:\n"; \
+		for f in $$FAILED; do \
+			printf "  $(BLUE)git -C $$REPO_DIR/$$f pull --rebase origin dev$(NC)\n"; \
+		done; \
+		printf "\n"; \
 		exit 1; \
 	fi
-	@printf "\n$(GREEN)  ✓ all branches synced$(NC)\n"
+	@printf "\n$(GREEN)  ✓ all branches synced locally$(NC)\n"
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • verify status: $(BLUE)make git-status$(NC)\n"
