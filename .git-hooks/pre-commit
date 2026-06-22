@@ -35,6 +35,7 @@ while IFS= read -r file; do
      [[ $file == Scripts/extra/* ]] ||
      [[ $file == "Scripts/chaotic_aur.sh" ]] ||
      [[ $file == "Scripts/global_fn.sh" ]] ||
+     [[ $file == "Scripts/ravn/global_fn.sh" ]] ||
      [[ $file == "Scripts/install_pre.sh" ]] ||
      [[ $file == "Scripts/install_pst.sh" ]] ||
      [[ $file == "Scripts/restore_cfg.sh" ]] ||
