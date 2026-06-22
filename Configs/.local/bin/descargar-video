@@ -18,7 +18,7 @@
 #
 
 # 1. Validar que se pasó un argumento (el enlace)
-if [ -z "$1" ]; then
+if [[ -z $1 ]]; then
     gum style --foreground 210 "✕ Error: Debes pasar la URL del video como parámetro."
     echo "Uso: $(basename "$0") <URL_DEL_VIDEO>"
     exit 1
@@ -28,7 +28,7 @@ URL="$1"
 TARGET_DIR="$HOME/Videos"
 
 # 2. Crear la carpeta ~/Videos si no existe
-if [ ! -d "$TARGET_DIR" ]; then
+if [[ ! -d $TARGET_DIR ]]; then
     gum spin --spinner dot --title "Creando la carpeta $TARGET_DIR..." -- sleep 1
     mkdir -p "$TARGET_DIR"
 fi
@@ -40,20 +40,21 @@ OPTION=$(gum choose --cursor.foreground=99 "1. Video Completo (Máxima Calidad)"
 # 4. Ejecutar la descarga según la opción elegida
 cd "$TARGET_DIR" || exit 1
 
+success=0
 if [[ "$OPTION" == *"Video Completo"* ]]; then
     gum style --foreground 46 "➜ Descargando video en máxima calidad..."
-    
+
     # Ejecutamos yt-dlp. Pasamos el progreso limpio a gum para que se vea estético
     yt-dlp -f "bv*+ba/best" \
            --continue \
            --embed-metadata \
            --embed-thumbnail \
            --merge-output-format mkv \
-           "$URL"
+           "$URL" || success=1
 
 elif [[ "$OPTION" == *"Solo Audio"* ]]; then
     gum style --foreground 46 "➜ Descargando y convirtiendo a MP3..."
-    
+
     yt-dlp -f "ba/best" \
            --continue \
            --extract-audio \
@@ -61,11 +62,13 @@ elif [[ "$OPTION" == *"Solo Audio"* ]]; then
            --audio-quality 0 \
            --embed-metadata \
            --embed-thumbnail \
-           "$URL"
+           "$URL" || success=1
+else
+    success=1
 fi
 
 # 5. Mensaje de éxito
-if [ $? -eq 0 ]; then
+if ((success == 0)); then
     gum style --foreground 46 --bold "✔ ¡Descarga completada con éxito en $TARGET_DIR!"
 else
     gum style --foreground 196 --bold "✕ Algo salió mal durante la descarga."

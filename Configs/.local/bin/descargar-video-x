@@ -12,7 +12,7 @@
 #
 
 # 1. Validar que se pasó un argumento (el enlace de X)
-if [ -z "$1" ]; then
+if [[ -z $1 ]]; then
     gum style --foreground 210 "✕ Error: Debes pasar la URL del post de X como parámetro."
     echo "Uso: $(basename "$0") <URL_DE_X>"
     exit 1
@@ -22,7 +22,7 @@ URL="$1"
 TARGET_DIR="$HOME/Videos"
 
 # 2. Crear la carpeta ~/Videos si no existe
-if [ ! -d "$TARGET_DIR" ]; then
+if [[ ! -d $TARGET_DIR ]]; then
     gum spin --spinner dot --title "Creando la carpeta $TARGET_DIR..." -- sleep 1
     mkdir -p "$TARGET_DIR"
 fi
@@ -34,9 +34,10 @@ OPTION=$(gum choose --cursor.foreground=117 "1. Video Completo (Máxima Calidad 
 # 4. Ejecutar la descarga según la opción elegida
 cd "$TARGET_DIR" || exit 1
 
+success=0
 if [[ "$OPTION" == *"Video Completo"* ]]; then
     gum style --foreground 46 "➜ Descargando video de X en máxima calidad..."
-    
+
     # Ejecutamos yt-dlp usando cookies de Chrome y forzando la mejor combinación en MP4
     yt-dlp --cookies-from-browser chrome \
            -f "bestvideo+bestaudio/best" \
@@ -44,11 +45,11 @@ if [[ "$OPTION" == *"Video Completo"* ]]; then
            --embed-metadata \
            --embed-thumbnail \
            --merge-output-format mp4 \
-           "$URL"
+           "$URL" || success=1
 
 elif [[ "$OPTION" == *"Solo Audio"* ]]; then
     gum style --foreground 46 "➜ Descargando audio de X y convirtiendo a MP3..."
-    
+
     # Útil para Spaces de X o clips musicales
     yt-dlp --cookies-from-browser chrome \
            -f "bestaudio/best" \
@@ -58,13 +59,14 @@ elif [[ "$OPTION" == *"Solo Audio"* ]]; then
            --audio-quality 0 \
            --embed-metadata \
            --embed-thumbnail \
-           "$URL"
+           "$URL" || success=1
+else
+    success=1
 fi
 
 # 5. Mensaje de éxito o error
-if [ $? -eq 0 ]; then
+if ((success == 0)); then
     gum style --foreground 46 --bold "✔ ¡Descarga de X completada con éxito en $TARGET_DIR!"
 else
     gum style --foreground 196 --bold "✕ Algo salió mal. Asegúrate de tener Chrome abierto o con la sesión de X iniciada."
 fi
-
