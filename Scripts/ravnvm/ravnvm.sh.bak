@@ -56,7 +56,6 @@ function print_usage() {
     echo "  --clean                 Clean all cached data"
     echo "  --install-deps          Install required dependencies (Arch only)"
     echo "  --check-deps            Check if dependencies are installed"
-    echo "  --ssh                   Connect to the running VM via SSH"
     echo "  --help                  Show this help"
     echo ""
     echo "Environment Variables:"
@@ -328,10 +327,8 @@ function run_qemu_vm() {
             qemu_args+=("${extra_vm_args[@]}")
     fi
 
-        # Execute QEMU with all arguments and redirect stderr to log
-        if ! "$qemu_cmd" "${qemu_args[@]}" 2> "$CACHE_DIR/qemu.log"; then
-            echo "❌ QEMU failed to start. Check details in $CACHE_DIR/qemu.log" >&2
-    fi
+        # Execute QEMU with all arguments
+        "$qemu_cmd" "${qemu_args[@]}"
   fi
 }
 
@@ -366,6 +363,8 @@ function create_ravn_snapshot() {
     local snapshot_path="$SNAPSHOTS_DIR/ravn-$snapshot_name.qcow2"
     local qemu_cmd
     qemu_cmd=$(get_qemu_command)
+    local python_cmd
+    python_cmd=$(get_python_command)
 
     # Check if snapshot already exists
     if [ -f "$snapshot_path" ]; then
@@ -389,12 +388,12 @@ echo "🚀 Setting up RaVN environment for branch/commit: $ref"
 
 # Set root password for convenience (using 'arch' as requested for simplicity)
 echo "🔐 Setting root password..."
-echo "root:arch" | sudo chpasswd
+echo -e "arch\narch" | sudo passwd root
 
 # Update system and install dependencies
 echo "📦 Updating system and installing dependencies..."
 sudo pacman -Syu --noconfirm
-sudo pacman -S --needed --noconfirm git base-devel openssh curl kitty-terminfo
+sudo pacman -S --needed --noconfirm git base-devel openssh curl
 
 # Configure SSH
 echo "🔧 Configuring SSH..."
@@ -466,38 +465,30 @@ SETUP_EOF
     echo ""
     echo "🖥️  Starting VM for RaVN installation..."
     echo "📋 SETUP INSTRUCTIONS:"
-    echo "   1. The VM will boot in the background."
-    echo "   2. The setup script will be automatically copied to /home/arch/setup.sh via SSH (port 2222)."
-    echo "   3. Once copied, login to the VM (arch/arch) or SSH into it: ssh arch@127.0.0.1 -p 2222 (or ssh ravnvm)"
-    echo "   4. Run the setup script manually: chmod +x ./setup.sh && ./setup.sh"
-    echo "   5. When the installation finishes, power off the VM: sudo poweroff"
-    echo "      (This will automatically complete the snapshot creation on the host)"
+    echo "   1. Wait for the VM to boot to login prompt"
+    echo "   2. Login as: arch / arch"
+    echo "   3. Run: curl -s http://10.0.2.2:8000/setup.sh -o ./setup.sh"
+    echo "   4. Run: chmod +x ./setup.sh"
+    echo "   5. Run: ./setup.sh"
+    echo "   6. Wait for installation to complete"
+    echo "      - Hit enter for defaults"
+    echo "      - It will prompt for a password at the end, use 'arch'"
+    echo "      - If you end up missing the password check, you can rerun the install script './setup.sh'"
+    echo "   7. Run: sudo poweroff"
     echo ""
+    echo "Starting simple HTTP server for script delivery..."
 
-    # Start VM for setup in background with SSH port forward
-    run_qemu_vm "$temp_image" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}" "hostfwd=tcp::2222-:22" &
-    local qemu_pid=$!
+    # Start simple HTTP server in background to serve the setup script
+    cd "$CACHE_DIR"
+    # TODO: feat(ravnvm) migrate from the python http server to a pure ssh solution, no setup script needed
+    $python_cmd -m http.server 8000 --bind 127.0.0.1 &
+    local server_pid=$!
 
-    echo "⏳ Waiting for VM SSH server to be fully ready..."
-    while ! ssh-keyscan -p 2222 127.0.0.1 2> /dev/null | grep -q "ssh-"; do
-        sleep 1
-  done
-    echo "✅ SSH server is ready."
+    # Start VM for setup
+    run_qemu_vm "$temp_image" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}"
 
-    echo "📥 Copying setup script to VM..."
-    # We use StrictHostKeyChecking=no and UserKnownHostsFile=/dev/null to avoid host key warnings
-    local ssh_opts=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null)
-    if command -v sshpass > /dev/null 2>&1; then
-        sshpass -p 'arch' scp -P 2222 "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh
-  else
-        echo "💡 Tip: Install 'sshpass' to avoid entering the 'arch' password manually."
-        scp -P 2222 "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh
-  fi
-    echo "✅ setup.sh copied successfully to /home/arch/setup.sh"
-    echo "🚀 You can now login to the VM and run: chmod +x ./setup.sh && ./setup.sh"
-
-    # Wait for QEMU process to finish cleanly
-    wait $qemu_pid
+    # Kill the HTTP server
+    kill $server_pid 2> /dev/null || true
 
     echo ""
     echo "💾 Converting VM to snapshot..."
@@ -540,7 +531,7 @@ function run_vm() {
 
     echo "🚀 Starting RaVN VM (branch/commit: $ref)..."
     echo "   Login: arch / arch"
-    echo "   SSH: ssh arch@127.0.0.1 -p 2222 (or run: ravnvm --ssh or ssh ravnvm)"
+    echo "   SSH: ssh arch@localhost -p 2222"
 
     # Run VM with SSH port forwarding
     run_qemu_vm "$vm_disk" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}" "hostfwd=tcp::2222-:22"
@@ -557,13 +548,8 @@ function list_snapshots() {
 }
 
 function clean_cache() {
-    echo "🧹 Cleaning RavnVM cache (preserving base image)..."
-    if [ -d "$CACHE_DIR" ]; then
-        # Delete snapshots directory and any other temporary files, leaving only the base image
-        find "$CACHE_DIR" -mindepth 1 -maxdepth 1 ! -name "archbase.qcow2" -exec rm -rf {} +
-        # Recreate snapshots directory
-        mkdir -p "$SNAPSHOTS_DIR"
-  fi
+    echo "🧹 Cleaning RavnVM cache..."
+    rm -rf "$CACHE_DIR"
     echo "✅ Cache cleaned"
 }
 
@@ -595,10 +581,6 @@ while [ $# -gt 0 ]; do
         --check-deps)
             check_deps_only
             exit $?
-            ;;
-        --ssh)
-            ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null arch@127.0.0.1
-            exit 0
             ;;
         --help | -h)
             print_usage

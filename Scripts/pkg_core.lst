@@ -70,6 +70,7 @@ ffmpegthumbs                                           # for dolphin video thumb
 kde-cli-tools                                          # for dolphin file type defaults
 libnotify                                              # for notifications
 noto-fonts-emoji                                       # emoji font
+sshpass                                                # non-interactive ssh password provider
 
 # --------------------------------------------------- // Theming
 nwg-look                                               # gtk configuration tool
