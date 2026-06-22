@@ -40,6 +40,39 @@ NC     := \033[0m      # reset
 
 ---
 
+## Patrón: Encabezado del Archivo (.mk)
+
+Cada archivo `.mk` debe comenzar con un bloque de comentarios estructurado que documente en detalle los comandos que contiene, sus alias y el soporte para `DRY_RUN`. Esto asegura la coherencia visual e informativa en todo el proyecto.
+
+El encabezado debe seguir la siguiente estructura:
+
+1. **Borde decorativo y título**: Delimitado con doble línea gruesa `═` (U+2550).
+2. **Metadatos básicos**: Enlace a la documentación (`📚 Documentation: ...`), propósito del módulo (`🎯 Purpose: ...`) y resumen de targets (`──── Overview: ...`).
+3. **Tabla de Alias y Targets** (`📎 Aliases & Targets:`): Columnas de ALIAS, TARGET y DESCRIPTION perfectamente alineadas.
+4. **Soporte de Dry Run** (`🧪 Dry Run (preview without executing):`): Lista de comandos y su comportamiento con `DRY_RUN=1`, o indicando si son de solo lectura (`read-only`).
+
+### Ejemplo de Estructura de Encabezado:
+
+```makefile
+# ═══════════════════════════════════════════════════════════════
+# 🏷️ CATEGORÍA - Nombre del Módulo
+# ═══════════════════════════════════════════════════════════════
+# 📚 Documentation: docs/src/content/docs/makefile/xx-ejemplo.mdx
+# 🎯 Purpose: Descripción del objetivo de este módulo make
+# ──── Overview: N targets principales para ... ───────────────
+#
+# 📎 Aliases & Targets:
+#    ALIAS          TARGET                   DESCRIPTION
+#    alias1         target-real1             Descripción corta del comando 1
+#    alias2         target-real2             Descripción corta del comando 2
+#
+# 🧪 Dry Run (preview without executing):
+#    make target-real1        DRY_RUN=1   · omitir ejecución real del comando 1
+#    (target-real2 es de solo lectura)
+```
+
+---
+
 ## Patrón: Header
 
 Una sola línea con emoji + nombre del target + contexto, seguida de un
