@@ -12,9 +12,11 @@ run_task() {
   mkdir -p "$log_dir"
 
   # ── Reset defaults by re-sourcing the package contract ──
+  # shellcheck disable=SC1091
   source "${RAVN_DIR}/framework/package.sh"
 
   # ── Source the task module (overrides defaults) ──
+  # shellcheck disable=SC1090
   source "$file"
 
   local name="${PACKAGE:-$(basename "$file" .sh)}"
@@ -50,7 +52,7 @@ run_task() {
   local start
   start=$(date +%s)
 
-  (
+  ( 
     # Run in subshell to isolate failures
     run_hook before "before"
     install
@@ -68,10 +70,10 @@ run_task() {
 
   local end
   end=$(date +%s)
-  local elapsed=$(( end - start ))
+  local elapsed=$((end - start))
 
   # ── Report result ──
-  if (( status == 0 )); then
+  if ((status == 0)); then
     success "${name} instalado en ${elapsed}s"
     count_ok "$name"
   else
@@ -101,5 +103,5 @@ run_pipeline() {
   pipeline_end=$(date +%s)
 
   print_summary "Bootstrap"
-  info "Completado en $(( pipeline_end - pipeline_start ))s"
+  info "Completado en $((pipeline_end - pipeline_start))s"
 }

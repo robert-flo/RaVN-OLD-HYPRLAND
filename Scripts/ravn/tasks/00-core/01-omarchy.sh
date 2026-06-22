@@ -4,6 +4,7 @@
 # Clones/updates Omarchy, integrates [omarchy] repo into pacman.conf,
 # installs tobi-try + omarchy-walker, configures Walker + Elephant.
 
+# shellcheck disable=SC2034
 PACKAGE="omarchy"
 DESCRIPTION="Omarchy desktop framework integration"
 CATEGORY="core"
@@ -12,7 +13,7 @@ INTERACTIVE=false
 
 check() {
   # Skip if [omarchy] repo is already in pacman.conf
-  grep -q '^\[omarchy\]' /etc/pacman.conf 2>/dev/null
+  grep -q '^\[omarchy\]' /etc/pacman.conf 2> /dev/null
 }
 
 install() {
@@ -50,7 +51,7 @@ install() {
   local channel_name="${omarchy_mirror}"
 
   # Agregar el bloque al final de pacman.conf
-  sudo tee -a /etc/pacman.conf >/dev/null <<EOF
+  sudo tee -a /etc/pacman.conf > /dev/null << EOF
 
 [omarchy]
 SigLevel = Optional TrustAll
@@ -82,7 +83,7 @@ EOF
 
   # Crear el hook de pacman para reiniciar walker tras actualizaciones
   sudo mkdir -p /etc/pacman.d/hooks
-  sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null <<EOF
+  sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null << EOF
 [Trigger]
 Type = Package
 Operation = Upgrade

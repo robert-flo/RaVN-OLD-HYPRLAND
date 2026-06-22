@@ -3,6 +3,7 @@
 # Extracted from install_fnl.sh (lines 293-312)
 # Installs the dotbare plugin for oh-my-zsh.
 
+# shellcheck disable=SC2034
 PACKAGE="dotbare"
 DESCRIPTION="Dotbare plugin for oh-my-zsh"
 CATEGORY="apps"
@@ -27,7 +28,7 @@ install() {
   fi
 
   retry 3 git clone https://github.com/kazhala/dotbare.git \
-    "$HOME/.oh-my-zsh/custom/plugins/dotbare" 2>/dev/null
+    "$HOME/.oh-my-zsh/custom/plugins/dotbare" 2> /dev/null
 
   success "Plugin dotbare instalado correctamente."
 }

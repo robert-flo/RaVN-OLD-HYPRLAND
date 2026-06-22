@@ -2,6 +2,7 @@
 # ─── RaVN Task: Mimo CLI ────────────────────────────────────────────────────
 # Migrated from installers/02-tui/mimo.sh
 
+# shellcheck disable=SC2034
 PACKAGE="mimo"
 DESCRIPTION="Xiaomi Mimo CLI"
 CATEGORY="apps"
@@ -9,7 +10,7 @@ DEPENDS=()
 INTERACTIVE=false
 
 check() {
-  command -v mimo &>/dev/null
+  command -v mimo &> /dev/null
 }
 
 install() {

@@ -3,6 +3,7 @@
 # Migrated from installers/02-tui/copilot.sh
 # Requires: omarchy-npx-install (provided by tasks/core/01-omarchy.sh)
 
+# shellcheck disable=SC2034
 PACKAGE="copilot"
 DESCRIPTION="GitHub Copilot CLI via omarchy-npx-install"
 CATEGORY="apps"
@@ -10,7 +11,7 @@ DEPENDS=()
 INTERACTIVE=false
 
 check() {
-  command -v copilot &>/dev/null
+  command -v copilot &> /dev/null
 }
 
 install() {

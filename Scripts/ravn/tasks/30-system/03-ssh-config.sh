@@ -3,6 +3,7 @@
 # Extracted from install_fnl.sh (lines 270-288)
 # Ensures AddKeysToAgent is configured in ~/.ssh/config.
 
+# shellcheck disable=SC2034
 PACKAGE="ssh-config"
 DESCRIPTION="Configure AddKeysToAgent in ~/.ssh/config"
 CATEGORY="system"

@@ -13,7 +13,7 @@ hook_defined() {
   local fn="$1"
 
   # Function must exist
-  if ! declare -f "$fn" &>/dev/null; then
+  if ! declare -f "$fn" &> /dev/null; then
     return 1
   fi
 
@@ -30,7 +30,6 @@ hook_defined() {
 #   Returns 0 if the hook was not defined (skip is success).
 run_hook() {
   local fn="$1"
-  local label="${2:-$fn}"
 
   if hook_defined "$fn"; then
     "$fn"

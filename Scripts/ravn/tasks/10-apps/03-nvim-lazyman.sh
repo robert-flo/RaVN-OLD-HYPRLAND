@@ -4,6 +4,7 @@
 # Optionally installs nvim-lazyman. Marked INTERACTIVE because it requires
 # user confirmation and runs the lazyman.sh interactive setup.
 
+# shellcheck disable=SC2034
 PACKAGE="nvim-lazyman"
 DESCRIPTION="Neovim configuration manager (paso tardado)"
 CATEGORY="apps"
@@ -21,7 +22,7 @@ install() {
   sudo pacman -S --needed --noconfirm neovim
 
   if retry 3 git clone https://github.com/doctorfree/nvim-lazyman \
-    "$HOME/.config/nvim-Lazyman" 2>/dev/null; then
+    "$HOME/.config/nvim-Lazyman" 2> /dev/null; then
     "$HOME/.config/nvim-Lazyman/lazyman.sh"
     success "nvim-lazyman instalado correctamente."
   else

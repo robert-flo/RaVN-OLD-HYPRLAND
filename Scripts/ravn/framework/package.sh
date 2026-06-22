@@ -5,6 +5,7 @@
 # need.
 
 # ─── Module metadata ────────────────────────────────────────────────────────
+# shellcheck disable=SC2034
 PACKAGE=""
 DESCRIPTION=""
 CATEGORY=""
