@@ -300,9 +300,9 @@ git-setup: ## Clone a repo as bare + create all worktrees with upstream (use REP
 	printf "  • check git status:  $(BLUE)make git-status$(NC)\n\n"
 
 # ═══════════════════════════════════════════════════════════════
-# 🔄 GIT-SYNC - Pull rebase + push all topic branches from dev
+# 🔄 GIT-SYNC - Rebase all topic branches from dev
 # ═══════════════════════════════════════════════════════════════
-# ──── Sync: rebase each branch onto origin/dev, then push ────
+# ──── Sync: rebase each branch from origin/dev (local only) ───
 # ──── Usage: make git-sync [REPO=name] ────────────────────────
 #
 # Branches synced: Dynamically detected from ~/Work/<repo>/
@@ -311,9 +311,9 @@ git-setup: ## Clone a repo as bare + create all worktrees with upstream (use REP
 # Override worktrees location:
 #   WORKTREES_HOME=~/Projects make git-sync REPO=RaVN
 REPO ?= RaVN
-git-sync: ## Rebase all topic branches onto dev (local only, default REPO=RaVN)
+git-sync: ## Update all topic branches from dev (local only, default REPO=RaVN)
 	@printf "\n"
-	@printf "$(CYAN)🔄 git-sync · rebase all topic branches onto dev$(NC)\n"
+	@printf "$(CYAN)🔄 git-sync · update all topic branches from dev$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@if [ -z "$(REPO)" ]; then \
 		printf "$(RED)  ✗ missing required argument$(NC)\n\n"; \
