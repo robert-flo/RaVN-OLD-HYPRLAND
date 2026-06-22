@@ -12,7 +12,9 @@
         logs-service boot-logs error-logs hosts search search-inst repl shell vm closure-size \
         format lint tree diff-config docs-local docs-dev docs-build docs-install docs-clean \
         help-aliases \
-        git-a git-c git-ac git-p git-st git-s git-d git-l git-lg
+        git-a git-c git-ac git-p git-st git-s git-d git-l git-lg \
+        git-af git-fuck git-bye git-df git-fc git-fm \
+        a c ac p l st s d lg af fuck bye df fc fm
 
 # === Alias Help ===
 # ═══════════════════════════════════════════════════════════════
@@ -75,14 +77,20 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "tree" "fmt-tree" "Format"
 	@printf "%-20s %-25s %s\n" "diff-config" "fmt-diff" "Format"
 	@printf "%-20s %-25s %s\n" "docs-*" "doc-*" "Docs"
-	@printf "%-20s %-25s %s\n" "git-a" "git-add" "Git"
-	@printf "%-20s %-25s %s\n" "git-c" "git-commit" "Git"
-	@printf "%-20s %-25s %s\n" "git-ac" "git-add-commit" "Git"
-	@printf "%-20s %-25s %s\n" "git-p" "git-push" "Git"
-	@printf "%-20s %-25s %s\n" "git-st/s" "git-status" "Git"
-	@printf "%-20s %-25s %s\n" "git-d" "git-diff" "Git"
-	@printf "%-20s %-25s %s\n" "git-l" "git-pull" "Git"
-	@printf "%-20s %-25s %s\n" "git-lg" "git-log" "Git"
+	@printf "%-20s %-25s %s\n" "a / git-a" "git-add" "Git"
+	@printf "%-20s %-25s %s\n" "c / git-c" "git-commit" "Git"
+	@printf "%-20s %-25s %s\n" "ac / git-ac" "git-add-commit" "Git"
+	@printf "%-20s %-25s %s\n" "p / git-p" "git-push" "Git"
+	@printf "%-20s %-25s %s\n" "l / git-l" "git-pull" "Git"
+	@printf "%-20s %-25s %s\n" "st/s / git-st/s" "git-status" "Git"
+	@printf "%-20s %-25s %s\n" "d / git-d" "git-diff" "Git"
+	@printf "%-20s %-25s %s\n" "lg / git-lg" "git-log" "Git"
+	@printf "%-20s %-25s %s\n" "af / git-af" "git-add-fuzzy" "Git"
+	@printf "%-20s %-25s %s\n" "fuck / git-fuck" "git-amend" "Git"
+	@printf "%-20s %-25s %s\n" "bye / git-bye" "git-prune-branches" "Git"
+	@printf "%-20s %-25s %s\n" "df / git-df" "git-diff-fuzzy" "Git"
+	@printf "%-20s %-25s %s\n" "fc / git-fc" "git-search CODE=\"..\"" "Git"
+	@printf "%-20s %-25s %s\n" "fm / git-fm" "git-search MSG=\"..\"" "Git"
 	@printf "\n"
 	@printf "$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
@@ -171,3 +179,26 @@ git-s: git-status
 git-d: git-diff
 git-l: git-pull
 git-lg: git-log
+git-af: git-add-fuzzy
+git-fuck: git-amend
+git-bye: git-prune-branches
+git-df: git-diff-fuzzy
+git-fc: git-search
+git-fm: git-search
+
+# === Short Git Aliases ===
+a: git-add
+c: git-commit
+ac: git-add-commit
+p: git-push
+l: git-pull
+st: git-status
+s: git-status
+d: git-diff
+lg: git-log
+af: git-add-fuzzy
+fuck: git-amend
+bye: git-prune-branches
+df: git-diff-fuzzy
+fc: git-search
+fm: git-search

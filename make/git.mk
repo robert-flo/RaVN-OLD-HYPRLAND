@@ -5,12 +5,32 @@
 # 🎯 Purpose: Stage, commit, push and inspect git repository state
 # ──── Overview: 7 targets for the full git commit/push cycle ─
 #
+# 📎 Aliases & Targets:
+#    ALIAS          TARGET                   DESCRIPTION
+#    a  / git-a     git-add                  Stage all changes
+#    c  / git-c     git-commit               Quick timestamped commit
+#    ac / git-ac    git-add-commit           Stage & commit together
+#    p  / git-p     git-push                 Push commits to remote
+#    l  / git-l     git-pull                 Pull remote changes
+#    st / git-st    git-status               Show repository state
+#    s  / git-s     git-status               Show repository state
+#    d  / git-d     git-diff                 Show uncommitted diffs
+#    lg / git-lg    git-log                  Show commit log history
+#    af / git-af    git-add-fuzzy            Interactively stage (fzf)
+#    fuck/git-fuck  git-amend                Amend last commit (MSG="...")
+#    bye / git-bye  git-prune-branches       Delete local merged branches
+#    df / git-df    git-diff-fuzzy           Fuzzy select commit to diff
+#    fc / git-fc    git-search CODE="..."    Search history by code modification
+#    fm / git-fm    git-search MSG="..."     Search history by message query
+#
 # 🧪 Dry Run (preview without executing):
-#    make git-add     DRY_RUN=1   · skip git add
-#    make git-commit  DRY_RUN=1   · skip git commit
-#    make git-push    DRY_RUN=1   · skip git push
-#    make git-pull    DRY_RUN=1   · skip git pull
-#    (git-status, git-diff, git-log are read-only)
+#    make git-add             DRY_RUN=1   · skip git add
+#    make git-commit          DRY_RUN=1   · skip git commit
+#    make git-push            DRY_RUN=1   · skip git push
+#    make git-pull            DRY_RUN=1   · skip git pull
+#    make git-amend           DRY_RUN=1   · skip git commit --amend
+#    make git-prune-branches  DRY_RUN=1   · skip git branch -d
+#    (git-status, git-diff, git-log, git-add-fuzzy, git-diff-fuzzy, git-search are read-only)
 
 DRY_RUN ?= 0
 export DRY_RUN
@@ -22,7 +42,8 @@ endif
 
 RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
 
-.PHONY: git-add git-commit git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here
+.PHONY: git-add git-commit git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here \
+        git-add-fuzzy git-amend git-prune-branches git-diff-fuzzy git-search
 
 # ═══════════════════════════════════════════════════════════════
 # 💾 GIT-ADD - Stage all modified/new files for commit
@@ -500,4 +521,147 @@ ifndef EMBEDDED
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • compare dev against rc:    $(BLUE)make git-diff-dev$(NC)\n"
 	@printf "  • compare rc against master: $(BLUE)make git-diff-rc$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 💾 GIT-ADD-FUZZY - Interactively stage changes using fzf
+# ═══════════════════════════════════════════════════════════════
+# ──── Add Fuzzy: Interactive file staging with fzf ───────────
+git-add-fuzzy: ## Interactively stage changes using fzf
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)💾 git-add-fuzzy · interactive staging$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if command -v fzf >/dev/null 2>&1; then \
+		FILES=$$(git ls-files -m -o --exclude-standard | fzf -m --header="Select files to stage (TAB to multi-select, ENTER to accept)"); \
+		if [ -n "$$FILES" ]; then \
+			echo "$$FILES" | while IFS= read -r file; do \
+				[ -n "$$file" ] && git add "$$file"; \
+			done; \
+			printf "$(GREEN)  ✓ staged selected file(s)$(NC)\n"; \
+		else \
+			printf "$(YELLOW)  ⚠  no files selected$(NC)\n"; \
+		fi; \
+	else \
+		printf "$(RED)  ✗ fzf is not installed$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • commit staged changes:  $(BLUE)make git-commit$(NC)\n"
+	@printf "  • check repository state: $(BLUE)make git-status$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 📝 GIT-AMEND - Modify last commit
+# ═══════════════════════════════════════════════════════════════
+# ──── Amend: Amends last commit message or staged files ──────
+git-amend: ## Amend the last commit (use MSG="message" to update description)
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📝 git-amend · modify last commit$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -n "$(MSG)" ]; then \
+		$(EXEC) git commit --amend -m "$(MSG)"; \
+	else \
+		$(EXEC) git commit --amend --no-edit; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • push changes to remote: $(BLUE)make git-push$(NC)\n"
+	@printf "  • check repository state: $(BLUE)make git-status$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🗑️  GIT-PRUNE-BRANCHES - Delete all local merged branches
+# ═══════════════════════════════════════════════════════════════
+# ──── Prune: Automatically removes local merged branches ──────
+git-prune-branches: ## Delete all local merged branches
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🗑️  git-prune-branches · remove merged branches$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@MERGED=$$(git branch --merged | sed -E 's|^[*+[:space:]]+||' | grep -E -v '^(dev|master|rc)$$' || true); \
+	if [ -n "$$MERGED" ]; then \
+		printf "  branches to delete:\n$$MERGED\n\n"; \
+		if [ "$$DRY_RUN" = "1" ]; then \
+			printf "  ▶ [dry-run] git branch -d $$MERGED\n"; \
+		else \
+			echo "$$MERGED" | xargs -n 1 git branch -d; \
+			printf "$(GREEN)  ✓ merged branches deleted$(NC)\n"; \
+		fi; \
+	else \
+		printf "$(GREEN)  ✓ no merged branches to delete$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check repository state: $(BLUE)make git-status$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🔍 GIT-DIFF-FUZZY - Fuzzy select a past commit to diff
+# ═══════════════════════════════════════════════════════════════
+# ──── Diff Fuzzy: Interactively select a commit to diff ───────
+git-diff-fuzzy: ## Fuzzy select a past commit to diff
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔍 git-diff-fuzzy · select commit to view diff$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if command -v fzf >/dev/null 2>&1; then \
+		COMMIT=$$(git log --oneline --color=always | fzf --ansi --no-multi --header="Select commit to diff" | awk '{print $$1}'); \
+		if [ -n "$$COMMIT" ]; then \
+			git diff "$$COMMIT"^ "$$COMMIT"; \
+		fi; \
+	elif command -v peco >/dev/null 2>&1; then \
+		COMMIT=$$(git log --oneline | peco | awk '{print $$1}'); \
+		if [ -n "$$COMMIT" ]; then \
+			git diff "$$COMMIT"^ "$$COMMIT"; \
+		fi; \
+	else \
+		printf "$(RED)  ✗ neither fzf nor peco is installed$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check repository state: $(BLUE)make git-status$(NC)\n"
+	@printf "  • view recent history:    $(BLUE)make git-log$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 🔍 GIT-SEARCH - Search commit history
+# ═══════════════════════════════════════════════════════════════
+# ──── Search: Search history by message or source code changes ─
+git-search: ## Search history (use CODE="string" or MSG="query")
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)🔍 git-search · search commit history$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -n "$(CODE)" ]; then \
+		git log --pretty=format:"  %C(green)%h%C(reset)  %<(50,trunc)%s  %C(dim)%<(15)%ar%C(reset)" -S"$(CODE)"; \
+		printf "\n"; \
+	elif [ -n "$(MSG)" ]; then \
+		git log --pretty=format:"  %C(green)%h%C(reset)  %<(50,trunc)%s  %C(dim)%<(15)%ar%C(reset)" --grep="$(MSG)"; \
+		printf "\n"; \
+	else \
+		printf "$(RED)  ✗ please specify CODE=\"string\" or MSG=\"query\" to search$(NC)\n"; \
+		printf "  example: $(BLUE)make git-search CODE=\"foo\"$(NC)\n"; \
+		printf "  example: $(BLUE)make git-search MSG=\"chore\"$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • view recent history:    $(BLUE)make git-log$(NC)\n"
+	@printf "  • check repository state: $(BLUE)make git-status$(NC)\n\n"
 endif
