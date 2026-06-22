@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # shellcheck disable=SC1091
 #|---/ /+--------------------------------------------+---/ /|#
 #|--/ /-| Script to initialize dotbare tracking      |--/ /-|#
@@ -23,7 +23,7 @@ if [[ ! -f $track_file_home ]]; then
     cp "$track_file_repo" "$track_file_home"
   else
     mkdir -p "$(dirname "$track_file_home")"
-    cat <<EOF > "$track_file_home"
+    cat << EOF > "$track_file_home"
 # Rutas a rastrear por dotbare
 ~/.config/zsh/.zshrc
 ~/.config/zsh/user.zsh
@@ -57,18 +57,17 @@ while read -r line || [[ -n $line ]]; do
 
   # Resolver la ruta expandiendo variables y tilde
   resolved_path=$(eval "echo $line")
+  rel_path="${resolved_path#"$DOTBARE_TREE"/}"
 
   if [[ -e $resolved_path ]]; then
     if [[ -d $resolved_path ]]; then
       # Si es un directorio, agregar sus archivos recursivamente
-      if git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" add "$resolved_path" 2>/dev/null; then
-        rel_path="${resolved_path#$DOTBARE_TREE/}"
+      if git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" add "$resolved_path" 2> /dev/null; then
         print_log -g "[track]" -b " :: " "$rel_path/ (directorio)"
       fi
     else
       # Si es un archivo individual
-      if git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" add "$resolved_path" 2>/dev/null; then
-        rel_path="${resolved_path#$DOTBARE_TREE/}"
+      if git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" add "$resolved_path" 2> /dev/null; then
         print_log -g "[track]" -b " :: " "$rel_path"
       else
         print_log -err "No se pudo registrar: $rel_path"
@@ -82,9 +81,7 @@ done < "$track_file_home"
 # Crear un commit inicial si hay cambios preparados en el índice
 if ! git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" diff --cached --quiet; then
   print_log -g "[dotbare]" -b " :: " "Creando commit de las rutas rastreadas..."
-  git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" commit -m "Initial commit of tracked paths" >/dev/null
+  git --git-dir="$DOTBARE_DIR" --work-tree="$DOTBARE_TREE" commit -m "Initial commit of tracked paths" > /dev/null
 fi
 
 print_log -g "[dotbare]" -b " :: " "Rastreo selectivo configurado con éxito."
-
-
