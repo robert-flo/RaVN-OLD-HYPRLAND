@@ -33,8 +33,13 @@ while IFS= read -r file; do
      [[ $file == Configs/.local/share/waybar/* ]] ||
      [[ $file == "Configs/.config/hyde/wallbash/scripts/code.sh" ]] ||
      [[ $file == Scripts/extra/* ]] ||
+     [[ $file == "Scripts/chaotic_aur.sh" ]] ||
+     [[ $file == "Scripts/global_fn.sh" ]] ||
      [[ $file == "Scripts/install_pre.sh" ]] ||
-     [[ $file == "Scripts/restore_cfg.sh" ]]; then
+     [[ $file == "Scripts/install_pst.sh" ]] ||
+     [[ $file == "Scripts/restore_cfg.sh" ]] ||
+     [[ $file == "Scripts/restore_shl.sh" ]] ||
+     [[ $file == "Scripts/uninstall.sh" ]]; then
     continue
   fi
 

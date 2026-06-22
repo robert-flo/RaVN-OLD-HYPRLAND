@@ -25,8 +25,13 @@
     "**/Configs/.local/lib/**": true,
     "**/Configs/.local/share/wallbash/**": true,
     "**/Configs/.local/share/waybar/**": true,
+    "**/Scripts/chaotic_aur.sh": true,
     "**/Scripts/extra/**": true,
+    "**/Scripts/global_fn.sh": true,
     "**/Scripts/install_pre.sh": true,
-    "**/Scripts/restore_cfg.sh": true
+    "**/Scripts/install_pst.sh": true,
+    "**/Scripts/restore_cfg.sh": true,
+    "**/Scripts/restore_shl.sh": true,
+    "**/Scripts/uninstall.sh": true
   }
 }
