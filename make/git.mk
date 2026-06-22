@@ -9,6 +9,7 @@
 #    make git-add     DRY_RUN=1   · skip git add
 #    make git-commit  DRY_RUN=1   · skip git commit
 #    make git-push    DRY_RUN=1   · skip git push
+#    make git-pull    DRY_RUN=1   · skip git pull
 #    (git-status, git-diff, git-log are read-only)
 
 DRY_RUN ?= 0
@@ -21,7 +22,7 @@ endif
 
 RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
 
-.PHONY: git-add git-commit git-add-commit git-push git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here
+.PHONY: git-add git-commit git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here
 
 # ═══════════════════════════════════════════════════════════════
 # 💾 GIT-ADD - Stage all modified/new files for commit
@@ -132,6 +133,35 @@ ifndef EMBEDDED
 	@printf "  • verify remote history: $(BLUE)make git-log$(NC)\n"
 	@printf "  • check repo state: $(BLUE)make git-status$(NC)\n"
 	@printf "  • apply system after push: $(BLUE)make sys-apply$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# ☁️  GIT-PULL - Pull updates from remote repository
+# ═══════════════════════════════════════════════════════════════
+# ──── Pull: Fetches and integrates remote changes ────────────
+git-pull: ## Pull updates from remote
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)☁️  git-pull · pull from remote$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@BRANCH=$$(git branch --show-current); \
+	REMOTE=$$(git remote get-url origin 2>/dev/null | sed -E 's|.*github.com[:/]([^/]+/[^/]+)(\.git)?$$|\1|' | sed 's|\.git$$||'); \
+	printf "  $(DIM)branch:$(NC) $$BRANCH  $(DIM)remote:$(NC) $$REMOTE\n\n"; \
+	if [ "$$DRY_RUN" = "1" ]; then \
+		printf "  ▶ [dry-run] git pull\n"; \
+	else \
+		printf "  pulling changes from remote...\n\n"; \
+		git pull || exit 1; \
+		printf "\n$(GREEN)  ✓ pulled from remote$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check repo state:     $(BLUE)make git-status$(NC)\n"
+	@printf "  • view history:         $(BLUE)make git-log$(NC)\n"
+	@printf "  • validate formatting:  $(BLUE)make fmt-check$(NC)\n\n"
 endif
 
 # ═══════════════════════════════════════════════════════════════
