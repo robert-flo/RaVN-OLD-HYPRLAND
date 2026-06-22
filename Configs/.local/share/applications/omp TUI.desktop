@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=omp TUI
+Comment=omp Terminal UI Agent
+Exec=xdg-terminal-exec --app-id=TUI.tile -e omp
+Terminal=false
+Icon=utilities-terminal
+StartupNotify=true
+Path=/home/dominus/src
+Categories=ConsoleOnly;TUI;Utility;
+Keywords=tui;terminal;cli;

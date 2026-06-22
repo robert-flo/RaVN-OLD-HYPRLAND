@@ -98,6 +98,7 @@ baobab                                                 # graphical disk usage an
 nwg-displays                                           # monitor management utility
 fzf                                                    # Command-line fuzzy finder
 alacritty                                              # GPU-accelerated terminal emulator
+warp-terminal-bin                                      # terminal emulator
 yt-dlp                                                 # The media downloading engine
 ffmpeg                                                 # Required by yt-dlp to merge audio/video streams and extract MP3
 
