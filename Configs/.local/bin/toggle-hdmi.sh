@@ -5,6 +5,7 @@ AWK_CMD=$(command -v awk || echo "/usr/bin/awk")
 HYPRCTL_CMD=$(command -v hyprctl || echo "/usr/bin/hyprctl")
 notify-send "HDMI Toggle" "HDMI Positions swap L&R"
 
+# shellcheck disable=SC2016
 position=$("$HYPRCTL_CMD" monitors | "$AWK_CMD" '/HDMI-A-1/,/at/ { if ($0 ~ /at /) print $NF }')
 if [[ $position == "-1600x0" ]]; then
   "$HYPRCTL_CMD" keyword monitor "HDMI-A-1,1920x1080@60,1600x0,1.2"
