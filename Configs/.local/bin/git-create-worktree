@@ -20,7 +20,7 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 # shellcheck disable=SC2034
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd -P)
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Colors & Styling                                                             │
@@ -43,7 +43,6 @@ readonly ICON_ARROW=""
 readonly ICON_WARN=""
 readonly ICON_INFO=""
 readonly ICON_GIT=""
-readonly ICON_BRANCH=""
 readonly ICON_FOLDER="󰉋"
 readonly ICON_PUSH="󰕒"
 readonly ICON_ROCKET="󱓞"
@@ -113,7 +112,7 @@ usage() {
 
 parse_params() {
     create_upstream=1
-    prefix="$(git config github.user 2>/dev/null || true)/"
+    prefix="$(git config github.user 2> /dev/null || true)/"
     base='origin/main'
     branch=''
     repo_dir=''
@@ -142,16 +141,16 @@ parse_params() {
             ;;
         -?*) die "Unknown option: $1" ;;
         *)   break ;;
-        esac
+    esac
         shift
-    done
+  done
 
     args=("$@")
-    [[ ${#args[@]} -eq 0 ]] && usage
+    ((${#args[@]} == 0))   && usage
 
     if [[ -z "$branch" ]]; then
         branch="${prefix}${args[0]}"
-    fi
+  fi
 
     worktree="${args[0]}"
 
@@ -168,8 +167,8 @@ parse_params "$@"
 if [[ -n "$repo_dir" ]]; then
     if [[ ! -d "$repo_dir" ]]; then
         die "Repository directory not found: ${GRAY}$repo_dir${NC}"
-    fi
-    
+  fi
+
     cd "$repo_dir" || die "Failed to change to repository directory: ${GRAY}$repo_dir${NC}"
 fi
 
@@ -179,7 +178,7 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
 fi
 
 # Extract repository metadata for display before changing directories
-common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || pwd)
+common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2> /dev/null || pwd)
 common_dir="${common_dir%/.git}"
 repo_name=$(basename "$common_dir")
 
@@ -201,9 +200,11 @@ print_info "Path:       ${GRAY}$repo_path${NC}"
 print_info "Worktree:   ${WHITE}$worktree${NC}"
 print_info "Branch:     ${WHITE}$branch${NC}"
 print_info "Base:       ${GRAY}$base${NC}"
-[[ $create_upstream -eq 1 ]] \
-    && print_info "Upstream:   ${GREEN}enabled${NC}" \
-    || print_info "Upstream:   ${YELLOW}disabled (--no-create-upstream)${NC}"
+if ((create_upstream == 1)); then
+    print_info "Upstream:   ${GREEN}enabled${NC}"
+else
+    print_info "Upstream:   ${YELLOW}disabled (--no-create-upstream)${NC}"
+fi
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Execution Steps                                                              │
@@ -231,20 +232,20 @@ print_section "${ICON_PUSH} [2/2] Configuring upstream"
 update_remote() {
     local target_branch="$1"
 
-    if [[ $create_upstream -eq 0 ]]; then
+    if ((create_upstream == 0)); then
         print_warn "Upstream skipped (--no-create-upstream)"
         return 0
-    fi
+  fi
 
     print_step "Checking remote for branch ${CYAN}$target_branch${NC}"
 
     if [[ -z "$(git ls-remote --heads origin "$target_branch")" ]]; then
         print_step "Remote branch not found — pushing to origin"
         git push -u origin "$target_branch"
-    else
+  else
         print_step "Remote branch exists — setting upstream"
         git branch --set-upstream-to="origin/$target_branch"
-    fi
+  fi
 }
 
 cd "$worktree"

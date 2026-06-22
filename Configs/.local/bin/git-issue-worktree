@@ -20,7 +20,7 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 # shellcheck disable=SC2034
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd -P)
 script_name=$(basename "${BASH_SOURCE[0]}")
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -43,7 +43,6 @@ readonly ICON_CROSS=""
 readonly ICON_ARROW=""
 readonly ICON_WARN=""
 readonly ICON_INFO=""
-readonly ICON_GIT=""
 readonly ICON_BRANCH=""
 readonly ICON_FOLDER="󰉋"
 readonly ICON_ISSUE=""
@@ -142,12 +141,12 @@ parse_params() {
             ;;
         -?*) die "Unknown option: $1" ;;
         *)   break ;;
-        esac
+    esac
         shift
-    done
+  done
 
     args=("$@")
-    [[ ${#args[@]} -lt 2 ]] && usage
+    ((${#args[@]} < 2))   && usage
 
     issue_num="${args[0]}"
     slug="${args[1]}"
@@ -155,7 +154,7 @@ parse_params() {
     # Validate issue_num is numeric
     if ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
         die "Invalid issue number: ${CYAN}$issue_num${NC}. Must be numeric."
-    fi
+  fi
 
     return 0
 }
@@ -209,7 +208,7 @@ fi
 print_section "${ICON_ISSUE} [2/4] Fetching issue #$issue_num from GitHub"
 
 # Try to get issue information
-issue_data=$(gh issue view "$issue_num" --json "number,title,state" 2>/dev/null) || {
+issue_data=$(gh issue view "$issue_num" --json "number,title,state" 2> /dev/null) || {
     die "Could not fetch issue #${CYAN}$issue_num${NC}. Does it exist? (Check your repo context with ${CYAN}gh repo set-default${NC})"
 }
 
