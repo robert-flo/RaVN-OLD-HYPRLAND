@@ -17,5 +17,15 @@
   // ──── Shell: Linter (shellcheck) ────────────────────────────
   "shellcheck.enable": true,
   "shellcheck.run": "onType",
-  "shellcheck.executablePath": "/usr/bin/shellcheck"
+  "shellcheck.executablePath": "/usr/bin/shellcheck",
+  "shellcheck.ignorePatterns": {
+    "**/Configs/.config/uwsm/**": true,
+    "**/Configs/.config/waybar/**": true,
+    "**/Configs/.local/lib/**": true,
+    "**/Configs/.local/share/wallbash/**": true,
+    "**/Configs/.local/share/waybar/**": true,
+    "**/Scripts/extra/**": true,
+    "**/Scripts/install_pre.sh": true,
+    "**/Scripts/restore_cfg.sh": true
+  }
 }

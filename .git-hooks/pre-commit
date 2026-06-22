@@ -26,6 +26,17 @@ while IFS= read -r file; do
   [[ -z $file ]] && continue
   [[ ! -f $file ]] && continue
 
+  if [[ $file == Configs/.config/uwsm/* ]] ||
+     [[ $file == Configs/.config/waybar/* ]] ||
+     [[ $file == Configs/.local/lib/* ]] ||
+     [[ $file == Configs/.local/share/wallbash/* ]] ||
+     [[ $file == Configs/.local/share/waybar/* ]] ||
+     [[ $file == Scripts/extra/* ]] ||
+     [[ $file == "Scripts/install_pre.sh" ]] ||
+     [[ $file == "Scripts/restore_cfg.sh" ]]; then
+    continue
+  fi
+
   if [[ $file == *.sh ]]; then
     STAGED_FILES+=("$file")
   else
