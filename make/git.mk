@@ -144,8 +144,6 @@ ifndef EMBEDDED
 	@printf "$(CYAN)📊 git-status · repository overview$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
-	@printf "  $(DIM)host:$(NC)  $(HOSTNAME)  $(DIM)flake:$(NC) $(PWD)\n"
-	@printf "  $(DIM)nixos:$(NC) $$(nixos-version 2>/dev/null | cut -d' ' -f1 || echo 'N/A')\n\n"
 	@if git rev-parse --git-dir > /dev/null 2>&1; then \
 		REMOTE_URL=$$(git remote get-url origin 2>/dev/null); \
 		REPO_NAME=$$(echo "$$REMOTE_URL" | sed -E 's|.*github.com[:/]([^/]+/[^/]+)(\.git)?$$|\1|' | sed 's|\.git$$||'); \
@@ -155,8 +153,11 @@ endif
 		STAGED=$$(git diff --cached --name-only 2>/dev/null | wc -l | tr -d ' '); \
 		UNSTAGED=$$(git diff --name-only 2>/dev/null | wc -l | tr -d ' '); \
 		UNTRACKED=$$(git ls-files --others --exclude-standard 2>/dev/null | wc -l | tr -d ' '); \
-		printf "  $(DIM)repo:$(NC)   $$REPO_NAME\n"; \
-		printf "  $(DIM)branch:$(NC) $$BRANCH"; \
+		GIT_DIR=$$(realpath "$$(git rev-parse --git-dir 2>/dev/null)"); \
+		COMMON_DIR=$$(realpath "$$(git rev-parse --git-common-dir 2>/dev/null)"); \
+		if [ "$$GIT_DIR" != "$$COMMON_DIR" ]; then WORKTREE="yes"; else WORKTREE="no"; fi; \
+		printf "  $(DIM)repo:$(NC)      $$REPO_NAME\n"; \
+		printf "  $(DIM)branch:$(NC)    $$BRANCH"; \
 		if [ "$$AHEAD" -gt 0 ] && [ "$$BEHIND" -gt 0 ]; then \
 			printf "  $(YELLOW)⇕ ↑$$AHEAD ↓$$BEHIND$(NC)"; \
 		elif [ "$$AHEAD" -gt 0 ]; then \
@@ -164,7 +165,9 @@ endif
 		elif [ "$$BEHIND" -gt 0 ]; then \
 			printf "  $(RED)↓ $$BEHIND behind$(NC)"; \
 		fi; \
-		printf "\n\n"; \
+		printf "\n"; \
+		printf "  $(DIM)path:$(NC)      $(PWD)\n"; \
+		printf "  $(DIM)worktree:$(NC)  $$WORKTREE\n\n"; \
 		if [ "$$STAGED" -eq 0 ] && [ "$$UNSTAGED" -eq 0 ] && [ "$$UNTRACKED" -eq 0 ]; then \
 			printf "  $(GREEN)✓ nothing to commit — working tree clean$(NC)\n"; \
 			printf "\n"; \
