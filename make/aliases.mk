@@ -15,7 +15,8 @@
         git-a git-c git-ac git-p git-st git-s git-d git-l git-lg \
         git-af git-fuck git-bye git-df git-fc git-fm \
         a c ac p l st s d lg af fuck bye df fc fm \
-        clean-vm disk-repo disk-home
+        clean-vm disk-repo disk-home \
+        scvm sdr sdh
 
 # === Alias Help ===
 # ═══════════════════════════════════════════════════════════════
@@ -43,11 +44,11 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "fix-permissions" "sys-doctor" "System"
 	@printf "%-20s %-25s %s\n" "hardware-scan" "sys-hw-scan" "System"
 	@printf "%-20s %-25s %s\n" "sync/deploy" "sys-deploy" "Deployment"
-	@printf "%-20s %-25s %s\n" "clean" "sys-gc" "Cleanup"
+	@printf "%-20s %-25s %s\n" "clean" "sys-purge" "Cleanup"
 	@printf "%-20s %-25s %s\n" "deep-clean" "sys-purge" "Cleanup"
-	@printf "%-20s %-25s %s\n" "clean-vm" "sys-clean-vm" "Cleanup"
-	@printf "%-20s %-25s %s\n" "disk-repo" "sys-disk-repo" "Cleanup"
-	@printf "%-20s %-25s %s\n" "disk-home" "sys-disk-home" "Cleanup"
+	@printf "%-20s %-25s %s\n" "scvm / clean-vm" "sys-clean-vm" "Cleanup"
+	@printf "%-20s %-25s %s\n" "sdr / disk-repo" "sys-disk-repo" "Cleanup"
+	@printf "%-20s %-25s %s\n" "sdh / disk-home" "sys-disk-home" "Cleanup"
 	@printf "%-20s %-25s %s\n" "update" "upd-all" "Updates"
 	@printf "%-20s %-25s %s\n" "update-nixpkgs" "upd-nixpkgs" "Updates"
 	@printf "%-20s %-25s %s\n" "update-hydenix" "upd-hydenix" "Updates"
@@ -120,11 +121,16 @@ sync: sys-deploy
 deploy: sys-deploy
 
 # === Cleanup (sys-) ===
-clean: sys-gc
+clean: sys-purge
 deep-clean: sys-purge
 clean-vm: sys-clean-vm
 disk-repo: sys-disk-repo
 disk-home: sys-disk-home
+
+# === Short Cleanup Aliases ===
+scvm: sys-clean-vm
+sdr: sys-disk-repo
+sdh: sys-disk-home
 
 # === Updates (upd-) ===
 update: upd-all

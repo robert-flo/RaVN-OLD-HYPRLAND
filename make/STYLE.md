@@ -189,7 +189,7 @@ Documentar en el header del `.mk` qué targets lo soportan y cuáles son read-on
 ```makefile
 # 🧪 Dry Run (preview without executing):
 #    make sys-apply   DRY_RUN=1   · skip nixos-rebuild switch
-#    make sys-gc      DRY_RUN=1   · skip nix-collect-garbage
+#    make sys-purge   DRY_RUN=1   · skip system packages & cache purge
 #    (sys-check, sys-build are read-only)
 ```
 
