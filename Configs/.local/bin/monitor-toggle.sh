@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Configuration
-PRIMARY_MONITOR="DP-1"
+# PRIMARY_MONITOR="DP-1" # Documentation only, unused in this script
 SECONDARY_MONITOR="HDMI-A-1"
 
 # Check if hyprctl is available
-if ! command -v hyprctl &>/dev/null; then
+if ! command -v hyprctl &> /dev/null; then
   notify-send "Monitor Toggle" "Error: hyprctl not found"
   exit 1
 fi
