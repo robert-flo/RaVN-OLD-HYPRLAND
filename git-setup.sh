@@ -19,7 +19,6 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 # │ Configuration                                                                │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GIT_CONFIG_FILE="$HOME/.config/git/config"
 
 # User configuration (edit these)
@@ -54,7 +53,6 @@ readonly ICON_GITHUB=""
 readonly ICON_GEAR="󰒓"
 readonly ICON_ROCKET="󱓞"
 readonly ICON_PACKAGE="󰏗"
-readonly ICON_REFRESH="󰑓"
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Helper Functions                                                             │
@@ -101,7 +99,7 @@ print_info() {
 }
 
 command_exists() {
-  command -v "$1" >/dev/null 2>&1
+  command -v "$1" > /dev/null 2>&1
 }
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -112,16 +110,16 @@ get_gpg_key_id() {
   local key_id=""
 
   # Try by name
-  key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_NAME" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
+  key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_NAME" 2> /dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
 
   # Try by email
   if [[ -z $key_id ]]; then
-    key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_EMAIL" 2>/dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
+    key_id=$(gpg --list-secret-keys --keyid-format SHORT "$USER_EMAIL" 2> /dev/null | grep "^sec" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
   fi
 
   # Try any RSA key
   if [[ -z $key_id ]]; then
-    key_id=$(gpg --list-secret-keys --keyid-format SHORT 2>/dev/null | grep "^sec" | grep "rsa4096" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
+    key_id=$(gpg --list-secret-keys --keyid-format SHORT 2> /dev/null | grep "^sec" | grep "rsa4096" | head -1 | awk '{print $2}' | cut -d'/' -f2 || true)
   fi
 
   echo "$key_id"
@@ -145,7 +143,7 @@ verify_dependencies() {
     fi
   done
 
-  if (( missing == 1 )); then
+  if ((missing == 1)); then
     echo ""
     print_info "Install missing packages on Arch Linux:"
     echo -e "${GRAY}    sudo pacman -S git github-cli gnupg openssh git-delta${NC}"
@@ -159,9 +157,9 @@ verify_git_config() {
   # 1. Check user name
   local name=""
   if [[ -f $GIT_CONFIG_FILE ]]; then
-    name=$(git config --file "$GIT_CONFIG_FILE" user.name 2>/dev/null || echo "")
+    name=$(git config --file "$GIT_CONFIG_FILE" user.name 2> /dev/null || echo "")
   else
-    name=$(git config --global user.name 2>/dev/null || echo "")
+    name=$(git config --global user.name 2> /dev/null || echo "")
   fi
 
   if [[ -n $name ]]; then
@@ -174,9 +172,9 @@ verify_git_config() {
   # 2. Check user email
   local email=""
   if [[ -f $GIT_CONFIG_FILE ]]; then
-    email=$(git config --file "$GIT_CONFIG_FILE" user.email 2>/dev/null || echo "")
+    email=$(git config --file "$GIT_CONFIG_FILE" user.email 2> /dev/null || echo "")
   else
-    email=$(git config --global user.email 2>/dev/null || echo "")
+    email=$(git config --global user.email 2> /dev/null || echo "")
   fi
 
   if [[ -n $email ]]; then
@@ -198,9 +196,9 @@ verify_git_config() {
   # 4. Check commit signing preference
   local gpg_sign="false"
   if [[ -f $GIT_CONFIG_FILE ]]; then
-    gpg_sign=$(git config --file "$GIT_CONFIG_FILE" commit.gpgsign 2>/dev/null || echo "false")
+    gpg_sign=$(git config --file "$GIT_CONFIG_FILE" commit.gpgsign 2> /dev/null || echo "false")
   else
-    gpg_sign=$(git config --global commit.gpgsign 2>/dev/null || echo "false")
+    gpg_sign=$(git config --global commit.gpgsign 2> /dev/null || echo "false")
   fi
 
   if [[ $gpg_sign == "true" ]]; then
@@ -212,9 +210,9 @@ verify_git_config() {
   # 5. Check default branch
   local default_branch=""
   if [[ -f $GIT_CONFIG_FILE ]]; then
-    default_branch=$(git config --file "$GIT_CONFIG_FILE" init.defaultBranch 2>/dev/null || echo "")
+    default_branch=$(git config --file "$GIT_CONFIG_FILE" init.defaultBranch 2> /dev/null || echo "")
   else
-    default_branch=$(git config --global init.defaultBranch 2>/dev/null || echo "")
+    default_branch=$(git config --global init.defaultBranch 2> /dev/null || echo "")
   fi
 
   if [[ -n $default_branch ]]; then
@@ -228,20 +226,17 @@ verify_ssh() {
   print_section "${ICON_KEY} SSH Authentication"
 
   # 1. Check for SSH keys
-  local key_found=false
   local key_type=""
   local key_path=""
 
-  if [[ -f ~/.ssh/id_ed25519 ]]; then
-    key_found=true
+  if [[ -f $HOME/.ssh/id_ed25519 ]]; then
     key_type="ed25519"
-    key_path="~/.ssh/id_ed25519"
-    print_success "SSH key found: ${WHITE}$key_type${NC} ${GRAY}($key_path)${NC}"
-  elif [[ -f ~/.ssh/id_rsa ]]; then
-    key_found=true
+    key_path="$HOME/.ssh/id_ed25519"
+    print_success "SSH key found: ${WHITE}$key_type${NC} ${GRAY}(${key_path/#$HOME/\~})${NC}"
+  elif [[ -f $HOME/.ssh/id_rsa ]]; then
     key_type="RSA"
-    key_path="~/.ssh/id_rsa"
-    print_success "SSH key found: ${WHITE}$key_type${NC} ${GRAY}($key_path)${NC}"
+    key_path="$HOME/.ssh/id_rsa"
+    print_success "SSH key found: ${WHITE}$key_type${NC} ${GRAY}(${key_path/#$HOME/\~})${NC}"
   else
     print_error "No SSH key found"
     print_info "Run setup to generate a new key"
@@ -249,29 +244,29 @@ verify_ssh() {
   fi
 
   # 2. Check public key exists
-  if [[ -f ${key_path/#\~/$HOME}.pub ]]; then
+  if [[ -f $key_path.pub ]]; then
     print_success "Public key exists"
   else
-    print_error "Public key missing: ${GRAY}${key_path}.pub${NC}"
+    print_error "Public key missing: ${GRAY}${key_path/#$HOME/\~}.pub${NC}"
   fi
 
   # 3. Check SSH agent and load key if needed
   if [[ -n ${SSH_AUTH_SOCK:-} ]]; then
     local loaded_keys=0
-    loaded_keys=$(ssh-add -l 2>/dev/null | grep -c "SHA256" || true)
+    loaded_keys=$(ssh-add -l 2> /dev/null | grep -c "SHA256" || true)
     loaded_keys=${loaded_keys//[^0-9]/}
     [[ -z $loaded_keys ]] && loaded_keys=0
 
-    if (( loaded_keys > 0 )); then
+    if ((loaded_keys > 0)); then
       print_success "SSH agent running: ${WHITE}$loaded_keys${NC} key(s) loaded"
     else
       print_warn "SSH agent running but no keys loaded"
       print_step "Loading SSH key into agent..."
-      if ssh-add "${key_path/#\~/$HOME}" 2>/dev/null; then
+      if ssh-add "$key_path" 2> /dev/null; then
         print_success "SSH key loaded into agent"
       else
         print_error "Failed to load SSH key"
-        print_info "Try manually: ${GRAY}ssh-add $key_path${NC}"
+        print_info "Try manually: ${GRAY}ssh-add ${key_path/#$HOME/\~}${NC}"
       fi
     fi
   else
@@ -295,17 +290,17 @@ verify_ssh() {
   fi
 
   # 5. Check if key is on GitHub
-  if command_exists gh && gh auth status >/dev/null 2>&1; then
+  if command_exists gh && gh auth status > /dev/null 2>&1; then
     local local_key=""
-    local_key=$(awk '{print $1" "$2}' "${key_path/#\~/$HOME}.pub" 2>/dev/null || echo "")
+    local_key=$(awk '{print $1" "$2}' "$key_path.pub" 2> /dev/null || echo "")
     local key_title=""
 
     if [[ -n $local_key ]]; then
       # Check authentication keys
-      key_title=$(gh api user/keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2>/dev/null || echo "")
+      key_title=$(gh api user/keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2> /dev/null || echo "")
       # If not found, check signing keys
       if [[ -z $key_title ]]; then
-        key_title=$(gh api user/ssh_signing_keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2>/dev/null || echo "")
+        key_title=$(gh api user/ssh_signing_keys --jq ".[] | select(.key | startswith(\"$local_key\")) | .title" 2> /dev/null || echo "")
         [[ -n $key_title ]] && key_title="$key_title (Signing)"
       fi
     fi
@@ -315,15 +310,16 @@ verify_ssh() {
     elif [[ -z $key_title ]]; then
       print_warn "Key not on GitHub"
       print_step "Uploading SSH key to GitHub..."
-      local key_title_new="ravn-$(hostname)-$(date +%Y%m%d)"
-      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --title "$key_title_new" 2>/dev/null; then
+      local key_title_new
+      key_title_new="ravn-$(hostname)-$(date +%Y%m%d)"
+      if gh ssh-key add "$key_path.pub" --title "$key_title_new" 2> /dev/null; then
         print_success "Authentication key uploaded: ${WHITE}$key_title_new${NC}"
       else
         print_error "Failed to upload authentication key"
-        print_info "Try manually: ${GRAY}gh ssh-key add ${key_path}.pub${NC}"
+        print_info "Try manually: ${GRAY}gh ssh-key add ${key_path/#$HOME/\~}.pub${NC}"
       fi
 
-      if gh ssh-key add "${key_path/#\~/$HOME}.pub" --type signing --title "$key_title_new (Signing)" 2>/dev/null; then
+      if gh ssh-key add "$key_path.pub" --type signing --title "$key_title_new (Signing)" 2> /dev/null; then
         print_success "Signing key uploaded: ${WHITE}$key_title_new (Signing)${NC}"
       else
         print_error "Failed to upload signing key"
@@ -342,8 +338,8 @@ verify_gpg() {
 
   # 1. Check if GPG keys exist
   local total_keys=0
-  total_keys=$(gpg --list-secret-keys 2>/dev/null | grep -c "^sec" || true)
-  if (( total_keys == 0 )); then
+  total_keys=$(gpg --list-secret-keys 2> /dev/null | grep -c "^sec" || true)
+  if ((total_keys == 0)); then
     print_error "No GPG secret keys found on system"
     print_info "Run setup to generate a new key"
     return 1
@@ -356,7 +352,7 @@ verify_gpg() {
   if [[ -z $GPG_KEY_ID ]]; then
     print_error "No key found for ${YELLOW}$USER_NAME${NC} or ${YELLOW}$USER_EMAIL${NC}"
     print_info "Available keys:"
-    gpg --list-secret-keys --keyid-format SHORT 2>/dev/null | grep -E "^sec|^uid" | while read -r line; do
+    gpg --list-secret-keys --keyid-format SHORT 2> /dev/null | grep -E "^sec|^uid" | while read -r line; do
       echo -e "    ${GRAY}$line${NC}"
     done
     return 1
@@ -365,7 +361,7 @@ verify_gpg() {
   fi
 
   # 3. Check if key exists in secret keyring (can sign)
-  if gpg --list-secret-keys "$GPG_KEY_ID" >/dev/null 2>&1; then
+  if gpg --list-secret-keys "$GPG_KEY_ID" > /dev/null 2>&1; then
     print_success "Secret key available for signing"
   else
     print_error "Secret key ${YELLOW}$GPG_KEY_ID${NC} not found"
@@ -376,9 +372,9 @@ verify_gpg() {
   # 4. Check Git's configured signing key
   local configured_key=""
   if [[ -f $GIT_CONFIG_FILE ]]; then
-    configured_key=$(git config --file "$GIT_CONFIG_FILE" user.signingkey 2>/dev/null || echo "")
+    configured_key=$(git config --file "$GIT_CONFIG_FILE" user.signingkey 2> /dev/null || echo "")
   else
-    configured_key=$(git config --global user.signingkey 2>/dev/null || echo "")
+    configured_key=$(git config --global user.signingkey 2> /dev/null || echo "")
   fi
 
   if [[ -z $configured_key ]]; then
@@ -395,15 +391,15 @@ verify_gpg() {
   fi
 
   # 5. Check if key is on GitHub
-  if command_exists gh && gh auth status >/dev/null 2>&1; then
+  if command_exists gh && gh auth status > /dev/null 2>&1; then
     local key_found_gh=""
-    key_found_gh=$(gh api user/gpg_keys --jq ".[] | select(.key_id | ascii_upcase | endswith(\"${GPG_KEY_ID^^}\")) | .key_id" 2>/dev/null || echo "")
+    key_found_gh=$(gh api user/gpg_keys --jq ".[] | select(.key_id | ascii_upcase | endswith(\"${GPG_KEY_ID^^}\")) | .key_id" 2> /dev/null || echo "")
     if [[ -n $key_found_gh ]]; then
       print_success "GPG key uploaded to GitHub"
     else
       print_warn "GPG key not on GitHub"
       print_step "Uploading GPG key to GitHub..."
-      if gpg --armor --export "$GPG_KEY_ID" | gh gpg-key add - 2>/dev/null; then
+      if gpg --armor --export "$GPG_KEY_ID" | gh gpg-key add - 2> /dev/null; then
         print_success "GPG key uploaded to GitHub"
       else
         print_error "Failed to upload GPG key"
@@ -419,7 +415,7 @@ verify_gpg() {
   local sign_output=""
   local sign_result=0
   sign_output=$(echo "test" | gpg --clearsign 2>&1) || sign_result=$?
-  if (( sign_result == 0 )); then
+  if ((sign_result == 0)); then
     print_success "GPG signing works correctly"
   else
     print_error "GPG signing failed"
@@ -436,7 +432,7 @@ verify_gpg() {
   fi
 
   # 7. Check GPG agent status
-  if pgrep -x gpg-agent >/dev/null 2>&1; then
+  if pgrep -x gpg-agent > /dev/null 2>&1; then
     print_success "GPG agent running"
   else
     print_warn "GPG agent not running"
@@ -460,9 +456,9 @@ verify_github_auth() {
   auth_status=$(gh auth status 2>&1 || true)
   if echo "$auth_status" | grep -q "Logged in"; then
     local user=""
-    user=$(gh api user -q .login 2>/dev/null || echo "unknown")
+    user=$(gh api user -q .login 2> /dev/null || echo "unknown")
     local email=""
-    email=$(gh api user -q .email 2>/dev/null || echo "private")
+    email=$(gh api user -q .email 2> /dev/null || echo "private")
     print_success "Authenticated as ${WHITE}@$user${NC}"
     if [[ $email != "null" && $email != "private" ]]; then
       print_info "GitHub email: ${GRAY}$email${NC}"
@@ -482,12 +478,12 @@ verify_github_auth() {
 
   # 4. Check git protocol
   local protocol=""
-  protocol=$(gh config get git_protocol 2>/dev/null || echo "https")
+  protocol=$(gh config get git_protocol 2> /dev/null || echo "https")
   print_info "Git protocol: ${WHITE}$protocol${NC}"
 
   # 5. Test API access
   print_step "Testing GitHub API..."
-  if gh api user >/dev/null 2>&1; then
+  if gh api user > /dev/null 2>&1; then
     print_success "API access working"
   else
     print_error "API access failed"
@@ -501,9 +497,9 @@ verify_github_auth() {
 setup_github_auth() {
   print_section "${ICON_GITHUB} GitHub Authentication"
 
-  if gh auth status >/dev/null 2>&1; then
+  if gh auth status > /dev/null 2>&1; then
     local user=""
-    user=$(gh api user -q .login 2>/dev/null || echo "unknown")
+    user=$(gh api user -q .login 2> /dev/null || echo "unknown")
     local scopes=""
     scopes=$(gh auth status 2>&1 | grep -oP "Token scopes: '\K[^']+" || echo "unknown")
     print_success "Already authenticated as ${WHITE}@$user${NC}"
@@ -548,14 +544,15 @@ setup_ssh_key() {
     print_success "Key generated"
   fi
 
-  local key_title="ravn-$(hostname)-$(date +%Y%m%d)"
-  if gh ssh-key add ~/.ssh/id_ed25519.pub --title "$key_title" 2>/dev/null; then
+  local key_title
+  key_title="ravn-$(hostname)-$(date +%Y%m%d)"
+  if gh ssh-key add ~/.ssh/id_ed25519.pub --title "$key_title" 2> /dev/null; then
     print_success "Authentication key added to GitHub"
   else
     print_info "Authentication key already on GitHub"
   fi
 
-  if gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "$key_title (Signing)" 2>/dev/null; then
+  if gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "$key_title (Signing)" 2> /dev/null; then
     print_success "Signing key added to GitHub"
   else
     print_info "Signing key already on GitHub"
@@ -565,7 +562,7 @@ setup_ssh_key() {
 setup_gpg_key() {
   print_section "${ICON_LOCK} GPG Key"
 
-  if gpg --list-secret-keys "$USER_NAME" 2>/dev/null | grep -q "$USER_NAME"; then
+  if gpg --list-secret-keys "$USER_NAME" 2> /dev/null | grep -q "$USER_NAME"; then
     print_success "Key already exists"
   else
     print_step "Generating RSA 4096 key..."
@@ -589,7 +586,7 @@ EOF
   print_info "Key ID: ${WHITE}$GPG_KEY_ID${NC}"
 
   if [[ -n $GPG_KEY_ID ]]; then
-    if gpg --armor --export "$GPG_KEY_ID" | gh gpg-key add - 2>/dev/null; then
+    if gpg --armor --export "$GPG_KEY_ID" | gh gpg-key add - 2> /dev/null; then
       print_success "Key added to GitHub"
     else
       print_info "Key already on GitHub"
@@ -655,8 +652,8 @@ EOF
     print_info "gpg-agent.conf exists"
   fi
 
-  gpgconf --kill gpg-agent 2>/dev/null || true
-  gpgconf --launch gpg-agent 2>/dev/null || true
+  gpgconf --kill gpg-agent 2> /dev/null || true
+  gpgconf --launch gpg-agent 2> /dev/null || true
   print_success "Agent restarted"
 }
 
@@ -667,7 +664,8 @@ EOF
 run_test() {
   print_section "${ICON_ROCKET} Integration Test"
 
-  local repo_name="test-git-$(date +%s)"
+  local repo_name
+  repo_name="test-git-$(date +%s)"
   local test_dir="/tmp/$repo_name"
   local test_passed=0
   local test_failed=0
@@ -677,28 +675,30 @@ run_test() {
   # Test 1: Create repository
   print_step "Creating test repository..."
   mkdir -p "$test_dir" && cd "$test_dir"
-  if git init -b main >/dev/null 2>&1; then
+  if git init -b main > /dev/null 2>&1; then
     print_success "Git repository initialized"
-    (( ++test_passed ))
+    ((++test_passed))
   else
     print_error "Failed to initialize repository"
-    (( ++test_failed ))
-    cd - >/dev/null || true
+    ((++test_failed))
+    cd - > /dev/null || true
     return 1
   fi
 
   # Test 2: Create file and stage
-  echo "# Test Repository" > README.md
-  echo "" >> README.md
-  echo "This is a test repository created by git-setup.sh" >> README.md
-  echo "Created: $(date)" >> README.md
+  {
+    echo "# Test Repository"
+    echo ""
+    echo "This is a test repository created by git-setup.sh"
+    echo "Created: $(date)"
+  } > README.md
 
-  if git add README.md 2>/dev/null; then
+  if git add README.md 2> /dev/null; then
     print_success "File staged"
-    (( ++test_passed ))
+    ((++test_passed))
   else
     print_error "Failed to stage file"
-    (( ++test_failed ))
+    ((++test_failed))
   fi
 
   # Test 3: Signed commit
@@ -706,16 +706,16 @@ run_test() {
   local commit_output=""
   local commit_result=0
   commit_output=$(git commit -S -m "Test signed commit" 2>&1) || commit_result=$?
-  if (( commit_result == 0 )); then
+  if ((commit_result == 0)); then
     print_success "Signed commit created"
     commit_signed=true
-    (( ++test_passed ))
+    ((++test_passed))
 
     # Show commit details
     local commit_hash=""
-    commit_hash=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    commit_hash=$(git rev-parse --short HEAD 2> /dev/null || echo "unknown")
     local commit_author=""
-    commit_author=$(git log -1 --format='%an <%ae>' 2>/dev/null || echo "unknown")
+    commit_author=$(git log -1 --format='%an <%ae>' 2> /dev/null || echo "unknown")
     print_info "Commit: ${WHITE}$commit_hash${NC}"
     print_info "Author: ${GRAY}$commit_author${NC}"
 
@@ -725,13 +725,13 @@ run_test() {
     verify_output=$(git log --show-signature -1 2>&1) || true
     if echo "$verify_output" | grep -q -E "Good signature|signature"; then
       print_success "Commit is signed & verified"
-      (( ++test_passed ))
+      ((++test_passed))
     else
       print_warn "Could not verify signature"
     fi
   else
     print_error "Signed commit failed"
-    (( ++test_failed ))
+    ((++test_failed))
 
     # Show why it failed
     if echo "$commit_output" | grep -q "No secret key"; then
@@ -741,11 +741,11 @@ run_test() {
     fi
 
     print_step "Trying unsigned commit..."
-    if git -c commit.gpgsign=false commit -m "Test commit (unsigned)" >/dev/null 2>&1; then
+    if git -c commit.gpgsign=false commit -m "Test commit (unsigned)" > /dev/null 2>&1; then
       print_warn "Unsigned commit worked"
     else
       print_error "Even unsigned commit failed"
-      (( ++test_failed ))
+      ((++test_failed))
     fi
   fi
 
@@ -758,16 +758,16 @@ run_test() {
     local gh_output=""
     local gh_result=0
     gh_output=$(gh repo create "$repo_name" --public --source=. --remote=origin --push 2>&1) || gh_result=$?
-    if (( gh_result == 0 )); then
+    if ((gh_result == 0)); then
       local user=""
-      user=$(gh api user -q .login 2>/dev/null || echo "unknown")
+      user=$(gh api user -q .login 2> /dev/null || echo "unknown")
       print_success "Repository created and pushed"
       print_info "URL: ${CYAN}https://github.com/$user/$repo_name${NC}"
       pushed_to_github=true
-      (( ++test_passed ))
+      ((++test_passed))
     else
       print_error "Push failed"
-      (( ++test_failed ))
+      ((++test_failed))
       echo -e "    ${GRAY}Error: $gh_output${NC}"
     fi
   else
@@ -791,7 +791,7 @@ run_test() {
   fi
   if [[ $pushed_to_github == "true" ]]; then
     local user=""
-    user=$(gh api user -q .login 2>/dev/null || echo "unknown")
+    user=$(gh api user -q .login 2> /dev/null || echo "unknown")
     echo -e "    GitHub:         ${GREEN}github.com/$user/$repo_name${NC}"
   else
     echo -e "    GitHub:         ${GRAY}Not pushed${NC}"
@@ -799,7 +799,7 @@ run_test() {
 
   # Overall status
   echo ""
-  if (( test_failed == 0 )); then
+  if ((test_failed == 0)); then
     print_success "All tests passed! Your Git setup is working correctly."
   else
     print_warn "Some tests failed. Check the details above."
@@ -810,17 +810,17 @@ run_test() {
   print_section "󰃢 Cleanup"
 
   # Delete local test directory
-  cd - >/dev/null || true
-  if rm -rf "$test_dir" 2>/dev/null; then
+  cd - > /dev/null || true
+  if rm -rf "$test_dir" 2> /dev/null; then
     print_success "Local test directory deleted"
   fi
 
   # Delete GitHub repository if it was created
   if [[ $pushed_to_github == "true" ]]; then
     local user=""
-    user=$(gh api user -q .login 2>/dev/null || echo "unknown")
+    user=$(gh api user -q .login 2> /dev/null || echo "unknown")
     print_step "Deleting GitHub repository ${GRAY}$user/$repo_name${NC}..."
-    if gh repo delete "$user/$repo_name" --yes 2>/dev/null; then
+    if gh repo delete "$user/$repo_name" --yes 2> /dev/null; then
       print_success "GitHub repository deleted"
     else
       print_warn "Could not delete GitHub repository"
@@ -907,14 +907,14 @@ do_clean() {
 
   # Get all GPG key IDs for the user
   local gpg_keys=""
-  gpg_keys=$(gpg --list-secret-keys --keyid-format LONG "$USER_EMAIL" 2>/dev/null | grep "^sec" | awk '{print $2}' | cut -d'/' -f2 || true)
+  gpg_keys=$(gpg --list-secret-keys --keyid-format LONG "$USER_EMAIL" 2> /dev/null | grep "^sec" | awk '{print $2}' | cut -d'/' -f2 || true)
 
   if [[ -n $gpg_keys ]]; then
     for key_id in $gpg_keys; do
       print_step "Removing GPG key: ${WHITE}$key_id${NC}"
       # Delete secret key first (required before public)
-      gpg --batch --yes --delete-secret-keys "$key_id" 2>/dev/null || true
-      gpg --batch --yes --delete-keys "$key_id" 2>/dev/null || true
+      gpg --batch --yes --delete-secret-keys "$key_id" 2> /dev/null || true
+      gpg --batch --yes --delete-keys "$key_id" 2> /dev/null || true
       print_success "Removed key $key_id"
     done
   else
@@ -928,13 +928,13 @@ do_clean() {
   fi
 
   # Restart gpg-agent
-  gpgconf --kill gpg-agent 2>/dev/null || true
+  gpgconf --kill gpg-agent 2> /dev/null || true
   print_success "Stopped GPG agent"
 
   print_section "󰃢 Cleaning GitHub CLI"
 
-  if gh auth status >/dev/null 2>&1; then
-    gh auth logout --hostname github.com 2>/dev/null || true
+  if gh auth status > /dev/null 2>&1; then
+    gh auth logout --hostname github.com 2> /dev/null || true
     print_success "Logged out from GitHub CLI"
   else
     print_info "GitHub CLI not authenticated"
@@ -955,7 +955,7 @@ do_clean() {
 main() {
   clear || true
   local gh_user=""
-  gh_user=$(gh api user -q .login 2>/dev/null || echo "ravn-ruby-path")
+  gh_user=$(gh api user -q .login 2> /dev/null || echo "ravn-ruby-path")
   echo -e "${CYAN}"
   cat << 'BANNER_EOF'
   ╭────────────────────────────────────────────────────╮
@@ -979,23 +979,23 @@ BANNER_EOF
 
   # Handle command line arguments
   case "${1:-}" in
-    verify|v|--verify|-v)
+    verify | v | --verify | -v)
       do_verify
       exit 0
       ;;
-    setup|s|--setup|-s)
+    setup | s | --setup | -s)
       do_setup
       exit 0
       ;;
-    test|t|--test|-t)
+    test | t | --test | -t)
       run_test
       exit 0
       ;;
-    clean|c|--clean|-c)
+    clean | c | --clean | -c)
       do_clean
       exit 0
       ;;
-    help|h|--help|-h)
+    help | h | --help | -h)
       echo "Usage: $0 [command]"
       echo ""
       echo "Commands:"
@@ -1018,7 +1018,11 @@ BANNER_EOF
       2) do_setup ;;
       3) run_test ;;
       4) do_clean ;;
-      q|Q) echo ""; print_info "Goodbye!"; exit 0 ;;
+      q | Q)
+           echo ""
+                    print_info "Goodbye!"
+                                           exit 0
+                                                  ;;
       *) print_error "Invalid option" ;;
     esac
     echo ""
