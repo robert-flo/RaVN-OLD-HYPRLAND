@@ -21,6 +21,7 @@
   "shellcheck.ignorePatterns": {
     "**/Configs/.config/uwsm/**": true,
     "**/Configs/.config/waybar/**": true,
+    "**/Configs/.config/hyde/wallbash/scripts/code.sh": true,
     "**/Configs/.local/lib/**": true,
     "**/Configs/.local/share/wallbash/**": true,
     "**/Configs/.local/share/waybar/**": true,
