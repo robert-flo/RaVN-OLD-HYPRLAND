@@ -374,9 +374,9 @@ git-sync: ## Rebase all topic branches onto dev (local only, default REPO=RaVN)
 			printf "  $(BLUE)git -C $$REPO_DIR/$$f pull --rebase origin dev$(NC)\n"; \
 		done; \
 		printf "\n"; \
-		exit 1; \
+	else \
+		printf "\n$(GREEN)  ✓ all branches synced locally$(NC)\n"; \
 	fi
-	@printf "\n$(GREEN)  ✓ all branches synced locally$(NC)\n"
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • verify status: $(BLUE)make git-status$(NC)\n"
