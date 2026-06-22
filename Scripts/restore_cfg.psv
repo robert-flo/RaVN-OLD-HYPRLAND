@@ -182,3 +182,7 @@ P|${HOME}/.config/hypr|hyprsunset.conf|hyprsunset
 
  Fontconfig Emoji Fallback 
 S|${HOME}/.config|fontconfig|noto-fonts-emoji
+
+ Antigravity IDE 
+P|${HOME}/.gemini/antigravity-cli|settings.json|git
+
