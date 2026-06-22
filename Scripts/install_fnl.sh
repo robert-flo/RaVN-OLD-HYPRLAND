@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #|---/ /+--------------------------------------+---/ /|#
 #|--/ /-| Script for final configuration tweaks |--/ /-|#
 #|-/ /--| Roberto Flores                       |-/ /--|#
@@ -15,6 +15,7 @@ if ! source "${scrDir}/global_fn.sh"; then
 fi
 
 flg_DryRun=${flg_DryRun:-0}
+cloneDir="${cloneDir:-}"
 
 step "Configuración Final"
 print_log -g "[FINAL CONFIG] " -b " :: " "Iniciando configuración final..."
@@ -34,9 +35,9 @@ setup_omarchy() {
     local omarchy_mirror="stable"
     if [[ "${omarchy_ref}" == "dev" ]]; then
         omarchy_mirror="edge"
-    elif [[ "${omarchy_ref}" == "rc" ]]; then
+  elif   [[ "${omarchy_ref}" == "rc" ]]; then
         omarchy_mirror="rc"
-    fi
+  fi
     export OMARCHY_MIRROR="${omarchy_mirror}"
 
     # 1. Asegurar la instalación de git usando los repositorios actuales del sistema
@@ -57,7 +58,7 @@ setup_omarchy() {
         local channel_name="${omarchy_mirror}"
 
         # Agregar el bloque al final de pacman.conf
-        sudo tee -a /etc/pacman.conf >/dev/null <<EOF
+        sudo tee -a /etc/pacman.conf > /dev/null << EOF
 
 [omarchy]
 SigLevel = Optional TrustAll
@@ -89,7 +90,7 @@ EOF
 
         # Crear el hook de pacman para reiniciar walker tras actualizaciones
         sudo mkdir -p /etc/pacman.d/hooks
-        sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null <<EOF
+        sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null << EOF
 [Trigger]
 Type = Package
 Operation = Upgrade
@@ -104,10 +105,10 @@ Exec = $HOME/.local/share/omarchy/bin/omarchy-restart-walker
 EOF
         success "Omarchy configurado correctamente."
         count_ok
-    else
+  else
         print_log -y "[OMARCHY] " -b " :: " "Simulación: Se omite la integración de [omarchy] en pacman.conf"
         count_skip
-    fi
+  fi
 }
 
 # Ejecutar configuración de Omarchy
@@ -116,7 +117,7 @@ setup_omarchy
 setup_ravn() {
     # Usar rama personalizada si se indica, de lo contrario por defecto la actual o 'master'
     local default_branch
-    default_branch=$(git -C "$scrDir" branch --show-current 2>/dev/null || echo "master")
+    default_branch=$(git -C "$scrDir" branch --show-current 2> /dev/null || echo "master")
     local ravn_ref="${RAVN_REF:-$default_branch}"
     # Usar repositorio personalizado si se especifica, de lo contrario por defecto 'robert-flo/RaVN'
     local ravn_repo="${RAVN_REPO:-robert-flo/RaVN}"
@@ -130,9 +131,9 @@ setup_ravn() {
     #    El quinto argumento "ssh" habilita la detección automática de llaves SSH
     if clone_or_update_repo "RaVN" "$ravn_repo" "$HOME/.local/share/ravn" "$ravn_ref" "ssh"; then
         count_ok
-    else
+  else
         count_fail
-    fi
+  fi
 }
 
 # Ejecutar configuración de RaVN
@@ -148,14 +149,13 @@ setup_ravn
 
 # ==============================================================================
 
-
 # ==============================================================================
 # 2c. Configurar tema Sleek para Spotify vía Spicetify
 # ==============================================================================
 setup_spicetify() {
   if pkg_installed spotify && pkg_installed spicetify-cli; then
     step "Configurando tema Sleek para Spotify"
-    if (( flg_DryRun != 1 )); then
+    if ((flg_DryRun != 1)); then
       # Asegurar permisos de escritura en la carpeta de Spotify
       if [[ -d /opt/spotify ]]; then
         if [[ ! -w /opt/spotify || ! -w /opt/spotify/Apps ]]; then
@@ -174,7 +174,7 @@ setup_spicetify() {
       # Configurar rutas en spicetify y crear directorio de temas y extensiones
       mkdir -p "$HOME/.config/spicetify/Themes"
       mkdir -p "$HOME/.config/spicetify/Extensions"
-      spicetify config spotify_path "/opt/spotify" prefs_path "$HOME/.config/spotify/prefs" &>/dev/null || true
+      spicetify config spotify_path "/opt/spotify" prefs_path "$HOME/.config/spotify/prefs" &> /dev/null || true
 
       # Asegurar la existencia de los temas y extensiones
       # (Si no se restauraron por alguna razón, los creamos o descargamos como fallback)
@@ -198,9 +198,9 @@ setup_spicetify() {
         if [[ ! -d $HOME/.config/spicetify/Backup ]]; then
           run_with_status "Creando backup de Spicetify" spicetify backup
         fi
-        spicetify config current_theme Sleek &>/dev/null || true
-        spicetify config color_scheme Catppuccin &>/dev/null || true
-        spicetify config extensions adblock.js &>/dev/null || true
+        spicetify config current_theme Sleek &> /dev/null || true
+        spicetify config color_scheme Catppuccin &> /dev/null || true
+        spicetify config extensions adblock.js &> /dev/null || true
         run_with_status "Aplicando tema Sleek (Catppuccin) + adblock" spicetify apply
         success "Spotify: Tema Sleek (Catppuccin) y adblock configurados correctamente."
         count_ok
@@ -220,8 +220,6 @@ setup_spicetify() {
 
 setup_spicetify
 
-
-
 # ==============================================================================
 # 3. Tweaks finales y otros comandos
 # ==============================================================================
@@ -229,8 +227,8 @@ step "Tweaks del sistema"
 
 setup_firewall() {
   info "Configurando reglas de firewall UFW para LocalSend..."
-  if command -v ufw &>/dev/null; then
-    if (( flg_DryRun != 1 )); then
+  if command -v ufw &> /dev/null; then
+    if ((flg_DryRun != 1)); then
       # Validamos si el servicio ufw está activo
       if systemctl is-active --quiet ufw; then
         run_with_status "Permitiendo puerto 53317/udp para localsend" sudo ufw allow 53317/udp
@@ -255,13 +253,13 @@ setup_firewall
 
 info "Habilitando socket de ssh-agent para el usuario..."
 if [[ ${flg_DryRun} -ne 1 ]]; then
-    if systemctl --user enable --now ssh-agent.socket 2>/dev/null; then
+    if systemctl --user enable --now ssh-agent.socket 2> /dev/null; then
         success "ssh-agent.socket habilitado."
         count_ok
-    else
+  else
         warn_msg "No se pudo habilitar ssh-agent.socket (puede que ya esté activo)."
         count_skip
-    fi
+  fi
 else
     print_log -y "[SSH-AGENT] " -b " :: " "Simulación: Se omite la habilitación del socket de ssh-agent"
     count_skip
@@ -275,12 +273,12 @@ if [[ ${flg_DryRun} -ne 1 ]]; then
         echo -e "Host *\n    AddKeysToAgent yes" > "$HOME/.ssh/config"
         chmod 600 "$HOME/.ssh/config"
         success "Archivo ~/.ssh/config creado con AddKeysToAgent."
-    elif ! grep -q "AddKeysToAgent" "$HOME/.ssh/config"; then
+  elif   ! grep -q "AddKeysToAgent" "$HOME/.ssh/config"; then
         echo -e "\nHost *\n    AddKeysToAgent yes" >> "$HOME/.ssh/config"
         success "AddKeysToAgent agregado a ~/.ssh/config existente."
-    else
+  else
         info "AddKeysToAgent ya está configurado en ~/.ssh/config."
-    fi
+  fi
     count_ok
 else
     print_log -y "[SSH-CONFIG] " -b " :: " "Simulación: Se omite la configuración de ~/.ssh/config"
@@ -293,8 +291,8 @@ fi
 if [[ -d "$HOME/.oh-my-zsh" ]]; then
   if [[ ! -d "$HOME/.oh-my-zsh/custom/plugins/dotbare" ]]; then
     step "Instalando plugin dotbare para oh-my-zsh"
-    if (( flg_DryRun != 1 )); then
-      if retry 3 git clone https://github.com/kazhala/dotbare.git "$HOME/.oh-my-zsh/custom/plugins/dotbare" 2>/dev/null; then
+    if ((flg_DryRun != 1)); then
+      if retry 3 git clone https://github.com/kazhala/dotbare.git "$HOME/.oh-my-zsh/custom/plugins/dotbare" 2> /dev/null; then
         success "Plugin dotbare instalado correctamente."
         count_ok
       else
@@ -322,7 +320,7 @@ if [[ ! -d "$HOME/.config/nvim-Lazyman" ]]; then
 
       run_with_status "Instalando neovim" sudo pacman -S --needed --noconfirm neovim
 
-      if retry 3 git clone https://github.com/doctorfree/nvim-lazyman "$HOME/.config/nvim-Lazyman" 2>/dev/null; then
+      if retry 3 git clone https://github.com/doctorfree/nvim-lazyman "$HOME/.config/nvim-Lazyman" 2> /dev/null; then
         "$HOME/.config/nvim-Lazyman/lazyman.sh"
         success "nvim-lazyman instalado correctamente."
         count_ok
