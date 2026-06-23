@@ -9,10 +9,10 @@
     m  = merge
 
     # ─── Commits ──────────────────────────────────────────────────────────────
-    ci   = commit
-    c    = commit -m
-    ca   = commit -am
-    fuck = commit --amend -m
+    ci   = commit --signoff
+    c    = commit --signoff -m
+    ca   = commit --signoff -am
+    fuck = commit --signoff --amend -m
 
     # ─── Sync & Remote ────────────────────────────────────────────────────────
     l  = pull

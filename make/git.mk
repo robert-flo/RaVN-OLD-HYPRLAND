@@ -88,7 +88,7 @@ endif
 		$(EXEC) git add .; \
 		COMMIT_MSG="config: update $$(date '+%Y-%m-%d %H:%M:%S')"; \
 		printf "  commit: $(GREEN)$$COMMIT_MSG$(NC)\n\n"; \
-		$(EXEC) git commit -m "$$COMMIT_MSG" || exit 1; \
+		$(EXEC) git commit --signoff -m "$$COMMIT_MSG" || exit 1; \
 		COMMIT_HASH=$$(git rev-parse --short HEAD); \
 		BRANCH=$$(git branch --show-current); \
 		printf "$(GREEN)  ✓ $(NC)$(DIM)$$COMMIT_HASH$(NC)  $$BRANCH\n"; \
@@ -565,9 +565,9 @@ ifndef EMBEDDED
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
 	@if [ -n "$(MSG)" ]; then \
-		$(EXEC) git commit --amend -m "$(MSG)"; \
+		$(EXEC) git commit --signoff --amend -m "$(MSG)"; \
 	else \
-		$(EXEC) git commit --amend --no-edit; \
+		$(EXEC) git commit --signoff --amend --no-edit; \
 	fi
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
