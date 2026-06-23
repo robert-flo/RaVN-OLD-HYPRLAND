@@ -85,7 +85,7 @@ qt6-wayland                                            # wayland support in qt6
 # firefox                                              # browser
 brave-origin-beta-bin                                  # browser
 google-chrome                                          # browser
-microsoft-edge-stable-bin                              # browser 
+microsoft-edge-stable-bin                              # browser
 kitty                                                  # terminal
 konsole                                                # terminal
 dolphin                                                # kde file manager
@@ -124,12 +124,13 @@ gamemode                                               # daemon and library for 
 cava                                                   # audio visualizer
 spotify                                                # proprietary music streaming service
 spicetify-cli                                          # cli to customize spotify client
-lyricify                                               # cli to fetch lyrics from Spotify  
+lyricify                                               # cli to fetch lyrics from Spotify
 
 # --------------------------------------------------- // Apps
 localsend                                              # Share files and folders locally
 nautilus-python                                        # Python bindings for Nautilus
-# neovim                                               # vim based text editor
+neovim                                               # vim based text editor
+neovide                                              # Neovim GUI Client
 
 # --------------------------------------------------- // zsh
 bat|zsh                                                  # enhanced version of cat
@@ -146,17 +147,17 @@ zed                                                   # A high-performance, mult
 vulkan-intel
 
 # --------------------------------------------------- // Driver for my Intel HD Graphics 530
-vulkan-intel 
-lib32-vulkan-intel 
-intel-media-driver 
+vulkan-intel
+lib32-vulkan-intel
+intel-media-driver
 libva-utils
 
 
 
 # --------------------------------------------------- // Git
-github-cli                                            # The GitHub CLI tool  
+github-cli                                            # The GitHub CLI tool
 gitkraken                                             # The intuitive, fast, and beautiful cross-platform Git client
-gitkraken-cli                                         # The intuitive, fast, and beautiful cross-platform Git client  
+gitkraken-cli                                         # The intuitive, fast, and beautiful cross-platform Git client
 lazygit                                               # Simple terminal UI for git commands
 
 # --------------------------------------------------- // Dotbare

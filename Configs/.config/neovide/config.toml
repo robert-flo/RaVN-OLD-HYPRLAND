@@ -1,0 +1,6 @@
+[font]
+# Config base de Neovide (tamaño de fuente).
+normal = "CaskaydiaCove Nerd Font Mono"
+size = 11.0
+hinting = "full"
+edging = "antialias"
