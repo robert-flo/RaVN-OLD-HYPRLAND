@@ -50,6 +50,9 @@ RaVN relies on `dotbare` for tracking active dotfiles in `$HOME`, with clean ver
 
 # Helper Functions
 
+> [!IMPORTANT]
+> **MANDATORY CHECK**: Before implementing any custom helper logic (such as git cloning, file downloading, retries, spinners, or status logging), you **MUST** inspect [global_fn.sh](file:///home/dominus/Work/RaVN/dev/Scripts/global_fn.sh) and reuse its existing helper functions (like `clone_or_update_repo` or `download_with_spinner`) instead of writing new custom shell routines.
+
 Always prioritize the helper functions imported from [global_fn.sh](Scripts/global_fn.sh) over raw shell commands:
 
 - **Logging:** Use `info`, `success`, `warn_msg`, `error_msg`, `step`, and `print_log` for unified, semantic output with visual indicators.
