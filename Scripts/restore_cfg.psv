@@ -155,6 +155,8 @@ P|${HOME}/.config|code-flags.conf|visual-studio-code-bin
 P|${HOME}/.config|codium-flags.conf|vscodium
 P|${HOME}/.config|electron-flags.conf|electron
 P|${HOME}/.config|antigravity-ide-flags.conf|bash
+S|${HOME}/.config/qBittorrent|themes|qbittorrent
+
 
  Browser 
 S|${HOME}/.config/google-chrome|userChrome.css|google-chrome

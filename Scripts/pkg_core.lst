@@ -132,6 +132,8 @@ nautilus-python                                        # Python bindings for Nau
 neovim                                               # vim based text editor
 neovide                                              # Neovim GUI Client
 lazydocker                                             # Docker UI for terminal
+qbittorrent                                            # BitTorrent client
+
 
 # --------------------------------------------------- // zsh
 bat|zsh                                                  # enhanced version of cat
