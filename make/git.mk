@@ -440,21 +440,21 @@ git-sync: ## Update all topic branches from dev (local only, default REPO=RaVN)
 # 🔄 GIT-DIFF-DEV - Compare dev worktree against rc worktree
 # ═══════════════════════════════════════════════════════════════
 # ──── Diff: Compare dev against rc using hunk patch ──────────
-git-diff-dev: ## Compare dev worktree against rc
+git-diff-dev: ## Compare dev branch against rc branch
 ifndef EMBEDDED
 	@printf "\n"
 	@printf "$(CYAN)🔄 git-diff-dev · compare dev against rc$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
-	@if [ -d "$(RAVN_WTS_DIR)/rc" ] && [ -d "$(RAVN_WTS_DIR)/dev" ]; then \
+	@if git show-ref --quiet refs/heads/rc && git show-ref --quiet refs/heads/dev; then \
 		printf "  comparing dev against rc...\n"; \
 		if command -v hunk >/dev/null 2>&1; then \
-			git diff --no-index "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/" | hunk patch; \
+			git diff rc dev | hunk patch; \
 		else \
-			git diff --no-index --color=always "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/rc/" "$(RAVN_WTS_DIR)/dev/"; \
+			git diff --color=always rc dev 2>/dev/null || git diff rc dev; \
 		fi; \
 	else \
-		printf "$(RED)  ✗ dev or rc worktree directory not found$(NC)\n"; \
+		printf "$(RED)  ✗ dev or rc branch not found$(NC)\n"; \
 		exit 1; \
 	fi
 ifndef EMBEDDED
@@ -466,24 +466,24 @@ ifndef EMBEDDED
 endif
 
 # ═══════════════════════════════════════════════════════════════
-# 🔄 GIT-DIFF-RC - Compare rc worktree against master worktree
+# 🔄 GIT-DIFF-RC - Compare rc branch against master branch
 # ═══════════════════════════════════════════════════════════════
 # ──── Diff: Compare rc against master using hunk patch ────────
-git-diff-rc: ## Compare rc worktree against master
+git-diff-rc: ## Compare rc branch against master
 ifndef EMBEDDED
 	@printf "\n"
 	@printf "$(CYAN)🔄 git-diff-rc · compare rc against master$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
-	@if [ -d "$(RAVN_WTS_DIR)/master" ] && [ -d "$(RAVN_WTS_DIR)/rc" ]; then \
+	@if git show-ref --quiet refs/heads/master && git show-ref --quiet refs/heads/rc; then \
 		printf "  comparing rc against master...\n"; \
 		if command -v hunk >/dev/null 2>&1; then \
-			git diff --no-index "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/" | hunk patch; \
+			git diff master rc | hunk patch; \
 		else \
-			git diff --no-index --color=always "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/master/" "$(RAVN_WTS_DIR)/rc/"; \
+			git diff --color=always master rc 2>/dev/null || git diff master rc; \
 		fi; \
 	else \
-		printf "$(RED)  ✗ rc or master worktree directory not found$(NC)\n"; \
+		printf "$(RED)  ✗ rc or master branch not found$(NC)\n"; \
 		exit 1; \
 	fi
 ifndef EMBEDDED
@@ -495,7 +495,7 @@ ifndef EMBEDDED
 endif
 
 # ═══════════════════════════════════════════════════════════════
-# 🔄 GIT-DIFF-HERE - Compare current worktree against dev worktree
+# 🔄 GIT-DIFF-HERE - Compare current branch/worktree against dev
 # ═══════════════════════════════════════════════════════════════
 # ──── Diff: Compare current worktree against dev using hunk ───
 git-diff-here: ## Compare current worktree against dev
@@ -504,15 +504,15 @@ ifndef EMBEDDED
 	@printf "$(CYAN)🔄 git-diff-here · compare current worktree against dev$(NC)\n"
 	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 endif
-	@if [ -d "$(RAVN_WTS_DIR)/dev" ] && [ -d "$(abspath $(RAVN_DIR))" ]; then \
+	@if git show-ref --quiet refs/heads/dev; then \
 		printf "  comparing current worktree against dev...\n"; \
 		if command -v hunk >/dev/null 2>&1; then \
-			git diff --no-index "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/" | hunk patch; \
+			git diff dev | hunk patch; \
 		else \
-			git diff --no-index --color=always "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/" 2>/dev/null || git diff --no-index "$(RAVN_WTS_DIR)/dev/" "$(abspath $(RAVN_DIR))/"; \
+			git diff --color=always dev 2>/dev/null || git diff dev; \
 		fi; \
 	else \
-		printf "$(RED)  ✗ dev or current worktree directory not found$(NC)\n"; \
+		printf "$(RED)  ✗ dev branch not found$(NC)\n"; \
 		exit 1; \
 	fi
 ifndef EMBEDDED

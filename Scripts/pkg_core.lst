@@ -131,6 +131,7 @@ localsend                                              # Share files and folders
 nautilus-python                                        # Python bindings for Nautilus
 neovim                                               # vim based text editor
 neovide                                              # Neovim GUI Client
+lazydocker                                             # Docker UI for terminal
 
 # --------------------------------------------------- // zsh
 bat|zsh                                                  # enhanced version of cat
