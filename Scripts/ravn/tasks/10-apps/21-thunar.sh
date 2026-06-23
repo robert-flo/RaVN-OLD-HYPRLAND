@@ -13,5 +13,14 @@ check() {
 }
 
 install() {
-  sudo pacman -Rns --noconfirm thunar thunar-archive-plugin thunar-volman thunar-media-tags-plugin
+  local pkgs=()
+  for pkg in thunar thunar-archive-plugin thunar-volman thunar-media-tags-plugin; do
+    if pacman -Qi "$pkg" &> /dev/null; then
+      pkgs+=("$pkg")
+    fi
+  done
+
+  if ((${#pkgs[@]} > 0)); then
+    sudo pacman -Rns --noconfirm "${pkgs[@]}"
+  fi
 }
