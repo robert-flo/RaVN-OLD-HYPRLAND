@@ -1,15 +1,40 @@
 # ═══════════════════════════════════════════════════════════════
 # 🎨 FORMAT & LINT - Shell script formatting and linting
 # ═══════════════════════════════════════════════════════════════
-# 📚 Documentation: docs/makefile/format.md
-# 🎯 Purpose: Format and lint shell scripts via shfmt and shellcheck
-# ──── Overview: 4 targets for code formatting and analysis ────
+# 📚 Documentation: docs/src/content/docs/makefile/09-format.mdx
+# 🎯 Purpose: Format, lint, and visualize project files and configurations
+# ──── Overview: 6 targets for code quality, structure, and diffs ──
+#
+# 📎 Aliases & Targets:
+#    ALIAS           TARGET                   DESCRIPTION
+#    f      / fmt-f  fmt                      Format shell scripts in-place using shfmt
+#    format / fmt-c  fmt-check                Check formatting of shell scripts
+#    lint   / fmt-l  fmt-lint                 Lint shell scripts using shellcheck
+#    fr     / fmt-r  fmt-report               Generate shell quality report
+#    tree            fmt-tree                 Show project structure tree
+#    diff-config     fmt-diff                 Show diff between local and repository configs
+#
+# 🧪 Dry Run (preview without executing):
+#    (fmt performs in-place formatting and does not support DRY_RUN)
+#    (fmt-check, fmt-lint, fmt-report, fmt-tree, fmt-diff are read-only)
 
-.PHONY: fmt fmt-check fmt-lint fmt-report
+DRY_RUN ?= 0
+export DRY_RUN
+ifeq ($(DRY_RUN),1)
+  EXEC = echo "  ▶ [dry-run]"
+else
+  EXEC =
+endif
+
+.PHONY: fmt fmt-check fmt-lint fmt-report fmt-tree fmt-diff
 
 # Active shell scripts in development (Scripts folder and root setup)
 SHELL_FILES := $(shell find Scripts -type f -name "*.sh" 2>/dev/null) git-setup.sh
 
+# ═══════════════════════════════════════════════════════════════
+# 🎨 FMT - Format shell scripts in-place using shfmt
+# ═══════════════════════════════════════════════════════════════
+# ──── Format: Applies shfmt code formatting to shell scripts ───
 fmt: ## Format shell scripts in-place using shfmt
 ifndef EMBEDDED
 	@printf "\n"
@@ -18,14 +43,26 @@ ifndef EMBEDDED
 endif
 	@if command -v shfmt >/dev/null 2>&1; then \
 		printf "  formatting shell scripts...  "; \
-		shfmt -i 2 -sr -kp -ci -w $(SHELL_FILES) >/dev/null 2>&1 && printf "$(GREEN)✓$(NC)\n" || printf "$(RED)✗$(NC)\n"; \
+		if [ "$(DRY_RUN)" = "1" ]; then \
+			printf "\n  ▶ [dry-run] shfmt -i 2 -sr -kp -ci -w <files>\n"; \
+		else \
+			shfmt -i 2 -sr -kp -ci -w $(SHELL_FILES) >/dev/null 2>&1 && printf "$(GREEN)✓$(NC)\n" || printf "$(RED)✗$(NC)\n"; \
+		fi; \
 	else \
 		printf "  $(YELLOW)⚠ shfmt not installed$(NC)\n"; \
 	fi
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
 endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check formatting:  $(BLUE)make fmt-check$(NC)\n"
+	@printf "  • lint for issues:   $(BLUE)make fmt-lint$(NC)\n\n"
 
+# ═══════════════════════════════════════════════════════════════
+# 🔍 FMT-CHECK - Check formatting of shell scripts
+# ═══════════════════════════════════════════════════════════════
+# ──── Check: Validates shell script formatting without changes ──
 fmt-check: ## Check formatting of shell scripts
 ifndef EMBEDDED
 	@printf "\n"
@@ -41,7 +78,15 @@ endif
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
 endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • format files:      $(BLUE)make fmt$(NC)\n"
+	@printf "  • lint for issues:   $(BLUE)make fmt-lint$(NC)\n\n"
 
+# ═══════════════════════════════════════════════════════════════
+# 🔎 FMT-LINT - Lint shell scripts using shellcheck
+# ═══════════════════════════════════════════════════════════════
+# ──── Lint: Runs shellcheck static analysis on shell scripts ───
 fmt-lint: ## Lint shell scripts using shellcheck
 ifndef EMBEDDED
 	@printf "\n"
@@ -57,7 +102,15 @@ endif
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
 endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • format files:      $(BLUE)make fmt$(NC)\n"
+	@printf "  • generate report:   $(BLUE)make fmt-report$(NC)\n\n"
 
+# ═══════════════════════════════════════════════════════════════
+# 📋 FMT-REPORT - Generate shell quality report
+# ═══════════════════════════════════════════════════════════════
+# ──── Report: Generates detailed shellcheck and shfmt report ───
 fmt-report: ## Generate shell quality report
 ifndef EMBEDDED
 	@printf "\n"
@@ -99,3 +152,53 @@ endif
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
 endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • format files:      $(BLUE)make fmt$(NC)\n"
+	@printf "  • lint for issues:   $(BLUE)make fmt-lint$(NC)\n\n"
+
+# ═══════════════════════════════════════════════════════════════
+# 📂 FMT-TREE - Show project structure tree
+# ═══════════════════════════════════════════════════════════════
+# ──── Structure: Excludes result*, node_modules, .git ─────────
+fmt-tree: ## Show project structure tree
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📂 fmt-tree · project structure$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if command -v tree >/dev/null 2>&1; then \
+		tree -C -L 3 --gitignore; \
+	elif command -v lsd >/dev/null 2>&1; then \
+		lsd --tree --depth 3 -I "result*" -I "node_modules" -I ".git" -I "dist" -I "cache" -I ".astro" -I ".vscode"; \
+	else \
+		find . -maxdepth 3 -not -path '*/.*' -not -path './result*' -not -path './docs/node_modules*'; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check config differences: $(BLUE)make fmt-diff$(NC)\n\n"
+
+# ═══════════════════════════════════════════════════════════════
+# 📉 FMT-DIFF - Show diff between local and repository configs
+# ═══════════════════════════════════════════════════════════════
+# ──── Compares active files in $$HOME against Configs/ templates ─
+fmt-diff: ## Show diff between local active configs and repository templates
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📉 fmt-diff · local configs vs templates$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -f "Scripts/diff_cfg.sh" ]; then \
+		bash Scripts/diff_cfg.sh; \
+	else \
+		printf "$(RED)  ❌ Scripts/diff_cfg.sh not found$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+endif
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • check formatting: $(BLUE)make fmt-check$(NC)\n\n"

@@ -16,7 +16,8 @@
         git-af git-fuck git-bye git-df git-fc git-fm \
         a c ac p l st s d lg af fuck bye df fc fm \
         clean-vm disk-repo disk-home \
-        scvm sdr sdh
+        scvm sdr sdh \
+        fmt-f fmt-c fmt-l fmt-r f fl fr
 
 # === Alias Help ===
 # ═══════════════════════════════════════════════════════════════
@@ -77,8 +78,10 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "shell" "dev-shell" "Dev"
 	@printf "%-20s %-25s %s\n" "vm" "dev-vm" "Dev"
 	@printf "%-20s %-25s %s\n" "closure-size" "dev-size" "Dev"
-	@printf "%-20s %-25s %s\n" "format" "fmt-check" "Format"
-	@printf "%-20s %-25s %s\n" "lint" "fmt-lint" "Format"
+	@printf "%-20s %-25s %s\n" "f / fmt-f" "fmt" "Format"
+	@printf "%-20s %-25s %s\n" "format / fmt-c" "fmt-check" "Format"
+	@printf "%-20s %-25s %s\n" "lint / fmt-l" "fmt-lint" "Format"
+	@printf "%-20s %-25s %s\n" "fr / fmt-r" "fmt-report" "Format"
 	@printf "%-20s %-25s %s\n" "tree" "fmt-tree" "Format"
 	@printf "%-20s %-25s %s\n" "diff-config" "fmt-diff" "Format"
 	@printf "%-20s %-25s %s\n" "docs-*" "doc-*" "Docs"
@@ -170,10 +173,19 @@ vm: dev-vm
 closure-size: dev-size
 
 # === Formatting and Structure (fmt-) ===
+fmt-f: fmt
+fmt-c: fmt-check
+fmt-l: fmt-lint
+fmt-r: fmt-report
 format: fmt-check
 lint: fmt-lint
 tree: fmt-tree
 diff-config: fmt-diff
+
+# === Short Formatting Aliases ===
+f: fmt
+fl: fmt-lint
+fr: fmt-report
 
 # === Documentation (doc-) ===
 docs-local: doc-local
