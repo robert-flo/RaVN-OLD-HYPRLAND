@@ -3,6 +3,8 @@
   "permissions": {
     "allow": [
       "command(*)",
+      "read_file(/home/dominus/)",
+      "write_file(/home/dominus/)",
       "read_file(/)",
       "write_file(/)",
       "read_url(*)",
