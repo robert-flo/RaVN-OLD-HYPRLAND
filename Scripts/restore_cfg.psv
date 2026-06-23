@@ -93,6 +93,7 @@ S|${HOME}/.local/share|waybar|waybar
 
  Terminal 
 P|${HOME}/.config|lsd|lsd
+S|${HOME}/.config/skim|skimrc|skim
 P|${HOME}/.config|fastfetch|fastfetch
 O|${HOME}/.local/share/fastfetch/presets|hyde|fastfetch
 
@@ -114,6 +115,7 @@ S|${HOME}/.config/zsh|.zshenv|zsh
 S|${HOME}/.config/zsh/conf.d|hyde 00-hyde.zsh|zsh
 S|${HOME}/.config/zsh/functions|error-handlers.zsh|zsh
 S|${HOME}/.config/zsh/functions|fzf.zsh|zsh fzf
+S|${HOME}/.config/zsh/functions|skim.zsh|zsh skim
 S|${HOME}/.config/zsh/functions|duf.zsh|zsh duf
 S|${HOME}/.config/zsh/functions|eza.zsh|zsh eza
 S|${HOME}/.config/zsh/functions|bat.zsh|zsh bat

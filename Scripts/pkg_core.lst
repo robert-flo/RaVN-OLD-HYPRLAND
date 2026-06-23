@@ -115,6 +115,7 @@ shellcheck                                             # Shell script static ana
 zoxide                                                 # A smarter cd command for your terminal
 tldr                                                   # Collaborative cheatsheets for console commands
 tmux                                                   # Terminal multiplexer
+skim                                                   # Fuzzy finder in Rust (alternative to fzf)
 
 fastfetch                                              # system information fetch tool
 
