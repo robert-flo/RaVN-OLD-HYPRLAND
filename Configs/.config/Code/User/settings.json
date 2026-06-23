@@ -1,4 +1,38 @@
 {
+  // ──── Editor ────────────────────────────────────────────────
+  "editor.renderWhitespace": "trailing",
+  "editor.formatOnSave": true,
+  // ──── Shell: Formatter (shfmt) ──────────────────────────────
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true
+  },
+  "shellformat.path": "shfmt",
+  "shellformat.flag": "-i 2 -sr -kp -ci",
+  "shellformat.effectLanguages": [
+    "shellscript"
+  ],
+  // ──── Shell: Linter (shellcheck) ────────────────────────────
+  "shellcheck.enable": true,
+  "shellcheck.run": "onType",
+  "shellcheck.executablePath": "/usr/bin/shellcheck",
+  "shellcheck.ignorePatterns": {
+    "**/Configs/.config/uwsm/**": true,
+    "**/Configs/.config/waybar/**": true,
+    "**/Configs/.config/hyde/wallbash/scripts/code.sh": true,
+    "**/Configs/.local/lib/**": true,
+    "**/Configs/.local/share/wallbash/**": true,
+    "**/Configs/.local/share/waybar/**": true,
+    "**/Scripts/chaotic_aur.sh": true,
+    "**/Scripts/extra/**": true,
+    "**/Scripts/global_fn.sh": true,
+    "**/Scripts/ravn/global_fn.sh": true,
+    "**/Scripts/install_pre.sh": true,
+    "**/Scripts/install_pst.sh": true,
+    "**/Scripts/restore_cfg.sh": true,
+    "**/Scripts/restore_shl.sh": true,
+    "**/Scripts/uninstall.sh": true
+  },
   "workbench.colorTheme": "Wallbash",
   "window.menuBarVisibility": "toggle",
   "editor.fontSize": 12,
@@ -21,9 +55,4 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "python.languageServer": "Default",
-  "shellformat.path": "shfmt",
-  "shellformat.flag": "-i 2 -sr -kp -ci",
-  "shellformat.effectLanguages": [
-    "shellscript"
-  ]
 }
