@@ -143,6 +143,7 @@ for task_file in "${TASKS_TO_TEST[@]}"; do
   cat > "$test_script" << EOF
 #!/usr/bin/env bash
 set -e
+export PATH="\$HOME/.local/bin:\$PATH"
 echo "=== Actualizando sistema base ==="
 pacman -Syu --noconfirm curl git 2>&1 | tail -3
 
