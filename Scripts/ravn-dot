@@ -144,8 +144,11 @@ overwrite_home() {
 view_diff() {
     local active="$1" template="$2"
     if command_exists hunk; then
-                                 hunk diff --no-index "$template" "$active" || true
-  else   diff --color=always -u "$template" "$active" | less -R || true; fi
+        hunk diff "$template" "$active" 2>/dev/null || \
+        git diff --no-index --color=always "$template" "$active" | less -R || true
+    else
+        git diff --no-index --color=always "$template" "$active" | less -R || true
+    fi
 }
 
 file_menu() {
