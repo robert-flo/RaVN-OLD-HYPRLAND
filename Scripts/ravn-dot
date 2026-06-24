@@ -169,7 +169,7 @@ file_menu() {
         echo "  [d] View diff"
         echo "  [m] Resolve with meld"
         echo "  [v] Resolve with nvim"
-        echo "  [x] Exclude forever"
+        echo "  [x] Exclude forever (~/.config/RaVN_dotcfg_excludes)"
         echo "  [s] Skip"
         echo "  [b] Back"
         echo ""
