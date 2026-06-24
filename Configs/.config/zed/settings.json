@@ -1,0 +1,230 @@
+{
+  "languages": {
+    "YAML": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on"
+    },
+    "Astro": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "biome",
+          "arguments": [
+            "format",
+            "--stdin-file-path",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "astro-language-server",
+        "tailwindcss-language-server"
+      ]
+    },
+    "JavaScript": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "biome",
+        "tailwindcss-language-server"
+      ]
+    },
+    "JSON": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "biome"
+      ]
+    },
+    "Markdown": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "marksman"
+      ]
+    },
+    "TypeScript": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "biome",
+        "tailwindcss-language-server"
+      ]
+    },
+    "TSX": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "biome",
+        "tailwindcss-language-server"
+      ]
+    },
+    "CSS": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "biome",
+        "tailwindcss-language-server"
+      ]
+    },
+    "HTML": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "tailwindcss-language-server"
+      ]
+    },
+    "Vue.js": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "oxfmt",
+          "arguments": [
+            "--stdin-filepath",
+            "{buffer_path}"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "vue-language-server",
+        "tailwindcss-language-server"
+      ]
+    },
+    "Nix": {
+      "tab_size": 2,
+      "formatter": {
+        "external": {
+          "command": "alejandra",
+          "arguments": [
+            "-q"
+          ]
+        }
+      },
+      "format_on_save": "on",
+      "language_servers": [
+        "nil"
+      ]
+    }
+  },
+  "lsp": {
+    "astro-language-server": {
+      "binary": {
+        "path": "astro-ls",
+        "arguments": [
+          "--stdio"
+        ]
+      }
+    },
+    "biome": {
+      "binary": {
+        "path": "biome",
+        "arguments": [
+          "lsp-proxy"
+        ]
+      }
+    },
+    "nil": {
+      "binary": {
+        "path": "nil"
+      },
+      "initialization_options": {
+        "formatting": {
+          "command": [
+            "alejandra",
+            "-q"
+          ]
+        }
+      }
+    },
+    "tailwindcss-language-server": {
+      "binary": {
+        "path": "tailwindcss-language-server",
+        "arguments": [
+          "--stdio"
+        ]
+      }
+    },
+    "vue-language-server": {
+      "binary": {
+        "path": "vue-language-server",
+        "arguments": [
+          "--stdio"
+        ]
+      }
+    }
+  }
+}
