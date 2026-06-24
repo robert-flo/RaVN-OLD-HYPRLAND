@@ -1,0 +1,100 @@
+[[language]]
+name = "bash"
+auto-format = true
+formatter = { command = "shfmt", args = ["-i", "2"] }
+
+[[language]]
+name = "yaml"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.yaml"] }
+
+[[language]]
+name = "astro"
+auto-format = true
+formatter = { command = "biome", args = ["format", "--stdin-file-path", "a.astro"] }
+language-servers = ["astro-ls", "tailwindcss"]
+
+[[language]]
+name = "javascript"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.js"] }
+language-servers = ["biome", "tailwindcss"]
+
+[[language]]
+name = "json"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.json"] }
+language-servers = ["biome"]
+
+[[language]]
+name = "jsx"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.jsx"] }
+language-servers = ["biome", "tailwindcss"]
+
+[[language]]
+name = "markdown"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.md"] }
+language-servers = ["marksman"]
+
+[[language]]
+name = "typescript"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.ts"] }
+language-servers = ["biome", "tailwindcss"]
+
+[[language]]
+name = "tsx"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.tsx"] }
+language-servers = ["biome", "tailwindcss"]
+
+[[language]]
+name = "css"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.css"] }
+language-servers = ["biome", "tailwindcss"]
+
+[[language]]
+name = "html"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.html"] }
+language-servers = ["tailwindcss"]
+
+[[language]]
+name = "vue"
+auto-format = true
+formatter = { command = "oxfmt", args = ["--stdin-filepath", "file.vue"] }
+language-servers = ["volar", "tailwindcss"]
+
+[[language]]
+name = "nix"
+auto-format = true
+formatter = { command = "alejandra", args = ["-q"] }
+language-servers = ["nil"]
+
+[language-server.astro-ls]
+command = "astro-ls"
+args = ["--stdio"]
+
+[language-server.biome]
+command = "biome"
+args = ["lsp-proxy"]
+
+[language-server.nil]
+command = "nil"
+
+[language-server.nil.config.nil.formatting]
+command = ["alejandra", "-q"]
+
+[language-server.marksman]
+command = "marksman"
+
+[language-server.tailwindcss]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+
+[language-server.volar]
+command = "vue-language-server"
+args = ["--stdio"]

@@ -84,6 +84,7 @@ P|${HOME}/.config/VSCodium/User|settings.json|vscodium
 P|${HOME}/.config/Antigravity IDE/User|settings.json|bash
 S|${HOME}/.config|neovide|neovide
 P|${HOME}/.config/zed|settings.json|zed
+P|${HOME}/.config/helix|config.toml languages.toml|helix
 
 
  Bar 

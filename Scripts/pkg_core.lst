@@ -159,7 +159,19 @@ antigravity-cli                                       # Google's agentic develop
 antigravity                                           # Google Antigravity 2.0 multi-agent orchestration platform
 luarocks                                               # Package manager for Lua modules
 zed                                                   # A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter
+helix                                                 # A post-modern modal text editor
 vulkan-intel
+
+# --------------------------------------------------- // LSP & Formatters
+biome                                                 # Linter/formatter for JS, TS, JSON, CSS
+marksman                                              # Markdown LSP
+nil-git                                               # Nix LSP
+alejandra                                             # Nix formatter
+tailwindcss-language-server                          # Tailwind CSS LSP
+vue-language-server                                   # Vue LSP
+oxfmt-bin                                             # JS ecosystem formatter
+shfmt                                                 # Shell script formatter
+astrojs-language-server                               # Astro LSP
 
 # --------------------------------------------------- // Driver for my Intel HD Graphics 530
 vulkan-intel
