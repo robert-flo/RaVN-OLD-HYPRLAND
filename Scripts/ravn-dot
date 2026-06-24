@@ -1,0 +1,470 @@
+#!/usr/bin/env bash
+#
+# ravn-dot - Professional Dotfiles Change Management TUI
+#
+# DESCRIPTION:
+#   A robust, safe, and beautiful terminal user interface for managing
+#   bidirectional synchronization between your live $HOME configuration
+#   and the canonical dotfiles stored in the RaVN repository.
+#
+#   It uses restore_cfg.psv as the single source of truth and allows you
+#   to review every difference using hunk before deciding what to do.
+#
+# USAGE:
+#   ravn-dot [OPTIONS]
+#
+# OPTIONS:
+#   --dry-run, -n     Simulate all copy operations without modifying any files.
+#                     Extremely recommended before running without this flag.
+#   --help, -h        Show this help message and exit.
+#
+# EXAMPLES:
+#   # Safe simulation (recommended first run)
+#   ravn-dot --dry-run
+#   ravn-dot -n
+#
+#   # Real execution (after reviewing with dry-run)
+#   ravn-dot
+#
+# KEY FEATURES:
+#   - Visual TUI inspired by git-setup.sh style + dotbare fstat interaction
+#   - Uses 'hunk' for beautiful syntax-highlighted diffs
+#   - Per-file decision making (no dangerous bulk operations)
+#   - Permanent exclusion list (~/.config/RaVN_dotcfg_excludes)
+#   - Full --dry-run support with clear visual indicators
+#   - Always shows diff before allowing destructive actions
+#   - Source of truth: $HOME/Work/RaVN/dev/Configs (user-independent)
+#
+# WORKFLOW:
+#   1. ravn-dot shows all files that differ between HOME and Configs/
+#   2. You navigate with fzf and preview the diff with hunk
+#   3. For each file you can choose:
+#        [k] Keep clean     → Copy from $HOME into the repository
+#        [o] Overwrite HOME → Restore the version from the repository
+#        [d] View diff      → Open hunk
+#        [e] Manual merge   → Open vimdiff
+#        [x] Exclude forever
+#        [s] Skip this time
+#   4. After decisions, you can commit the changes with your normal Git flow
+#      (dotbare, git, etc.)
+#
+# DEPENDENCIES:
+#   - fzf
+#   - hunk (recommended) or git diff
+#   - bash 5+
+#
+# CONFIGURATION FILES:
+#   - Manifest:        Scripts/restore_cfg.psv
+#   - Source of truth: $HOME/Work/RaVN/dev/Configs
+#   - Exclusions:      ~/.config/RaVN_dotcfg_excludes
+#
+# SAFETY:
+#   - Never performs copy operations without explicit confirmation
+#   - --dry-run mode is highly encouraged
+#   - Always shows what will be changed before doing it
+#
+# Part of the RaVN dotfiles ecosystem.
+# Inspired by git-setup.sh visual language and dotbare's excellent UX.
+#
+
+set -Eeuo pipefail
+trap cleanup SIGINT SIGTERM ERR EXIT
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Configuration                                                                │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIGS_DIR="$HOME/Work/RaVN/dev/Configs"
+EXCLUDES_FILE="$HOME/.config/RaVN_dotcfg_excludes"
+RESTORE_CFG="$SCRIPT_DIR/restore_cfg.psv"
+
+# Dry-run mode (very important for safety)
+DRY_RUN=false
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Colors & Styling                                                             │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[0;33m'
+readonly BLUE='\033[0;34m'
+readonly MAGENTA='\033[0;35m'
+readonly CYAN='\033[0;36m'
+readonly WHITE='\033[1;37m'
+readonly GRAY='\033[0;90m'
+readonly NC='\033[0m'
+
+readonly ICON_CHECK="󰄬"
+readonly ICON_CROSS="󰅖"
+readonly ICON_ARROW="󰁔"
+readonly ICON_WARN="󰀦"
+readonly ICON_INFO="󰋼"
+readonly ICON_GEAR="󰒓"
+readonly ICON_DIFF="󰦓"
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Helpers                                                                      │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+cleanup() { trap - SIGINT SIGTERM ERR EXIT; }
+
+print_header() {
+    echo ""
+    echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
+    echo -e "${CYAN}│${NC}  ${WHITE}$1${NC}"
+    echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
+}
+
+print_section() {
+    echo ""
+    echo -e "${MAGENTA}  $1${NC}"
+    echo -e "${GRAY}  ──────────────────────────────────────────────────────────${NC}"
+}
+
+print_success() { echo -e "  ${GREEN}${ICON_CHECK}${NC} $1"; }
+print_error()   { echo -e "  ${RED}${ICON_CROSS}${NC} $1"; }
+print_warn()    { echo -e "  ${YELLOW}${ICON_WARN}${NC} $1"; }
+print_info()    { echo -e "  ${BLUE}${ICON_INFO}${NC} $1"; }
+print_step()    { echo -e "  ${GRAY}${ICON_ARROW}${NC} $1"; }
+
+command_exists() { command -v "$1" > /dev/null 2>&1; }
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Validation                                                                   │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+validate_environment() {
+    print_section "${ICON_GEAR} Validating Environment"
+
+    [[ -d "$CONFIGS_DIR" ]] || {
+                                 print_error "Configs dir not found: $CONFIGS_DIR"
+                                                                                    exit 1
+  }
+    print_success "Configs: ${GRAY}${CONFIGS_DIR/#$HOME/\~}${NC}"
+
+    [[ -f "$RESTORE_CFG" ]] || {
+                                 print_error "Manifest not found"
+                                                                   exit 1
+  }
+    print_success "Manifest: restore_cfg.psv"
+
+    command_exists fzf || {
+                            print_error "fzf is required"
+                                                           exit 1
+  }
+    print_success "fzf ready"
+
+    command_exists hunk && print_success "hunk ready" || print_warn "hunk not found (using diff)"
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Exclusions                                                                   │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+declare -a EXCLUDES=()
+
+load_excludes() {
+    [[ -f "$EXCLUDES_FILE" ]] && mapfile -t EXCLUDES < "$EXCLUDES_FILE"
+}
+
+is_excluded() {
+    local f="$1"
+    for e in "${EXCLUDES[@]}"; do [[ "$f" == "$e" ]] && return 0; done
+    return 1
+}
+
+add_to_excludes() {
+    local f="$1"
+    mkdir -p "$(dirname "$EXCLUDES_FILE")"
+    echo "$f" >> "$EXCLUDES_FILE"
+    print_success "Permanently excluded: ${GRAY}$f${NC}"
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Comparison Engine                                                            │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+declare -a MANAGED_FILES=()
+declare -a DIFFERENT_FILES=()
+
+build_managed_files() {
+    MANAGED_FILES=()
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// /}" ]] && continue
+
+        local fields
+        IFS='|' read -ra fields <<< "$line"
+        ((${#fields[@]} < 3)) && continue
+
+        local path="${fields[1]}"
+        local cfg="${fields[2]}"
+
+        local path_resolved
+        path_resolved=$(eval echo "$path" 2> /dev/null) || continue
+
+        for cfg_chk in $cfg; do
+            local active="$path_resolved/$cfg_chk"
+            local rel="${path_resolved#$HOME/}/$cfg_chk"
+            local template="$CONFIGS_DIR/$rel"
+
+            if [[ -f "$active" && -f "$template" ]]; then
+                if ! is_excluded "$rel"; then
+                    MANAGED_FILES+=("$rel|$active|$template")
+        fi
+      fi
+    done
+  done   < "$RESTORE_CFG"
+}
+
+detect_differences() {
+    DIFFERENT_FILES=()
+    for entry in "${MANAGED_FILES[@]}"; do
+        IFS='|' read -r rel active template <<< "$entry"
+        if ! diff -q "$template" "$active" > /dev/null 2>&1; then
+            DIFFERENT_FILES+=("$entry")
+    fi
+  done
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Actions (with Dry-Run support)                                               │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+keep_clean() {
+    local active="$1" template="$2" rel="$3"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        print_step "[DRY-RUN] Would copy: \$HOME → Configs/"
+        echo -e "   ${GRAY}$active${NC}"
+        echo -e "   ${GRAY}→ $template${NC}"
+        print_info "[DRY-RUN] No changes made"
+        return 0
+  fi
+
+    print_step "Keep clean: \$HOME → Configs/"
+    if cp "$active" "$template"; then
+        print_success "Synced to repo: $rel"
+  else
+        print_error "Copy failed"
+  fi
+}
+
+overwrite_home() {
+    local active="$1" template="$2" rel="$3"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        print_step "[DRY-RUN] Would copy: Configs/ → \$HOME/"
+        echo -e "   ${GRAY}$template${NC}"
+        echo -e "   ${GRAY}→ $active${NC}"
+        print_info "[DRY-RUN] No changes made"
+        return 0
+  fi
+
+    print_step "Overwrite: Configs/ → \$HOME/"
+    if cp "$template" "$active"; then
+        print_success "Restored to home: $rel"
+  else
+        print_error "Copy failed"
+  fi
+}
+
+view_with_hunk() {
+    local active="$1" template="$2"
+    if command_exists hunk; then
+        hunk diff --no-index "$template" "$active" || true
+  else
+        diff --color=always -u "$template" "$active" | less -R || true
+  fi
+}
+
+manual_edit() {
+    local active="$1" template="$2"
+    if command_exists vimdiff; then
+        vimdiff "$template" "$active"
+  elif   command_exists nvim; then
+        nvim -d "$template" "$active"
+  else
+        ${EDITOR:-vi} "$active"
+  fi
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Per-file Menu                                                                │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+file_action_menu() {
+    local rel="$1" active="$2" template="$3"
+
+    while true; do
+        clear
+        print_header "Managing: ${WHITE}$rel${NC}"
+        echo ""
+        echo -e "  ${GRAY}HOME:   ${NC}${active/#$HOME/\~}"
+        echo -e "  ${GRAY}REPO:   ${NC}${template/#$HOME/\~}"
+        echo ""
+
+        if [[ "$DRY_RUN" == true ]]; then
+            print_warn "DRY-RUN MODE — No files will be modified"
+            echo ""
+    fi
+
+        print_section "Actions"
+        echo -e "  ${GREEN}[k]${NC} Keep clean     (HOME → Configs)"
+        echo -e "  ${BLUE}[o]${NC} Overwrite HOME (Configs → HOME)"
+        echo -e "  ${CYAN}[d]${NC} View diff      (hunk)"
+        echo -e "  ${MAGENTA}[e]${NC} Manual merge   (vimdiff)"
+        echo -e "  ${YELLOW}[x]${NC} Exclude forever"
+        echo -e "  ${GRAY}[s]${NC} Skip"
+        echo -e "  ${RED}[b]${NC} Back"
+        echo ""
+        read -rp "  Choice: " -n 1 c
+        echo ""
+
+        case "$c" in
+            k | K)
+                 keep_clean "$active" "$template" "$rel"
+                                                          read -rp "  Continue..."
+                                                                                   ;;
+            o | O)
+                 overwrite_home "$active" "$template" "$rel"
+                                                              read -rp "  Continue..."
+                                                                                       ;;
+            d | D) view_with_hunk "$active" "$template" ;;
+            e | E) manual_edit "$active" "$template" ;;
+            x | X)
+                 add_to_excludes "$rel"
+                                         return 0
+                                                  ;;
+            s | S) return 0 ;;
+            b | B) return 0 ;;
+            *)
+               print_warn "Invalid"
+                                     sleep 0.4
+                                               ;;
+    esac
+  done
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Main TUI                                                                     │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+run_tui() {
+    build_managed_files
+    detect_differences
+
+    if ((${#DIFFERENT_FILES[@]} == 0)); then
+        print_header "ravn-dot"
+        print_success "No differences found. Everything is clean."
+        echo ""
+        return 0
+  fi
+
+    while true; do
+        clear
+        print_header "ravn-dot — Dotfiles Change Manager"
+
+        if [[ "$DRY_RUN" == true ]]; then
+            print_warn "DRY-RUN MODE ACTIVE — Simulation only"
+    fi
+
+        print_section "Detected Changes"
+        echo -e "  ${WHITE}${#DIFFERENT_FILES[@]} files${NC} differ between HOME and Configs/"
+        echo ""
+
+        local selected
+        selected=$(printf "%s\n" "${DIFFERENT_FILES[@]}" | cut -d'|' -f1 |
+            fzf --height=75% --border \
+                --header="↑↓ navigate • Enter: manage • ESC: exit" \
+                --preview-window=right:55%:wrap \
+                --preview '
+                    file={}
+                    for entry in '"${DIFFERENT_FILES[*]}"'; do
+                        if [[ "$entry" == "$file|"* ]]; then
+                            IFS="|" read -r _ active template <<< "$entry"
+                            if command -v hunk >/dev/null; then
+                                hunk diff --no-index "$template" "$active" 2>/dev/null | head -60
+                            else
+                                diff -u --color=always "$template" "$active" 2>/dev/null | head -60
+                            fi
+                            break
+                        fi
+                    done
+                ' || true)
+
+        [[ -z "$selected" ]] && break
+
+        for entry in "${DIFFERENT_FILES[@]}"; do
+            if [[ "$entry" == "$selected|"* ]]; then
+                IFS='|' read -r rel active template <<< "$entry"
+                file_action_menu "$rel" "$active" "$template"
+                break
+      fi
+    done
+
+        detect_differences
+        ((${#DIFFERENT_FILES[@]} == 0)) && {
+                                             print_success "All resolved!"
+                                                                            sleep 1
+                                                                                     break
+    }
+  done
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Argument Parsing                                                             │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --dry-run | -n)
+                DRY_RUN=true
+                shift
+                ;;
+            -h | --help)
+                echo "Usage: ravn-dot [--dry-run|-n]"
+                echo ""
+                echo "  --dry-run, -n    Simulate all operations without modifying files"
+                exit 0
+                ;;
+            *)
+                shift
+                ;;
+    esac
+  done
+}
+
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │ Entry Point                                                                  │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+main() {
+    parse_args "$@"
+
+    print_header "ravn-dot — Professional Dotfiles Manager v1"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        print_warn "DRY-RUN MODE ENABLED — No files will be changed"
+        echo ""
+  fi
+
+    validate_environment
+    load_excludes
+
+    run_tui
+
+    print_section "Finished"
+    if [[ "$DRY_RUN" == true ]]; then
+        print_info "Dry-run completed. No changes were made to your system."
+  else
+        print_success "ravn-dot session complete"
+  fi
+    echo ""
+}
+
+main "$@"
