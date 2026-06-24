@@ -1,3 +1,4 @@
+# shellcheck shell=sh
 # ~/.profile
 # Shared environment configuration for bash and zsh
 
@@ -32,4 +33,14 @@ if [ -z "${SSH_AUTH_SOCK}" ]; then
   else
     eval "$(ssh-agent -s)" >/dev/null
   fi
+fi
+
+# Load UWSM environment variables manually if session is not managed by UWSM
+if [ -z "$UWSM_ACTIVE" ]; then
+  for f in "${XDG_CONFIG_HOME:-$HOME/.config}/uwsm/env.d"/*.sh; do
+    if [ -r "$f" ]; then
+      # shellcheck disable=SC1090
+      . "$f"
+    fi
+  done
 fi
