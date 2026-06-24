@@ -1,0 +1,5 @@
+ahora haz lo mismo con /home/dominus/Work/RaVN/dev/crear_usuario.sh
+solo que quiero que el password sea pedido en tiempo de ejecucion con un timer usando las funciones de /home/dominus/Work/RaVN/dev/Scripts/global_fn.sh
+sino que use el password hardcoded arch
+quiero tambien que en ese usuario se instale brave desde flatpack via este script para que este disponible desde el primer uso
+hazme sugerencias como podemos hacer esto y pulir esta idea.
