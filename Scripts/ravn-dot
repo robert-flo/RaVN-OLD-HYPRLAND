@@ -114,13 +114,13 @@ detect_differences() {
 keep_clean() {
     local active="$1" template="$2" rel="$3"
     [[ "$DRY_RUN" == true ]] && { print_info "[DRY] Would keep: $rel"; return 0; }
-    cp "$active" "$template" && print_success "Kept clean: $rel"
+    cp "$active" "$template" && print_success "Updated dotfiles copy from HOME: $rel"
 }
 
 overwrite_home() {
     local active="$1" template="$2" rel="$3"
     [[ "$DRY_RUN" == true ]] && { print_info "[DRY] Would overwrite: $rel"; return 0; }
-    cp "$template" "$active" && print_success "Overwrote HOME: $rel"
+    cp "$template" "$active" && print_success "Updated \$HOME copy from dotfiles: $rel"
 }
 
 view_diff() {
