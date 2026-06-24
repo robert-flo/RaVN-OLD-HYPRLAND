@@ -209,7 +209,14 @@ run_tui() {
         selected=$(printf "%s\n" "${DIFFERENT_FILES[@]}" | cut -d'|' -f1 | \
             fzf --height=85% --border \
                 --header="Enter: manage file • ESC: exit" \
-                --preview "echo 'File: {}' | sed 's|^|  |'" || true)
+                --preview '
+                    echo "  File: {}"
+                    echo ""
+                    echo "  HOME: $HOME/{}"
+                    echo "  REPO: '"$CONFIGS_DIR"'/{}"
+                    echo ""
+                    echo "  Press Enter to manage this file"
+                ' || true)
 
         [[ -z "$selected" ]] && break
 
