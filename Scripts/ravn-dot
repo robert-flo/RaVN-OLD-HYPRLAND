@@ -207,7 +207,23 @@ run_tui() {
 
         local selected
         selected=$(printf "%s\n" "${DIFFERENT_FILES[@]}" | cut -d'|' -f1 | \
-            fzf --height=85% --border --header="Enter: manage • ESC: quit" || true)
+            fzf --height=85% --border \
+                --header="Enter: manage file • ESC: exit" \
+                --preview-window=right:60%:wrap \
+                --preview '
+                    file={}
+                    for entry in '"${DIFFERENT_FILES[*]}"'; do
+                        if [[ "$entry" == "$file|"* ]]; then
+                            IFS="|" read -r _ active template <<< "$entry"
+                            if command -v hunk >/dev/null 2>&1; then
+                                hunk diff "$template" "$active" 2>/dev/null | head -80
+                            else
+                                git diff --no-index --color=always "$template" "$active" 2>/dev/null | head -80
+                            fi
+                            break
+                        fi
+                    done
+                ' || true)
 
         [[ -z "$selected" ]] && break
 
