@@ -31,10 +31,11 @@
 #
 # How it works:
 #   1. Starts a fresh Arch Linux container
-#   2. Sources the task module
-#   3. Executes its install() function
-#   4. Verifies that check() returns success afterwards
-#   5. Reports PASS / FAIL for each task
+#   2. Sources global_fn.sh (required by most tasks)
+#   3. Sources the task module
+#   4. Executes its install() function
+#   5. Verifies that check() returns success afterwards
+#   6. Reports PASS / FAIL for each task
 #
 # This script was created after successfully validating the Hermes task
 # (25-hermes.sh) in complete isolation.
@@ -46,6 +47,7 @@ set -e
 
 RAVN_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 TASKS_DIR="${RAVN_DIR}/tasks"
+GLOBAL_FN="${RAVN_DIR}/global_fn.sh"
 
 DOCKER_IMAGE="archlinux:latest"
 
@@ -70,6 +72,7 @@ Ejemplos:
   ./test-task.sh --all
 EOF
 }
+
 # Parse arguments
 TASKS_TO_TEST=()
 DRY_RUN=0
@@ -144,6 +147,12 @@ echo "=== Actualizando sistema base ==="
 pacman -Syu --noconfirm curl git 2>&1 | tail -3
 
 echo "=== Ejecutando tarea: $package ==="
+
+# Source global_fn.sh first (provides step, warn_msg, info, success, etc.)
+if [[ -f "/global_fn.sh" ]]; then
+  source "/global_fn.sh" 2>/dev/null || true
+fi
+
 source "/task.sh" 2>/dev/null || true
 
 if declare -f install >/dev/null; then
@@ -189,9 +198,10 @@ EOF
   fi
 
   if docker run "${docker_args[@]}" \
-    -v "$task_file:/task.sh:ro" \
-    -v "$test_script:/test.sh:ro" \
-    "$DOCKER_IMAGE" bash /test.sh; then
+       -v "$task_file:/task.sh:ro" \
+       -v "$GLOBAL_FN:/global_fn.sh:ro" \
+       -v "$test_script:/test.sh:ro" \
+       "$DOCKER_IMAGE" bash /test.sh; then
     echo "✓ $package → PASÓ"
     PASSED+=("$package")
   else
