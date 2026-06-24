@@ -29,6 +29,11 @@ fd                                                     # Simple, fast and user-f
 ufw                                                    # Uncomplicated Firewall
 btop                                                   # Modern, interactive terminal system monitor
 1password-cli                                          # 1Password command-line tool
+snapd                                                 # Service and tools for managing Snap packages
+apparmor                                              # AppArmor kernel security support for snapd
+squashfs-tools                                        # Tools to create and append squashfs filesystems for snapd
+
+
 
 
 
