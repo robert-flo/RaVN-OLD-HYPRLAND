@@ -22,7 +22,7 @@ check() {
   fi
 
   # 3. Check sudoers override file
-  if [[ ! -f /etc/sudoers.d/99-ai-tools ]]; then
+  if [[ ! -f /etc/sudoers.d/99-ai-tools ]] || [[ ! -f /etc/sudoers.d/hermes-nopasswd ]]; then
     return 1
   fi
 
@@ -92,6 +92,17 @@ Defaults !lecture
 Defaults use_pty
 EOF
   sudo chmod 0440 /etc/sudoers.d/99-ai-tools
+
+  info "Configurando excepciones de sudo para hermes en /etc/sudoers.d/hermes-nopasswd..."
+  sudo tee /etc/sudoers.d/hermes-nopasswd > /dev/null << 'EOF'
+dominus ALL=(ALL) NOPASSWD: ALL
+EOF
+  sudo chmod 0440 /etc/sudoers.d/hermes-nopasswd
+  if ! sudo visudo -c -f /etc/sudoers.d/hermes-nopasswd > /dev/null 2>&1; then
+    error_msg "Error de sintaxis en /etc/sudoers.d/hermes-nopasswd. Revirtiendo..."
+    sudo rm -f /etc/sudoers.d/hermes-nopasswd
+    return 1
+  fi
 
   # 4. Create systemd limits
   info "Configurando DefaultTasksMax=infinity en /etc/systemd/system.conf.d/99-limits.conf..."
