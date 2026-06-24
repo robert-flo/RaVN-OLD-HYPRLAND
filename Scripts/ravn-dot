@@ -3,6 +3,16 @@
 # ravn-dot - Professional Dotfiles Change Management TUI
 # Final clean version
 #
+# Prevent running with sudo / as root
+if [[ $EUID -eq 0 ]]; then
+    echo ""
+    echo -e "${RED}✗ ERROR: Do not run ravn-dot with sudo or as root.${NC}"
+    echo -e "${YELLOW}  This tool modifies files in your user home directory.${NC}"
+    echo -e "${YELLOW}  Running it as root can cause permission issues and data loss.${NC}"
+    echo ""
+    exit 1
+fi
+
 
 set +e  # Temporarily disable strict error handling during parsing
 
