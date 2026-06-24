@@ -162,6 +162,8 @@ S|${HOME}/.config/qBittorrent|themes|qbittorrent
 
  Browser 
 S|${HOME}/.config/google-chrome|userChrome.css|google-chrome
+P|${HOME}/.config|chrome-flags.conf|google-chrome
+P|${HOME}/.config|microsoft-edge-stable-flags.conf|microsoft-edge-stable-bin
 
  Notifications 
 S|${HOME}/.config|dunst|dunst
