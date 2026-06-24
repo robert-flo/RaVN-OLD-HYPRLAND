@@ -6,8 +6,8 @@
 # ──── Overview: All old commands kept for compatibility, deprecated ────
 
 .PHONY: switch switch-safe switch-fast test build dry-run boot validate debug emergency \
-        fix-permissions hardware-scan sync deploy clean deep-clean update update-nixpkgs \
-        update-hydenix update-dots update-input update-ai flake-diff upgrade show flake-check generations \
+        fix-permissions hardware-scan sync deploy clean deep-clean update \
+        update-all update-core update-aur update-flatpak update-flatpack update-snaps update-npm update-mise generations \
         rollback diff-gens diff-current gen-size health status test-network watch-logs \
         logs-service boot-logs error-logs hosts search search-inst repl shell vm closure-size \
         format lint tree diff-config docs-local docs-dev docs-build docs-install docs-clean \
@@ -51,15 +51,14 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "sdr / disk-repo" "sys-disk-repo" "Cleanup"
 	@printf "%-20s %-25s %s\n" "sdh / disk-home" "sys-disk-home" "Cleanup"
 	@printf "%-20s %-25s %s\n" "update" "upd-all" "Updates"
-	@printf "%-20s %-25s %s\n" "update-nixpkgs" "upd-nixpkgs" "Updates"
-	@printf "%-20s %-25s %s\n" "update-hydenix" "upd-hydenix" "Updates"
-	@printf "%-20s %-25s %s\n" "update-input" "upd-input" "Updates"
-	@printf "%-20s %-25s %s\n" "update-dots" "upd-dots" "Updates"
-	@printf "%-20s %-25s %s\n" "update-ai" "upd-ai" "Updates"
-	@printf "%-20s %-25s %s\n" "flake-diff" "upd-diff" "Updates"
-	@printf "%-20s %-25s %s\n" "upgrade" "upd-upgrade" "Updates (Master)"
-	@printf "%-20s %-25s %s\n" "show" "upd-show" "Updates"
-	@printf "%-20s %-25s %s\n" "flake-check" "upd-check" "Updates"
+	@printf "%-20s %-25s %s\n" "update-all" "upd-all" "Updates"
+	@printf "%-20s %-25s %s\n" "update-core" "upd-core" "Updates"
+	@printf "%-20s %-25s %s\n" "update-aur" "upd-aur" "Updates"
+	@printf "%-20s %-25s %s\n" "update-flatpak" "upd-flatpak" "Updates"
+	@printf "%-20s %-25s %s\n" "update-flatpack" "upd-flatpak" "Updates"
+	@printf "%-20s %-25s %s\n" "update-snaps" "upd-snaps" "Updates"
+	@printf "%-20s %-25s %s\n" "update-npm" "upd-npm" "Updates"
+	@printf "%-20s %-25s %s\n" "update-mise" "upd-mise" "Updates"
 	@printf "%-20s %-25s %s\n" "generations" "gen-list" "Generations"
 	@printf "%-20s %-25s %s\n" "rollback" "gen-rollback" "Generations"
 	@printf "%-20s %-25s %s\n" "diff-gens" "gen-diff" "Generations"
@@ -137,15 +136,14 @@ sdh: sys-disk-home
 
 # === Updates (upd-) ===
 update: upd-all
-update-nixpkgs: upd-nixpkgs
-update-hydenix: upd-hydenix
-update-input: upd-input
-update-dots: upd-dots
-update-ai: upd-ai
-flake-diff: upd-diff
-upgrade: upd-upgrade
-show: upd-show
-flake-check: upd-check
+update-all: upd-all
+update-core: upd-core
+update-aur: upd-aur
+update-flatpak: upd-flatpak
+update-flatpack: upd-flatpak
+update-snaps: upd-snaps
+update-npm: upd-npm
+update-mise: upd-mise
 
 # === Generations (gen-) ===
 generations: gen-list
