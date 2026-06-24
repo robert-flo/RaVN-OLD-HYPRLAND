@@ -12,7 +12,7 @@
 
 ## ShellCheck & Scripting Safety
 
-- **Zero-Warning Policy**: All new or modified shell scripts (excluding those explicitly in the ignore list) must pass `shellcheck` with zero warnings or errors before committing.
+- **Zero-Warning Policy**: All new or modified shell scripts (excluding those explicitly in the ignore list) must pass `shellcheck` with zero warnings or errors before committing. The pre-commit hook (`shellcheck` + `shfmt`) will block the commit if any warnings are found. This rule is non-negotiable.
 - **Direct Command Checks (SC2181/SC2319)**: Avoid checking `$?` indirectly (e.g., `if [ $? -eq 0 ]`). Check commands directly (e.g., `if my_command; then`) or use success tracking variables (`success=0; my_command || success=1; if (( success == 0 )); then`).
 - **Quote Variable Expansions (SC2086)**: Always double-quote variable expansions when they are used as command arguments to prevent word splitting (e.g., `"$var"`), except inside `[[ ]]` where expansion is safe.
 - **Built-in Parameter Expansion (SC2001)**: Avoid calling external tools like `sed` or `awk` for simple string replacements on single variables; prefer built-in Bash parameter expansion (e.g., `${var//search/replace}`).
@@ -177,3 +177,16 @@ Default section order:
 - [Scripts/AGENTS.md](Scripts/AGENTS.md) - Automation, package install, and update scripts.
   - [Scripts/ravnvm/AGENTS.md](Scripts/ravnvm/AGENTS.md) - NixOS virtualization environment settings.
 - [Source/AGENTS.md](Source/AGENTS.md) - Binary archives, themes, fonts, and graphical assets.
+
+## Verification
+
+Antes de hacer commit, asegúrate de que todos los scripts pasen las verificaciones:
+
+```bash
+# ShellCheck + shfmt (obligatorio)
+shellcheck Scripts/**/*.sh
+shfmt -d Scripts/
+
+# O simplemente deja que el pre-commit hook lo haga por ti
+git commit
+```
