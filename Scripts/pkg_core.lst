@@ -225,4 +225,4 @@ mise                                                  # The front-end to your de
 
 # --------------------------------------------------- // fonts
 ttf-firacode-nerd
-ttf-maplemono-nf-unhinted                              # Maple Mono NF (Nerd Font, ligatures) — fuente principal de Zed
+maplemono-nf-unhinted                                 # Maple Mono NF (Nerd Font, ligatures) — fuente principal de Zed

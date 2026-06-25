@@ -45,7 +45,8 @@
 
   // Fuentes de respaldo en orden de preferencia. Zed las usa si buffer_font_family
   // no está instalada o le faltan glifos específicos.
-  // JetBrainsMono Nerd Font ya está instalada en el sistema.
+  // Maple Mono NF se instala desde AUR con el paquete 'maplemono-nf-unhinted'.
+  // JetBrainsMono Nerd Font es alternativa de respaldo.
   "buffer_font_fallbacks": [
     "Maple Mono",
     "JetBrainsMono Nerd Font",
