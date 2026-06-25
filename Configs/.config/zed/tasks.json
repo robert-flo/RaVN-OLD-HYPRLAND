@@ -1,0 +1,42 @@
+// Zed Tasks — RaVN Configuration
+// Documentación: https://zed.dev/docs/tasks
+//
+// Las tasks se ejecutan desde:
+//   - Command Palette → "task: spawn" → seleccionar por label
+//   - Keybinding: <space>r t (SpawnNearestTask, ejecuta la más cercana al cursor)
+//   - Keybinding: <space>r t en contexto vacío
+//
+// Campos disponibles por task:
+//   label               → nombre visible en el selector
+//   command             → comando a ejecutar (puede incluir variables como $ZED_FILE)
+//   use_new_terminal    → true: abre una terminal nueva cada vez
+//                         false: reutiliza la terminal existente
+//   allow_concurrent_runs → true: permite múltiples instancias simultáneas
+//   reveal              → cuándo mostrar la terminal: "always" | "no_focus" | "never"
+//   reveal_target       → dónde mostrar: "dock" | "center"
+//   hide                → cuándo ocultar la terminal: "on_success" | "always" | "never"
+//   shell               → intérprete: "system" (shell del SO) | "bash" | "zsh" | etc.
+//   show_summary        → muestra resumen de la ejecución al terminar
+//   show_command        → muestra el comando ejecutado en la terminal
+//   save                → qué guardar antes de ejecutar: "none" | "current" | "all"
+[
+  {
+    // Abre Neovide (GUI de Neovim) desde Zed sin interrumpir el flujo de trabajo.
+    // use_new_terminal: false  → no abre una terminal visible, lanza el proceso directo.
+    // allow_concurrent_runs    → permite abrir varias instancias de Neovide.
+    // reveal: "no_focus"       → no mueve el foco al dock al ejecutarse.
+    // hide: "on_success"       → oculta la terminal si el proceso inicia sin errores.
+    // save: "none"             → no guarda ningún archivo antes de lanzarlo.
+    "label": "Launch Neovide",
+    "command": "neovide",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": true,
+    "reveal": "no_focus",
+    "reveal_target": "dock",
+    "hide": "on_success",
+    "shell": "system",
+    "show_summary": false,
+    "show_command": false,
+    "save": "none"
+  }
+]
