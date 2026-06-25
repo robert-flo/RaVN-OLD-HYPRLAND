@@ -5,8 +5,8 @@ Name=oh my pi · the harness
 Comment=omp Terminal UI Agent
 Exec=xdg-terminal-exec --app-id=TUI.tile -e omp
 Terminal=false
-Icon=/home/dominus/.local/share/applications/icons/omp.png
+Icon=/home/rollo/.local/share/applications/icons/omp.png
 StartupNotify=true
-Path=/home/dominus/src
+Path=/home/rollo/src
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

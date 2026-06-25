@@ -5,7 +5,7 @@ Comment=Docker
 Exec=xdg-terminal-exec --app-id=TUI.tile -e lazydocker
 Terminal=false
 Type=Application
-Icon=/home/dominus/.local/share/applications/icons/Docker.png
+Icon=/home/rollo/.local/share/applications/icons/Docker.png
 StartupNotify=true
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

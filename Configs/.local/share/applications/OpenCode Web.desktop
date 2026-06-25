@@ -5,8 +5,8 @@ Name=OpenCode Web
 Comment=OpenCode Web Agent Interface
 Exec=xdg-terminal-exec --app-id=TUI.tile -e opencode web
 Terminal=false
-Icon=/home/dominus/.local/share/applications/icons/OpenCode.png
+Icon=/home/rollo/.local/share/applications/icons/OpenCode.png
 StartupNotify=true
-Path=/home/dominus/src
+Path=/home/rollo/src
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

@@ -5,8 +5,8 @@ Name=Hermes TUI
 Comment=Hermes Terminal Agent
 Exec=kitty --class=hermes-tui --title="Hermes Agent" -e hermes --tui
 Terminal=false
-Icon=/home/dominus/.local/share/applications/icons/Hermes.png
+Icon=/home/rollo/.local/share/applications/icons/Hermes.png
 StartupNotify=true
-Path=/home/dominus
+Path=/home/rollo
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

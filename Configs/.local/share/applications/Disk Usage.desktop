@@ -5,7 +5,7 @@ Comment=Disk Usage
 Exec=xdg-terminal-exec --app-id=TUI.float -e bash -c 'dust -r; read -n 1 -s'
 Terminal=false
 Type=Application
-Icon=/home/dominus/.local/share/applications/icons/Disk Usage.png
+Icon=/home/rollo/.local/share/applications/icons/Disk Usage.png
 StartupNotify=true
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

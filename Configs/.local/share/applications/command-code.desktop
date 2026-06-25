@@ -5,8 +5,8 @@ Name=command-code
 Comment=Command Code - Coding agent that continuously learns your taste of writing code
 Exec=xdg-terminal-exec --app-id=TUI.tile -e cmd
 Terminal=false
-Icon=/home/dominus/.local/share/applications/icons/command-code.png
+Icon=/home/rollo/.local/share/applications/icons/command-code.png
 StartupNotify=true
-Path=/home/dominus/src
+Path=/home/rollo/src
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

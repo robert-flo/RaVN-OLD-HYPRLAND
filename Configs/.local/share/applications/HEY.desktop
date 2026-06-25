@@ -5,6 +5,6 @@ Comment=HEY
 Exec=omarchy-webapp-handler-hey %u
 Terminal=false
 Type=Application
-Icon=/home/dominus/.local/share/applications/icons/HEY.png
+Icon=/home/rollo/.local/share/applications/icons/HEY.png
 StartupNotify=true
 MimeType=x-scheme-handler/mailto

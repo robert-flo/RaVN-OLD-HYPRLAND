@@ -5,6 +5,6 @@ Comment=Zoom
 Exec=omarchy-webapp-handler-zoom %u
 Terminal=false
 Type=Application
-Icon=/home/dominus/.local/share/applications/icons/Zoom.png
+Icon=/home/rollo/.local/share/applications/icons/Zoom.png
 StartupNotify=true
 MimeType=x-scheme-handler/zoommtg;x-scheme-handler/zoomus

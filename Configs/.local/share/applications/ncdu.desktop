@@ -5,7 +5,7 @@ Comment=Check disk space usage in kitty terminal
 Exec=kitty --class=ncdu --title="Disk Usage Analyzer" -e ncdu
 Terminal=false
 Type=Application
-Icon=/home/dominus/.local/share/applications/icons/ncdu.png
+Icon=/home/rollo/.local/share/applications/icons/ncdu.png
 StartupNotify=false
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;

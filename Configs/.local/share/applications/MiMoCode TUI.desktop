@@ -5,8 +5,8 @@ Name=MiMoCode TUI
 Comment=MiMoCode Terminal Application
 Exec=xdg-terminal-exec --app-id=TUI.tile -e mimo
 Terminal=false
-Icon=/home/dominus/.local/share/applications/icons/mimo.png
+Icon=/home/rollo/.local/share/applications/icons/mimo.png
 StartupNotify=true
-Path=/home/dominus
+Path=/home/rollo
 Categories=ConsoleOnly;TUI;Utility;
 Keywords=tui;terminal;cli;
