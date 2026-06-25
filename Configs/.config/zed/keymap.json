@@ -1,0 +1,469 @@
+// Zed Keymap — RaVN Configuration
+// Documentación: https://zed.dev/docs/key-bindings
+// Referencia de todas las acciones: https://zed.dev/docs/actions
+//
+// Estructura de un binding:
+//   { "context": "<expresión>", "bindings": { "<tecla>": "<acción>" } }
+//
+// Contextos más comunes:
+//   Editor              → buffer de código activo
+//   vim_mode == normal  → modo vim específico (normal/visual/insert/operator)
+//   VimControl          → cualquier modo vim que acepta secuencias
+//   Workspace           → ventana completa de Zed
+//   Terminal            → terminal integrada activa
+//   ProjectPanel        → árbol de archivos
+//   Dock                → cualquier panel lateral
+//   EmptyPane           → pane sin archivo abierto
+//
+// Leader key: Space
+// Requiere que "space": null esté definido en VimControl para capturar secuencias.
+//
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║                        CHEAT SHEET — QUICK REF                         ║
+// ╠══════════════════════════════════════════════════════════════════════════╣
+// ║  LEADER = Space                                                         ║
+// ║                                                                         ║
+// ║  ── Archivos ──────────────────                                         ║
+// ║  <space><space>  file finder (Ctrl+P)                                   ║
+// ║  <space>f f      file finder (alias)                                    ║
+// ║  <space>f g      grep en proyecto                                       ║
+// ║  <space>f p      proyectos recientes                                    ║
+// ║  <space>/        grep en proyecto                                       ║
+// ║  <space>e        revelar archivo en árbol                               ║
+// ║                                                                         ║
+// ║  ── Buffers ───────────────────                                         ║
+// ║  H / L           tab anterior / siguiente                               ║
+// ║  shift-q         cerrar buffer                                          ║
+// ║  <space>b d      cerrar buffer                                          ║
+// ║  <space>b o      cerrar otros buffers                                   ║
+// ║                                                                         ║
+// ║  ── LSP ───────────────────────                                         ║
+// ║  g d / g D       definición / en split                                  ║
+// ║  g i / g I       implementación / en split                              ║
+// ║  g t / g T       tipo / en split                                        ║
+// ║  g r             referencias                                            ║
+// ║  g f             abrir archivo bajo cursor                              ║
+// ║  <space>c a      code actions                                           ║
+// ║  <space>.        code actions (alias)                                   ║
+// ║  <space>c r      renombrar símbolo                                      ║
+// ║  c r             renombrar (vía operador c)                             ║
+// ║  c a             code action (vía operador c)                           ║
+// ║                                                                         ║
+// ║  ── Diagnósticos ──────────────                                         ║
+// ║  ] d / [ d       siguiente / anterior                                   ║
+// ║  ] e / [ e       siguiente / anterior error                             ║
+// ║  <space>x x      panel de diagnósticos                                  ║
+// ║                                                                         ║
+// ║  ── Símbolos ──────────────────                                         ║
+// ║  s s             outline del archivo                                    ║
+// ║  s S             símbolos del proyecto                                  ║
+// ║                                                                         ║
+// ║  ── Git ───────────────────────                                         ║
+// ║  ] h / [ h       siguiente / anterior hunk                              ║
+// ║  <space>g s      panel de git                                           ║
+// ║  <space>g h d    toggle diff hunks                                      ║
+// ║  ctrl-shift-g    toggle panel git (global)                              ║
+// ║                                                                         ║
+// ║  ── Toggles ───────────────────                                         ║
+// ║  <space>t i      inlay hints                                            ║
+// ║  <space>u w      soft wrap                                              ║
+// ║  <space>c z      zen mode (centered layout)                             ║
+// ║                                                                         ║
+// ║  ── Panes ─────────────────────                                         ║
+// ║  ctrl-h/j/k/l    moverse entre panes                                    ║
+// ║  ctrl-w h/j/k/l  moverse desde dock/panel                              ║
+// ║                                                                         ║
+// ║  ── Terminal ──────────────────                                         ║
+// ║  ctrl-\          abrir/cerrar terminal                                  ║
+// ║  ctrl-b          toggle dock derecho                                    ║
+// ║                                                                         ║
+// ║  ── Insert mode ───────────────                                         ║
+// ║  jj / jk         → normal mode (Escape)                                ║
+// ║                                                                         ║
+// ║  ── Sneak ─────────────────────                                         ║
+// ║  s{a}{b}         saltar al par de chars                                 ║
+// ║  S{a}{b}         saltar hacia atrás                                     ║
+// ║                                                                         ║
+// ║  ── Markdown ──────────────────                                         ║
+// ║  <space>m p      preview                                                ║
+// ║  <space>m P      preview al lado                                        ║
+// ║                                                                         ║
+// ║  ── Tasks ─────────────────────                                         ║
+// ║  <space>r t      ejecutar task más cercano                              ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+[
+  // ───────────────────────────────────────────────────────────────────────────
+  // WHICH-KEY — Liberar Space como leader key
+  // Sin esto, Space en normal mode ejecuta vim::WrappingRight (avanza un carácter)
+  // y which_key no puede capturar secuencias como <space>ff, <space>gs, etc.
+  // También define los bindings de búsqueda de archivos con space f.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      // Deshabilita la acción por defecto de Space para que actúe como leader
+      "space": null,
+      // Buscar archivo en el proyecto (equivalente a Ctrl+P)
+      "space f f": "file_finder::Toggle",
+      // Buscar texto en todo el proyecto (grep)
+      "space f g": "pane::DeploySearch",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // NORMAL + VISUAL — Space leader: tools y utilidades generales
+  // Aplica en ambos modos para acciones que tienen sentido en los dos.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Editor && (vim_mode == normal || vim_mode == visual) && !VimWaiting && !menu",
+    "bindings": {
+      // ── Git ─────────────────────────────────────────────────────────────
+      // Abre y enfoca el panel de git (staged/unstaged/commits)
+      "space g s": "git_panel::ToggleFocus",
+      // Expande o colapsa los hunks de diff seleccionados en el editor
+      "space g h d": "editor::ToggleSelectedDiffHunks",
+
+      // ── Toggles del editor ──────────────────────────────────────────────
+      // Activa/desactiva inlay hints (tipos inferidos, nombres de parámetros)
+      "space t i": "editor::ToggleInlayHints",
+      // Activa/desactiva soft wrap (ajuste de línea al ancho del editor)
+      "space u w": "editor::ToggleSoftWrap",
+      // Activa/desactiva centered layout (zen mode con padding lateral)
+      "space c z": "workspace::ToggleCenteredLayout",
+
+      // ── Markdown ────────────────────────────────────────────────────────
+      // Preview de Markdown en el mismo pane
+      "space m p": "markdown::OpenPreview",
+      // Preview de Markdown en un split al lado del archivo
+      "space m P": "markdown::OpenPreviewToTheSide",
+
+      // ── Búsqueda ────────────────────────────────────────────────────────
+      // Abrir proyectos recientes
+      "space f p": "projects::OpenRecent",
+      // Buscar texto (abre el search panel con término opcional)
+      "space s w": "pane::DeploySearch",
+      // Buscar solo dentro del buffer actual
+      "space s b": "buffer_search::Deploy",
+
+      // ── AI ──────────────────────────────────────────────────────────────
+      // Abre/enfoca el panel del agente de AI (Zed AI / Copilot)
+      "space a c": "agent::ToggleFocus",
+
+      // ── Navegación ──────────────────────────────────────────────────────
+      // Abre el archivo o path bajo el cursor (gf en Neovim)
+      "g f": "editor::OpenExcerpts",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // SOLO NORMAL — LSP, navegación de panes/buffers, diagnósticos, git hunks
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Editor && vim_mode == normal && !VimWaiting && !menu",
+    "bindings": {
+      // ── Navegación de panes (splits) ─────────────────────────────────────
+      // Mueve el foco entre panes igual que Ctrl+W h/j/k/l en Neovim.
+      // También funciona para saltar entre el editor y la terminal.
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+
+      // ── LSP — Code actions y rename ──────────────────────────────────────
+      // Abre el menú de code actions del LSP (equivalente al 💡 en VSCode)
+      "space c a": "editor::ToggleCodeActions",
+      // Alias rápido para code actions
+      "space .": "editor::ToggleCodeActions",
+      // Renombrar símbolo bajo el cursor en todo el proyecto
+      "space c r": "editor::Rename",
+
+      // ── LSP — Go to ... ──────────────────────────────────────────────────
+      // Ir a la definición del símbolo (sustituye a ctrl-] del ctags)
+      "g d": "editor::GoToDefinition",
+      // Ir a la definición en un split vertical
+      "g D": "editor::GoToDefinitionSplit",
+      // Ir a la implementación (útil para interfaces/traits)
+      "g i": "editor::GoToImplementation",
+      // Ir a la implementación en split
+      "g I": "editor::GoToImplementationSplit",
+      // Ir a la definición del tipo del símbolo
+      "g t": "editor::GoToTypeDefinition",
+      // Ir a la definición del tipo en split
+      "g T": "editor::GoToTypeDefinitionSplit",
+      // Listar todas las referencias del símbolo en el proyecto
+      "g r": "editor::FindAllReferences",
+
+      // ── Diagnósticos ─────────────────────────────────────────────────────
+      // Saltar al siguiente error o warning del LSP
+      "] d": "editor::GoToDiagnostic",
+      "[ d": "editor::GoToPreviousDiagnostic",
+      // Alias ] e / [ e para errores (mismo comportamiento)
+      "] e": "editor::GoToDiagnostic",
+      "[ e": "editor::GoToPreviousDiagnostic",
+      // Abrir el panel con todos los diagnósticos del proyecto
+      "space x x": "diagnostics::Deploy",
+
+      // ── Símbolos ─────────────────────────────────────────────────────────
+      // Outline del archivo activo: lista de funciones, clases, variables
+      "s s": "outline::Toggle",
+      // Búsqueda de símbolos en todo el proyecto
+      "s S": "project_symbols::Toggle",
+
+      // ── Git hunks ────────────────────────────────────────────────────────
+      // Saltar al siguiente/anterior hunk de cambio git en el archivo
+      "] h": "editor::GoToHunk",
+      "[ h": "editor::GoToPreviousHunk",
+
+      // ── Buffers / Tabs ────────────────────────────────────────────────────
+      // Tab/buffer anterior y siguiente (como H/L en LazyVim)
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      // Cerrar el buffer/tab activo
+      "shift-q": "pane::CloseActiveItem",
+      "ctrl-q": "pane::CloseActiveItem",
+      "space b d": "pane::CloseActiveItem",
+      // Cerrar todos los demás buffers (queda solo el activo)
+      "space b o": "pane::CloseOtherItems",
+
+      // ── Guardar ───────────────────────────────────────────────────────────
+      // Garantiza ctrl-s en normal mode (VSCode keymap ya lo cubre en insert)
+      "ctrl-s": "workspace::Save",
+
+      // ── File finder y búsqueda ────────────────────────────────────────────
+      // Abre el file finder (equivalente a Ctrl+P / telescope find_files)
+      "space space": "file_finder::Toggle",
+      // Búsqueda de texto en todo el proyecto
+      "space /": "pane::DeploySearch",
+
+      // ── Árbol de archivos ─────────────────────────────────────────────────
+      // Revela y selecciona el archivo activo en el project panel
+      "space e": "pane::RevealInProjectPanel",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // EMPTY PANE — Pane sin archivo abierto
+  // Permite usar el leader cuando no hay editor activo.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "EmptyPane || SharedScreen",
+    "bindings": {
+      "space space": "file_finder::Toggle",
+      "space f p": "projects::OpenRecent",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // VISUAL — Comentar/descomentar selección
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Editor && vim_mode == visual && !VimWaiting && !menu",
+    "bindings": {
+      // gc en visual mode comenta/descomenta la selección (estilo vim-commentary)
+      "g c": "editor::ToggleComments",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // INSERT — Escape rápido a normal mode
+  // jj y jk son los remaps más comunes para evitar la tecla Escape física.
+  // ⚠️  Introduce un delay breve al escribir palabras que empiecen con 'j':
+  //    Zed espera a ver si el siguiente caracter es 'j' o 'k'.
+  //    Si no quieres este delay, elimina estos bindings.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Editor && vim_mode == insert && !menu",
+    "bindings": {
+      "j j": "vim::NormalBefore",
+      "j k": "vim::NormalBefore",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // VIM OPERATOR c — Rename y Code Actions vía operador
+  // Permite usar: cc (línea actual), cr (rename), ca (code action)
+  // Ejemplo: posiciona el cursor en un símbolo y presiona c r para renombrar.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Editor && vim_operator == c",
+    "bindings": {
+      // cc sigue funcionando como cambiar la línea actual
+      "c": "vim::CurrentLine",
+      // cr → rename del símbolo (Zed-specific, no existe en vim estándar)
+      "r": "editor::Rename",
+    },
+  },
+  {
+    "context": "Editor && vim_operator == c",
+    "bindings": {
+      "c": "vim::CurrentLine",
+      // ca → code actions (Zed-specific)
+      "a": "editor::ToggleCodeActions",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // WORKSPACE — Terminal y dock
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Workspace",
+    "bindings": {
+      // Abrir/cerrar la terminal integrada (estilo VSCode con Ctrl+`)
+      "ctrl-\\": "terminal_panel::ToggleFocus",
+      // ctrl-b controla el dock DERECHO (todos los paneles están ahí).
+      // El binding original de ctrl-b (dock izquierdo) se elimina más abajo.
+      "ctrl-b": "workspace::ToggleRightDock",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // TERMINAL — Navegación de panes desde la terminal integrada
+  // Permite saltar de la terminal a cualquier editor sin soltar el teclado.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // PROJECT PANEL — Árbol de archivos (estilo netrw / oil.nvim)
+  // Aplica solo cuando el panel tiene el foco y no se está editando un nombre.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      // Crear archivo nuevo en la carpeta seleccionada
+      "a": "project_panel::NewFile",
+      // Crear directorio nuevo
+      "A": "project_panel::NewDirectory",
+      // Renombrar la entrada seleccionada
+      "r": "project_panel::Rename",
+      // Eliminar la entrada seleccionada (pide confirmación)
+      "d": "project_panel::Delete",
+      // Cortar / Copiar / Pegar (igual que en un file manager)
+      "x": "project_panel::Cut",
+      "c": "project_panel::Copy",
+      "p": "project_panel::Paste",
+      // Cerrar el panel (dock derecho) con q o space-e
+      "q": "workspace::ToggleRightDock",
+      "space e": "workspace::ToggleRightDock",
+      // Navegar hacia el editor desde el panel sin usar el ratón
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // DOCK — Navegación de panes desde cualquier panel lateral
+  // Permite usar ctrl-w + hjkl desde el outline panel, git panel, etc.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "Dock",
+    "bindings": {
+      "ctrl-w h": "workspace::ActivatePaneLeft",
+      "ctrl-w l": "workspace::ActivatePaneRight",
+      "ctrl-w k": "workspace::ActivatePaneUp",
+      "ctrl-w j": "workspace::ActivatePaneDown",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // TASKS — Ejecutar el task más cercano al cursor
+  // Requiere un archivo .zed/tasks.json o tasks.json en la raíz del proyecto.
+  // "no_focus" ejecuta el task sin mover el foco a la terminal.
+  // Referencia: https://zed.dev/docs/tasks
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "EmptyPane || SharedScreen || vim_mode == normal",
+    "bindings": {
+      "space r t": ["editor::SpawnNearestTask", { "reveal": "no_focus" }],
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // SNEAK — Salto de 2 caracteres (estilo vim-sneak / leap.nvim)
+  // Uso: s{char1}{char2} → salta al primer match de esos 2 caracteres adelante
+  //      S{char1}{char2} → salta hacia atrás
+  //
+  // ⚠️  NOTA: Reasigna `s` que en vim estándar equivale a `cl` (sustituir).
+  //    Alternativas para sustituir un carácter: usa `cl` o `xi` directamente.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "context": "vim_mode == normal || vim_mode == visual",
+    "bindings": {
+      "s": ["vim::PushSneak", {}],
+      "S": ["vim::PushSneakBackward", {}],
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // GIT PANEL — Toggle global (sin contexto específico)
+  // ctrl-shift-g abre/cierra el panel de git desde cualquier contexto.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    "bindings": {
+      "ctrl-shift-g": "git_panel::Toggle",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // UNBINDS — Eliminar keybindings por defecto que interfieren
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // ctrl-b por defecto abre el dock IZQUIERDO.
+  // Lo liberamos para reasignarlo al dock derecho (donde están todos los paneles).
+  {
+    "context": "Workspace",
+    "unbind": { "ctrl-b": "workspace::ToggleLeftDock" },
+  },
+  // ctrl-alt-b por defecto controlaba el dock derecho; ya no lo necesitamos.
+  {
+    "context": "Workspace",
+    "unbind": { "ctrl-alt-b": "workspace::ToggleRightDock" },
+  },
+  // ctrl-shift-g por defecto usa ToggleFocus (abre y mueve el foco al panel).
+  // Lo reemplazamos por Toggle (abre/cierra sin forzar el foco).
+  {
+    "context": "Workspace",
+    "unbind": { "ctrl-shift-g": "git_panel::ToggleFocus" },
+  },
+  // ctrl-g en vim muestra la ubicación actual del cursor (ShowLocation).
+  // Lo liberamos para no bloquear otros flujos.
+  {
+    "context": "VimControl && !menu",
+    "unbind": { "ctrl-g": "vim::ShowLocation" },
+  },
+  {
+    "context": "vim_mode == literal",
+    "unbind": { "ctrl-g": ["vim::Literal", ["ctrl-g", "\u0007"]] },
+  },
+  // ctrl-t por defecto hace cosas distintas según el contexto:
+  //   Workspace → abre el panel de símbolos del proyecto
+  //   VimControl → pane::GoToOlderTag (historial de tags)
+  //   insert → vim::Indent (indentar en insert mode)
+  //   literal → carácter de control
+  // Los liberamos todos para poder reasignar ctrl-t en el futuro.
+  {
+    "context": "Workspace",
+    "unbind": { "ctrl-t": "project_symbols::Toggle" },
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": { "ctrl-t": "pane::GoToOlderTag" },
+  },
+  {
+    "context": "vim_mode == insert",
+    "unbind": { "ctrl-t": "vim::Indent" },
+  },
+  {
+    "context": "vim_mode == literal",
+    "unbind": { "ctrl-t": ["vim::Literal", ["ctrl-t", "\u0014"]] },
+  },
+]
