@@ -8,6 +8,17 @@
 
   // Colorea cada par de corchetes/paréntesis/llaves con un color distinto
   // por nivel de anidado. Muy útil para rastrear bloques visualmente.
+  "agent": {
+    "favorite_models": [],
+    "model_parameters": [],
+    "tool_permissions": {
+      "tools": {
+        "terminal": {
+          "default": "allow"
+        }
+      }
+    }
+  },
   "colorize_brackets": true,
 
   // Muestra anotaciones encima de funciones y clases (referencias, tests, etc.)
@@ -86,10 +97,10 @@
 
   // ── Tamaños de fuente ─────────────────────────────────────────────────────
   // Fuente de la interfaz: tabs, paneles, menús, sidebar. Default de Zed: 16
-  "ui_font_size": 17,
+  "ui_font_size": 15,
 
   // Fuente del código en el buffer del editor. Default de Zed: 15
-  "buffer_font_size": 18.5,
+  "buffer_font_size": 14.5,
 
   // ── Gutter ───────────────────────────────────────────────────────────────
   // Franja izquierda del editor: números de línea, indicadores de git, breakpoints.
@@ -291,15 +302,15 @@
   "theme": {
     "mode": "dark",
     "light": "Tokyo Night Light",
-    "dark": "One Dark",
+    "dark": "Tokyo Night Moon",
   },
 
   // Tema de iconos de archivos en el árbol del proyecto.
   // Requiere las extensiones: "Catppuccin Icons" y "Material Icon Theme".
   "icon_theme": {
-    "mode": "dark",
-    "light": "Catppuccin Mocha",
-    "dark": "Material Icon Theme",
+    "mode": "light",
+    "light": "Catppuccin Frappé",
+    "dark": "Catppuccin Mocha",
   },
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -313,7 +324,7 @@
   //   a que se cierre el tab antes de continuar.
   "terminal": {
     "show_count_badge": true,
-    "font_size": 17.0,
+    "font_size": 13.0,
     "font_family": "Maple Mono NF",
     "env": {
       "EDITOR": "zed --wait",
