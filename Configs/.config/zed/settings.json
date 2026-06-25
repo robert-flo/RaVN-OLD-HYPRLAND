@@ -1,230 +1,582 @@
+// Zed Settings — RaVN Configuration
+// Documentación completa: https://zed.dev/docs/configuring-zed
+// Ver todos los defaults: Command Palette → "open default settings"
 {
+  // ───────────────────────────────────────────────────────────────────────────
+  // EDITOR — Comportamiento general
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Colorea cada par de corchetes/paréntesis/llaves con un color distinto
+  // por nivel de anidado. Muy útil para rastrear bloques visualmente.
+  "colorize_brackets": true,
+
+  // Muestra anotaciones encima de funciones y clases (referencias, tests, etc.)
+  // generadas por el LSP activo. Valores: "on" | "off"
+  "code_lens": "on",
+
+  // Muestra el botón de Code Actions (💡) en la barra de herramientas del buffer.
+  // Permite aplicar sugerencias del LSP sin abrir el menú de contexto.
+  "toolbar": {
+    "code_actions": true,
+  },
+
+  // Muestra automáticamente la firma de una función mientras escribes sus argumentos.
+  "auto_signature_help": true,
+
+  // Vuelve a mostrar la firma de la función después de editar argumentos ya existentes.
+  "show_signature_help_after_edits": true,
+
+  // Oculta valores sensibles (API keys, tokens, secrets) mostrándolos como ████.
+  // Esencial al compartir pantalla, hacer screencasts o pair programming.
+  "redact_private_values": true,
+
+  // Comportamiento del CLI `zed <archivo>`: reutiliza la ventana ya abierta
+  // en lugar de crear una nueva instancia. Valores: "existing_window" | "new_window"
+  "cli_default_open_behavior": "existing_window",
+
+  // Mapa de teclas base. "VSCode" activa shortcuts familiares como Ctrl+P,
+  // Ctrl+Shift+P, Ctrl+`, Ctrl+B, etc. Valores: "VSCode" | "JetBrains" | "None" | "SublimeText" | "Atom"
+  "base_keymap": "VSCode",
+
+  // ── Fuentes del buffer ────────────────────────────────────────────────────
+  // Fuente principal del editor (requiere ttf-maplemono-nf-unhinted instalada).
+  // Si no está disponible, Zed cae automáticamente al siguiente fallback.
+  "buffer_font_family": "Maple Mono NF",
+
+  // Fuentes de respaldo en orden de preferencia. Zed las usa si buffer_font_family
+  // no está instalada o le faltan glifos específicos.
+  // JetBrainsMono Nerd Font ya está instalada en el sistema.
+  "buffer_font_fallbacks": [
+    "Maple Mono",
+    "JetBrainsMono Nerd Font",
+    "Menlo",
+    "Courier New",
+  ],
+
+  // ── Vim mode ─────────────────────────────────────────────────────────────
+  // Activa el modo Vim en Zed (normal/insert/visual modes con motions nativos).
+  // Referencia: https://zed.dev/docs/vim
+  "vim_mode": true,
+
+  // which-key: muestra un popup con los keybindings disponibles cuando pausas
+  // en medio de una secuencia de teclas (ej. <Space> → espera → muestra opciones).
+  // delay_ms: milisegundos de pausa antes de mostrar el popup.
+  "which_key": {
+    "enabled": true,
+    "delay_ms": 500,
+  },
+
+  // ── System window tabs ────────────────────────────────────────────────────
+  // Esta opción activa las pestañas nativas del sistema operativo (macOS únicamente).
+  // En Linux/Wayland/Hyprland NO tiene efecto: Zed gestiona su propio tab bar
+  // de forma nativa. Mantenida en false para claridad.
+  "use_system_window_tabs": false,
+
+  // Forma del cursor en el buffer.
+  // Valores: "bar" (línea vertical) | "block" | "underline" | "hollow"
+  "cursor_shape": "bar",
+
+  // El cursor parpadea mientras está activo.
+  "cursor_blink": true,
+
+  // Muestra sugerencias de autocompletado "fantasma" inline mientras escribes.
+  // Requiere un provider configurado (Copilot, Zed AI, etc.).
+  "show_edit_predictions": true,
+
+  // ── Tamaños de fuente ─────────────────────────────────────────────────────
+  // Fuente de la interfaz: tabs, paneles, menús, sidebar. Default de Zed: 16
+  "ui_font_size": 17,
+
+  // Fuente del código en el buffer del editor. Default de Zed: 15
+  "buffer_font_size": 18.5,
+
+  // ── Gutter ───────────────────────────────────────────────────────────────
+  // Franja izquierda del editor: números de línea, indicadores de git, breakpoints.
+  "gutter": {
+    "line_numbers": true,
+  },
+
+  // ── Status bar ───────────────────────────────────────────────────────────
+  // Barra inferior: modo vim activo, posición del cursor, estado del LSP, rama git.
+  // "experimental.show" activa la nueva implementación de status bar de Zed.
+  "status_bar": {
+    "experimental.show": true,
+  },
+
+  // Bloque de configuración avanzada del modo Vim.
+  // Aquí se puede configurar: leader key, surround, text objects, etc.
+  // Referencia: https://zed.dev/docs/vim
+  "vim": {},
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // UI — Apariencia y paneles
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Muestra todos los caracteres de espacio en blanco (espacios, tabs, saltos de línea)
+  // directamente en el buffer. Útil para detectar trailing spaces y mezcla de tabs/espacios.
+  // Valores: "all" | "none" | "selection" | "boundary" | "trailing"
+  "show_whitespaces": "all",
+
+  // Números de línea relativos al cursor (cuántas líneas arriba/abajo estás).
+  // Esencial con vim_mode para contar saltos (5j, 10k, d3j, y3k, etc.).
+  // Valores: "enabled" | "disabled"
+  "relative_line_numbers": "enabled",
+
+  // Oculta la scrollbar lateral. El editor se ve más limpio.
+  // Valores: "always" | "never" | "auto" | "when_scrolling"
+  "scrollbar": {
+    "show": "never",
+  },
+
+  // En las pestañas de archivos, solo muestra el indicador de diagnóstico
+  // cuando hay errores (no warnings). Reduce el ruido visual.
+  // Valores: "off" | "errors" | "all"
+  "tabs": {
+    "show_diagnostics": "errors",
+  },
+
+  // Barra de pestañas de archivos abiertos. Activa por defecto; declarada explícitamente.
+  "tab_bar": {
+    "show": true,
+  },
+
+  // Guías de indentación con colores por nivel (rainbow indent).
+  // "indent_aware" asigna un color diferente a cada nivel de anidado.
+  // Valores de coloring: "disabled" | "indent_aware"
+  "indent_guides": {
+    "enabled": true,
+    "coloring": "indent_aware",
+  },
+
+  // Ancho máximo del modal de búsqueda de archivos (Ctrl+P).
+  // Valores: "small" | "medium" | "large" | "full"
+  "file_finder": {
+    "modal_max_width": "medium",
+  },
+
+  // Padding lateral para el "Centered Layout" (modo zen).
+  // Actívalo desde: Command Palette → "Toggle Centered Layout"
+  "centered_layout": {
+    "left_padding": 0.15,
+    "right_padding": 0.15,
+  },
+
+  // ── Paneles laterales ────────────────────────────────────────────────────
+  // Todos los paneles agrupados en el dock derecho: libera la izquierda para
+  // el árbol de archivos o para tener más espacio de código.
+
+  // Panel de git con vista de árbol y dock a la derecha.
+  "git_panel": {
+    "tree_view": true,
+    "dock": "right",
+  },
+
+  // Panel de archivos del proyecto.
+  // auto_fold_dirs: false → no colapsa directorios con un solo hijo (más legible).
+  // git_status: muestra M/A/D/? junto a cada archivo en el árbol.
+  "project_panel": {
+    "auto_fold_dirs": false,
+    "button": true,
+    "dock": "right",
+    "git_status": true,
+  },
+
+  // Panel de outline: lista de símbolos del archivo activo (funciones, clases, vars).
+  "outline_panel": {
+    "dock": "right",
+  },
+
+  // Panel de colaboración (Live Share / canales de equipo Zed).
+  "collaboration_panel": {
+    "dock": "right",
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // GIT
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Muestra el blame de git inline sobre la línea en la que está el cursor.
+  // Se ve como un texto tenue al final de la línea con autor y fecha.
+  "git": {
+    "inline_blame": {
+      "enabled": true,
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // SESIÓN
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Confía automáticamente en todos los worktrees git sin confirmación manual.
+  // Necesario para el workflow de git worktrees de RaVN (~/Work/<repo>/).
+  "session": {
+    "trust_all_worktrees": true,
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // INLAY HINTS — Anotaciones inline del LSP
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Muestra tipos inferidos, nombres de parámetros y otras sugerencias
+  // directamente sobre el código como texto tenue.
+  // Soportado en: Go, Rust, TypeScript, Svelte (según el LSP activo).
+  // Cada bloque de lenguaje puede sobreescribir esta configuración.
+  "inlay_hints": {
+    "enabled": true,
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // AUTOSAVE
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Guarda el archivo automáticamente 1 segundo después de dejar de escribir.
+  // Alternativas: "off" | "on_focus_change" | "on_window_change"
+  //               | { "after_delay": { "milliseconds": N } }
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000,
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // TELEMETRÍA
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // diagnostics: true  → reporta crashes anónimamente a Zed (ayuda al equipo)
+  // metrics: false     → NO envía métricas de uso (features usados, frecuencia, etc.)
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": false,
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // FILE SCAN EXCLUSIONS
+  // Archivos y directorios ignorados en el árbol de proyecto y en búsquedas.
+  // Zed no los indexará, lo que mejora el rendimiento en proyectos grandes.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  "file_scan_exclusions": [
+    // — Defaults de Zed —
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    // — Proyectos web (Node, Next.js, Vite, etc.) —
+    "**/node_modules",
+    "**/dist",
+    "**/out",
+    "**/.next",
+    "**/.turbo",
+    "**/.vscode",
+    "**/.vscode-test",
+    "**/.storybook",
+    "**/.husky",
+    "**/.tap",
+    "**/.nyc_output",
+    "**/report",
+  ],
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // TEMA
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Tema de colores del editor.
+  // mode: "dark" | "light" | "system" (sigue al tema del SO).
+  // Las extensiones se instalan desde: Extensions → buscar por nombre.
+  "theme": {
+    "mode": "dark",
+    "light": "Tokyo Night Light",
+    "dark": "One Dark",
+  },
+
+  // Tema de iconos de archivos en el árbol del proyecto.
+  // Requiere las extensiones: "Catppuccin Icons" y "Material Icon Theme".
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Catppuccin Mocha",
+    "dark": "Material Icon Theme",
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // TERMINAL
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Terminal integrada de Zed (atajar con Ctrl+` usando base_keymap VSCode).
+  // font_family y font_size son independientes de las del buffer del editor.
+  // env.EDITOR: cuando git u otras herramientas necesitan un editor de texto
+  //   (ej. `git commit`, `git rebase -i`), abre el archivo en Zed y espera
+  //   a que se cierre el tab antes de continuar.
+  "terminal": {
+    "show_count_badge": true,
+    "font_size": 17.0,
+    "font_family": "Maple Mono NF",
+    "env": {
+      "EDITOR": "zed --wait",
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // FILE TYPES
+  // Mapea patrones de nombre de archivo a un lenguaje para syntax highlighting
+  // y selección de LSP, cuando la extensión sola no es suficiente.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Dockerfile.dev, Dockerfile.prod, Dockerfile.builder → lenguaje Dockerfile.
+  "file_types": {
+    "Dockerfile": ["Dockerfile", "Dockerfile.*"],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // LSP — Language Server Protocol
+  // Define los binarios y opciones de inicialización de cada servidor.
+  // Los LSPs proveen: autocompletado, diagnósticos, refactoring, hover info, etc.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  "lsp": {
+    // Servidor de lenguaje para Astro (frameworks web con .astro)
+    "astro-language-server": {
+      "binary": {
+        "path": "astro-ls",
+        "arguments": ["--stdio"],
+      },
+    },
+
+    // Biome: linter y formatter ultrarrápido para JS/TS/JSON/CSS
+    // Reemplaza a ESLint + Prettier en proyectos que lo adopten
+    "biome": {
+      "binary": {
+        "path": "biome",
+        "arguments": ["lsp-proxy"],
+      },
+    },
+
+    // nil: LSP para Nix con soporte completo del lenguaje.
+    // Delega el formateo al formatter alejandra via initialization_options
+    "nil": {
+      "binary": {
+        "path": "nil",
+      },
+      "initialization_options": {
+        "formatting": {
+          "command": ["alejandra", "-q"],
+        },
+      },
+    },
+
+    // Tailwind CSS: autocompletado de clases utilitarias en templates
+    "tailwindcss-language-server": {
+      "binary": {
+        "path": "tailwindcss-language-server",
+        "arguments": ["--stdio"],
+      },
+    },
+
+    // Servidor de lenguaje para Vue 3 (Volar)
+    "vue-language-server": {
+      "binary": {
+        "path": "vue-language-server",
+        "arguments": ["--stdio"],
+      },
+    },
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // LANGUAGES — Configuración por lenguaje
+  // Cada clave debe ser el nombre exacto del lenguaje en Zed (case-sensitive).
+  // Referencia de lenguajes disponibles: https://zed.dev/docs/languages
+  //
+  // Claves comunes por lenguaje:
+  //   tab_size         → número de espacios por nivel de indentación
+  //   formatter        → cómo formatear el archivo (LSP, external, prettier, none)
+  //   format_on_save   → "on" | "off" — aplica el formatter al guardar
+  //   language_servers → lista ordenada de LSPs activos; "!nombre" los desactiva
+  //   inlay_hints      → sobreescribe la configuración global de inlay hints
+  // ───────────────────────────────────────────────────────────────────────────
+
   "languages": {
+    // ── YAML ─────────────────────────────────────────────────────────────────
+    // oxfmt actúa como dispatcher: detecta el tipo de archivo por extensión
+    // y delega al formatter correcto (prettier, taplo, etc. según contexto)
     "YAML": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
-      "format_on_save": "on"
+      "format_on_save": "on",
     },
+
+    // ── Astro ─────────────────────────────────────────────────────────────────
+    // Usa biome como formatter (más rápido que prettier para archivos .astro)
+    // language_servers: astro primero para tipos, tailwind para clases CSS
     "Astro": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "biome",
-          "arguments": [
-            "format",
-            "--stdin-file-path",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["format", "--stdin-file-path", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
       "language_servers": [
         "astro-language-server",
-        "tailwindcss-language-server"
-      ]
+        "tailwindcss-language-server",
+      ],
     },
+
+    // ── JavaScript ────────────────────────────────────────────────────────────
     "JavaScript": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "biome",
-        "tailwindcss-language-server"
-      ]
+      "language_servers": ["biome", "tailwindcss-language-server"],
     },
+
+    // ── JSON ──────────────────────────────────────────────────────────────────
     "JSON": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "biome"
-      ]
+      "language_servers": ["biome"],
     },
+
+    // ── Markdown ──────────────────────────────────────────────────────────────
+    // marksman: LSP para Markdown con soporte de wiki-links, referencias y TOC
     "Markdown": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "marksman"
-      ]
+      "language_servers": ["marksman"],
     },
+
+    // ── TypeScript ────────────────────────────────────────────────────────────
     "TypeScript": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "biome",
-        "tailwindcss-language-server"
-      ]
+      "language_servers": ["biome", "tailwindcss-language-server"],
     },
+
+    // ── TSX ───────────────────────────────────────────────────────────────────
+    // TypeScript + JSX (React). Mismo stack que TypeScript.
     "TSX": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "biome",
-        "tailwindcss-language-server"
-      ]
+      "language_servers": ["biome", "tailwindcss-language-server"],
     },
+
+    // ── CSS ───────────────────────────────────────────────────────────────────
     "CSS": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "biome",
-        "tailwindcss-language-server"
-      ]
+      "language_servers": ["biome", "tailwindcss-language-server"],
     },
+
+    // ── HTML ──────────────────────────────────────────────────────────────────
+    // Sin biome: el soporte de biome para HTML aún es experimental
     "HTML": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "tailwindcss-language-server"
-      ]
+      "language_servers": ["tailwindcss-language-server"],
     },
+
+    // ── Vue.js ────────────────────────────────────────────────────────────────
+    // vue-language-server (Volar) para Vue 3 SFCs (.vue)
     "Vue.js": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "oxfmt",
-          "arguments": [
-            "--stdin-filepath",
-            "{buffer_path}"
-          ]
-        }
+          "arguments": ["--stdin-filepath", "{buffer_path}"],
+        },
       },
       "format_on_save": "on",
       "language_servers": [
         "vue-language-server",
-        "tailwindcss-language-server"
-      ]
+        "tailwindcss-language-server",
+      ],
     },
+
+    // ── Nix ───────────────────────────────────────────────────────────────
+    // alejandra: formatter opinionado para Nix (sin configuración, siempre consistente)
+    // nil: LSP con análisis estático, hover, y goto-definition para Nix
     "Nix": {
       "tab_size": 2,
       "formatter": {
         "external": {
           "command": "alejandra",
-          "arguments": [
-            "-q"
-          ]
-        }
+          "arguments": ["-q"],
+        },
       },
       "format_on_save": "on",
-      "language_servers": [
-        "nil"
-      ]
-    }
-  },
-  "lsp": {
-    "astro-language-server": {
-      "binary": {
-        "path": "astro-ls",
-        "arguments": [
-          "--stdio"
-        ]
-      }
+      "language_servers": ["nil"],
     },
-    "biome": {
-      "binary": {
-        "path": "biome",
-        "arguments": [
-          "lsp-proxy"
-        ]
-      }
-    },
-    "nil": {
-      "binary": {
-        "path": "nil"
+
+    // ── Python ────────────────────────────────────────────────────────────
+    // ty: type checker de nueva generación (Astral, el equipo de ruff/uv)
+    // ruff: linter y formatter ultrarrápido para Python
+    // Los servidores con "!" prefijo se desactivan explícitamente para evitar
+    // conflictos con ty/ruff (basedpyright, pyrefly, pyright, pylsp).
+    "Python": {
+      "tab_size": 4,
+      "format_on_save": "on",
+      "formatter": {
+        "language_server": {
+          "name": "ruff",
+        },
       },
-      "initialization_options": {
-        "formatting": {
-          "command": [
-            "alejandra",
-            "-q"
-          ]
-        }
-      }
+      "language_servers": [
+        "ty",
+        "ruff",
+        "!basedpyright",
+        "!pyrefly",
+        "!pyright",
+        "!pylsp",
+      ],
     },
-    "tailwindcss-language-server": {
-      "binary": {
-        "path": "tailwindcss-language-server",
-        "arguments": [
-          "--stdio"
-        ]
-      }
-    },
-    "vue-language-server": {
-      "binary": {
-        "path": "vue-language-server",
-        "arguments": [
-          "--stdio"
-        ]
-      }
-    }
-  }
+  },
 }
