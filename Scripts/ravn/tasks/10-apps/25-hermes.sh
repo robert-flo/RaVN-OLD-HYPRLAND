@@ -23,5 +23,5 @@ install() {
     echo "Error: curl not found" >&2
     return 1
   fi
-  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+#  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 }
