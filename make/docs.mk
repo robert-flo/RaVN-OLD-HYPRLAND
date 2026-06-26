@@ -108,7 +108,7 @@ endif
 	@printf "\n$(PURPLE)Git Operations:$(NC)\n"
 	@printf "  $(GREEN)make git-status$(NC)             $(DIM)# Show repository status$(NC)\n"
 	@printf "  $(GREEN)make git-commit$(NC)             $(DIM)# Commit changes with timestamp$(NC)\n"
-	@printf "  $(GREEN)make git-cm MSG=\"msg\"$(NC)         $(DIM)# Commit changes with custom message$(NC)\n"
+	@printf "  $(GREEN)make git-cm \"msg\"$(NC)             $(DIM)# Commit changes with custom message$(NC)\n"
 	@printf "  $(GREEN)make sys-deploy$(NC)             $(DIM)# Full deployment cycle (format, test, commit, push)$(NC)\n"
 ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"

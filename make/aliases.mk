@@ -86,7 +86,7 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "docs-*" "doc-*" "Docs"
 	@printf "%-20s %-25s %s\n" "a / git-a" "git-add" "Git"
 	@printf "%-20s %-25s %s\n" "c / git-c" "git-commit" "Git"
-	@printf "%-20s %-25s %s\n" "cm / git-cm" "git-cm MSG=\"..\"" "Git"
+	@printf "%-20s %-25s %s\n" "cm / git-cm" "git-cm \"msg\"" "Git"
 	@printf "%-20s %-25s %s\n" "ac / git-ac" "git-add-commit" "Git"
 	@printf "%-20s %-25s %s\n" "p / git-p" "git-push" "Git"
 	@printf "%-20s %-25s %s\n" "l / git-l" "git-pull" "Git"

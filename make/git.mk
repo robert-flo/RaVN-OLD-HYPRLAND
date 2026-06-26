@@ -41,6 +41,14 @@ else
   EXEC =
 endif
 
+# Intercept positional arguments as the commit message for cm / git-cm targets
+ifeq ($(firstword $(MAKECMDGOALS)),$(filter $(firstword $(MAKECMDGOALS)),git-cm cm))
+  MSG ?= $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # Avoid erroring out on positional arguments treated as targets
+  %:
+	@:
+endif
+
 RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
 
 .PHONY: git-add git-commit git-cm git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here \
