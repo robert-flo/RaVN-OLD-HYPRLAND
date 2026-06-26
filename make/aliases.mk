@@ -13,8 +13,8 @@
         format lint tree diff-config docs-local docs-dev docs-build docs-install docs-clean \
         help-aliases \
         git-a git-c git-ac git-p git-st git-s git-d git-l git-lg \
-        git-af git-fuck git-bye git-df git-fc git-fm \
-        a c ac p l st s d lg af fuck bye df fc fm \
+        git-af git-fuck git-bye git-df git-fc git-fm git-cm \
+        a c ac p l st s d lg af fuck bye df fc fm cm \
         clean-vm disk-repo disk-home \
         scvm sdr sdh \
         fmt-f fmt-c fmt-l fmt-r f fl fr
@@ -86,6 +86,7 @@ help-aliases: ## Show list of legacy aliases and their modern equivalents
 	@printf "%-20s %-25s %s\n" "docs-*" "doc-*" "Docs"
 	@printf "%-20s %-25s %s\n" "a / git-a" "git-add" "Git"
 	@printf "%-20s %-25s %s\n" "c / git-c" "git-commit" "Git"
+	@printf "%-20s %-25s %s\n" "cm / git-cm" "git-cm MSG=\"..\"" "Git"
 	@printf "%-20s %-25s %s\n" "ac / git-ac" "git-add-commit" "Git"
 	@printf "%-20s %-25s %s\n" "p / git-p" "git-push" "Git"
 	@printf "%-20s %-25s %s\n" "l / git-l" "git-pull" "Git"
@@ -212,6 +213,7 @@ git-fm: git-search
 # === Short Git Aliases ===
 a: git-add
 c: git-commit
+cm: git-cm
 ac: git-add-commit
 p: git-push
 l: git-pull

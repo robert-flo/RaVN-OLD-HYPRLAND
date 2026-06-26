@@ -9,6 +9,7 @@
 #    ALIAS          TARGET                   DESCRIPTION
 #    a  / git-a     git-add                  Stage all changes
 #    c  / git-c     git-commit               Quick timestamped commit
+#    cm / git-cm    git-cm MSG="..."         Commit with custom message
 #    ac / git-ac    git-add-commit           Stage & commit together
 #    p  / git-p     git-push                 Push commits to remote
 #    l  / git-l     git-pull                 Pull remote changes
@@ -42,7 +43,7 @@ endif
 
 RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
 
-.PHONY: git-add git-commit git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here \
+.PHONY: git-add git-commit git-cm git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here \
         git-add-fuzzy git-amend git-prune-branches git-diff-fuzzy git-search
 
 # ═══════════════════════════════════════════════════════════════
@@ -89,6 +90,41 @@ endif
 		COMMIT_MSG="config: update $$(date '+%Y-%m-%d %H:%M:%S')"; \
 		printf "  commit: $(GREEN)$$COMMIT_MSG$(NC)\n\n"; \
 		$(EXEC) git commit --signoff -m "$$COMMIT_MSG" || exit 1; \
+		COMMIT_HASH=$$(git rev-parse --short HEAD); \
+		BRANCH=$$(git branch --show-current); \
+		printf "$(GREEN)  ✓ $(NC)$(DIM)$$COMMIT_HASH$(NC)  $$BRANCH\n"; \
+	else \
+		printf "$(GREEN)  ✓  nothing to commit — working tree is clean$(NC)\n"; \
+	fi
+ifndef EMBEDDED
+	@printf "\n$(GREEN)  ✓ done$(NC)\n"
+	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
+	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+	@printf "  • push to remote: $(BLUE)make git-push$(NC)\n"
+	@printf "  • view recent history: $(BLUE)make git-log$(NC)\n"
+	@printf "  • check repo state:     $(BLUE)make git-status$(NC)\n\n"
+endif
+
+# ═══════════════════════════════════════════════════════════════
+# 📝 GIT-CM - Create a commit from staged changes with a custom message
+# ═══════════════════════════════════════════════════════════════
+# ──── Commit: Stages all and creates commit with custom message ─
+git-cm: ## Commit with custom message (use MSG="message")
+ifndef EMBEDDED
+	@printf "\n"
+	@printf "$(CYAN)📝 git-cm · custom commit$(NC)\n"
+	@printf "$(CYAN)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
+endif
+	@if [ -z "$(MSG)" ]; then \
+		printf "$(RED)  ✗ please specify MSG=\"message\" to commit$(NC)\n"; \
+		printf "  example: $(BLUE)make git-cm MSG=\"your commit message\"$(NC)\n\n"; \
+		exit 1; \
+	fi
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		printf "  staging changes...\n"; \
+		$(EXEC) git add .; \
+		printf "  commit: $(GREEN)$(MSG)$(NC)\n\n"; \
+		$(EXEC) git commit --signoff -m "$(MSG)" || exit 1; \
 		COMMIT_HASH=$$(git rev-parse --short HEAD); \
 		BRANCH=$$(git branch --show-current); \
 		printf "$(GREEN)  ✓ $(NC)$(DIM)$$COMMIT_HASH$(NC)  $$BRANCH\n"; \
