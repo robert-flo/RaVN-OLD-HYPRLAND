@@ -177,7 +177,7 @@ Default section order:
 - [Scripts/AGENTS.md](Scripts/AGENTS.md) - Automation, package install, and update scripts.
   - [Scripts/ravnvm/AGENTS.md](Scripts/ravnvm/AGENTS.md) - NixOS virtualization environment settings.
 - [Source/AGENTS.md](Source/AGENTS.md) - Binary archives, themes, fonts, and graphical assets.
-
+- [emacs-integration/AGENTS.md](emacs-integration/AGENTS.md) - Porting Josh Blais' Emacs workflow (joshuablais/nixos-config) into this repo.
 ## Verification
 
 Antes de hacer commit, asegúrate de que todos los scripts pasen las verificaciones:
