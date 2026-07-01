@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: class
+# key: cl
+# condition: t
+# --
+
+class=""

@@ -1,0 +1,8 @@
+lee /home/rollo/Work/RaVN/dev/emacs-integration/AGENTS.md
+
+luego procede a inegrar 
+/home/rollo/Work/nixos-config/master/dotfiles/emacs
+
+en /home/rollo/Work/RaVN/dev/Configs
+
+asegurate que se instale con /home/rollo/Work/RaVN/dev/Scripts/restore_cfg.psv

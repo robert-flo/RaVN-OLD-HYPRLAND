@@ -18,7 +18,7 @@ every session before doing anything else.
 
 | Source (`nixos-config`) | Destination (`RaVN`) | Status | PR / branch | Notes |
 |---|---|---|---|---|
-| _(none yet)_ | | | | |
+| `dotfiles/emacs/` | `Configs/.config/emacs/` | ✅ Done | N/A (Direct dev integration) | Main Emacs config tree |
 
 ## Open decisions
 

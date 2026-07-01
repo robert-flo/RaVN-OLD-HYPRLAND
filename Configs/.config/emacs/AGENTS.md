@@ -1,0 +1,31 @@
+# Purpose
+
+Governs the custom Emacs configuration ("Studium Emacs", vanilla use-package + elpaca) ported from joshuablais/nixos-config. It defines local contracts, work guidance, and verification for day-to-day edits of the Emacs configuration in RaVN.
+
+# Ownership
+
+Owned by the user (`robert-flo`).
+
+# Local Contracts
+
+- **Vanilla Setup**: Keep configuration modular and vanilla-compatible (no Doom-only macros).
+- **Elpaca Package Manager**: Use `elpaca` + `use-package` for package management. Always ensure dependencies are configured asynchronously and wait where necessary (`elpaca-wait`).
+- **Path structure**:
+  - `init.el` is the main entry point.
+  - `early-init.el` handles startup optimization and core UI configurations.
+  - `lisp/` houses standard configuration modules.
+  - `lisp/custom/` houses custom Lisp functions and integrations.
+  - `themes/` houses custom color themes.
+  - `snippets/` houses YASnippet templates.
+
+# Work Guidance
+
+- Avoid adding Nix-specific packages or paths.
+- Store sensitive values in `~/.authinfo.gpg` or retrieve them via the `pass` utility.
+- When adding new modules, ensure they are required in `init.el` and registered in the `provide` form of the module file.
+
+# Verification
+
+- Byte-compile check: run `emacs -Q --batch -f batch-byte-compile <file>.el` on any modified Lisp files to ensure there are no compilation errors.
+
+# Child DOX Index
