@@ -20,6 +20,7 @@ udiskie                                                # manage removable media
 wttrbar                                                # for weather
 python-requests|wttrbar                                # script dependency
 ncdu                                                   # Terminal Disk Usage Analyzer
+dua-cli                                                # Interactive disk usage analyzer (dua i)
 libqalculate                                           # terminal calculator
 konsole                                                # terminal emulator
 gum                                                    # Used for interactive menus, spinners, and styling the UI

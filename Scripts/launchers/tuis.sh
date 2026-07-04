@@ -5,7 +5,7 @@
 ICON_DIR="$HOME/.local/share/applications/icons"
 
 ravn_launcher_install 'Antigravity CLI' 'sh -c '\''cd "$HOME/src" && exec xdg-terminal-exec --app-id=TUI.tile -e agy'\''' 'Antigravity CLI.png' '--comment=Antigravity TUI Client' '--categories=ConsoleOnly;TUI;Utility;' '--keywords=tui;terminal;cli;'
-ravn_tui_install 'Disk Usage' 'bash -c '\''dust -r; read -n 1 -s'\''' 'float' "$ICON_DIR/Disk Usage.png"
+ravn_tui_install 'Disk Usage' 'dua i' 'float' "$ICON_DIR/Disk Usage.png"
 ravn_tui_install 'Docker' 'lazydocker' 'tile' "$ICON_DIR/Docker.png"
 ravn_launcher_install 'Grok Build' 'sh -c '\''cd "$HOME/src" && exec xdg-terminal-exec --app-id=TUI.tile -e grok'\''' 'Grok AI.png' '--comment=Grok Build CLI / xAI Agent' '--categories=ConsoleOnly;TUI;Utility;' '--keywords=tui;terminal;cli;'
 ravn_launcher_install 'Herdr' 'xdg-terminal-exec --app-id=TUI.tile -e herdr' 'utilities-terminal' '--comment=Herdr CLI Tool' '--categories=ConsoleOnly;TUI;Utility;' '--keywords=tui;terminal;cli;'
