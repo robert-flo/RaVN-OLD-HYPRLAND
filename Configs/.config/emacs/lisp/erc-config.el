@@ -65,5 +65,7 @@
   (setq erc-image-inline-rescale 400)
   (add-hook 'erc-insert-modify-hook #'erc-image-show-url))
 
+(elpaca-wait)
+
 (provide 'erc-config)
 ;;; erc-config.el ends here

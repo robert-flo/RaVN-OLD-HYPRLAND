@@ -9,7 +9,7 @@ Owned by the user (`robert-flo`).
 # Local Contracts
 
 - **Vanilla Setup**: Keep configuration modular and vanilla-compatible (no Doom-only macros).
-- **Elpaca Package Manager**: Use `elpaca` + `use-package` for package management. Always ensure dependencies are configured asynchronously and wait where necessary (`elpaca-wait`).
+- **Elpaca Package Manager**: Use `elpaca` + `use-package` for package management. After every `use-package` with `:demand t` in `lisp/**/*.el`, add `(elpaca-wait)` immediately below the closing form (same pattern as `magit-config.el`). Group consecutive `:demand t` blocks may share one wait after the last block in the group.
 - **Path structure**:
   - `init.el` is the main entry point.
   - `early-init.el` handles startup optimization and core UI configurations.

@@ -18,10 +18,14 @@
   (defun agenix--identity-protected-p (_identity-path)
     nil))
 
+(elpaca-wait)
+
 (use-package envrc
   :demand t
   :config
   (envrc-global-mode))
+
+(elpaca-wait)
 
 (use-package devdocs
   :ensure t

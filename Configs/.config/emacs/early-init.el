@@ -1,6 +1,11 @@
 ;;; early-init.el --- Description -*- lexical-binding: t; -*-
 (setq package-enable-at-startup nil)
 
+;; vterm needs a real TERM; systemd/graphical-session often leaves TERM=dumb.
+(when (member (getenv "TERM") '("dumb" nil ""))
+  (setenv "TERM" "xterm-256color")
+  (setenv "COLORTERM" "truecolor"))
+
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 1.0)
 

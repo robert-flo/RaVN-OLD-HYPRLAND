@@ -11,4 +11,6 @@
   (setq filechooser-choose-files #'filechooser-with-dired)
   (filechooser-start))
 
+(elpaca-wait)
+
 (provide 'filechooser-config)

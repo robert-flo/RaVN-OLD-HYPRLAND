@@ -174,6 +174,7 @@ zed                                                   # A high-performance, mult
 helix                                                 # A post-modern modal text editor
 emacs-wayland                                         # Extensible, customizable, self-documenting real-time display editor (pure GTK3 / Wayland)
 cmake                                                 # Build system, dependency for compiling emacs-vterm
+libvterm                                              # Terminal emulator library for emacs-vterm native module
 libtool                                               # Generic library support script, dependency for compiling emacs-vterm
 mu                                                    # Mail directory indexer/searcher (includes mu4e)
 pass                                                  # Password store integration for Emacs
