@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Open a new Emacs GUI frame running vterm (Super+E workflow).
+# Open a new Emacs GUI frame from the daemon (Super+Shift+E).
+# Hyprland strips -a "" in inline binds; use this wrapper instead.
 set -euo pipefail
 
 export GDK_BACKEND="${GDK_BACKEND:-wayland}"
@@ -13,4 +14,4 @@ if ! emacsclient -a "" -n -e "(display-graphic-p (selected-frame))" 2>/dev/null 
   emacsclient -c -a "" -n -e "(delete-frame (selected-frame))" 2>/dev/null || true
 fi
 
-exec emacsclient -a "" -n -e '(my/new-frame-with-vterm)'
+exec emacsclient -c -a "" -n -e "(delete-other-windows)"

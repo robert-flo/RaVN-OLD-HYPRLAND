@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Edit focused text field via Emacs (Super+Ctrl+E / thanos/type).
+# Does not switch Hyprland workspace — unlike emacs-launcher.
+set -euo pipefail
+
+export GDK_BACKEND="${GDK_BACKEND:-wayland}"
+export TERM="${TERM:-xterm-256color}"
+export COLORTERM="${COLORTERM:-truecolor}"
+
+"${HOME}/.local/bin/emacs-ensure-daemon"
+exec emacsclient -a "" -n --eval '(thanos/type)'

@@ -1,13 +1,15 @@
 [Unit]
 Description=Emacs daemon
-After=graphical-session.target
-Requires=graphical-session.target
+After=graphical-session.target dbus.socket
+Wants=graphical-session.target
 PartOf=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=%h/.local/bin/emacs-daemon-start
-ExecStop=emacsclient --eval "(kill-emacs)"
+ExecStop=/bin/kill -SIGTERM -- $MAINPID
+KillMode=control-group
+TimeoutStopSec=15
 Restart=on-failure
 PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR DISPLAY
 Environment=GDK_BACKEND=wayland TERM=xterm-256color COLORTERM=truecolor

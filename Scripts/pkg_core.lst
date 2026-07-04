@@ -179,6 +179,7 @@ libtool                                               # Generic library support 
 mu                                                    # Mail directory indexer/searcher (includes mu4e)
 pass                                                  # Password store integration for Emacs
 isync                                                 # mbsync for mu4e mail sync
+msmtp                                                 # SMTP client for mu4e outgoing mail
 wtype                                                 # Wayland text typing for emacs-everywhere
 xdotool                                               # X11 automation fallback
 ffmpegthumbnailer                                     # Dired video thumbnail previews

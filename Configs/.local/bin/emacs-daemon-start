@@ -8,7 +8,7 @@ export COLORTERM="${COLORTERM:-truecolor}"
 # Wait for Wayland display (mirrors nixos-config emacs-wayland.nix graphical-session dep).
 deadline=$((SECONDS + 30))
 until [[ -n ${WAYLAND_DISPLAY:-} || -n ${DISPLAY:-} ]]; do
-  if (( SECONDS >= deadline )); then
+  if ((SECONDS >= deadline)); then
     echo "emacs-daemon-start: no WAYLAND_DISPLAY or DISPLAY after 30s" >&2
     exit 1
   fi

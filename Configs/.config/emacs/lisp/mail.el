@@ -1,9 +1,44 @@
-;;; mu4e.el -*- lexical-binding: t; -*-
+;;; mail.el --- mu4e mail (Studium Emacs) -*- lexical-binding: t; -*-
+
+(defvar my/mail-user-config
+  (expand-file-name "lisp/custom/mail-user.el" user-emacs-directory)
+  "Optional per-user mu4e contexts, bookmarks, and SMTP overrides.")
+
+(defun my/mu4e-ready-p ()
+  "Return non-nil when local mail store and mu index are available."
+  (let ((maildir (expand-file-name "~/Mail"))
+        (mu-bin (or mu4e-mu-binary (executable-find "mu"))))
+    (and mu-bin
+         (file-directory-p maildir)
+         (zerop (call-process mu-bin nil nil nil "info")))))
+
+(defun my/mu4e-setup-instructions ()
+  "Return mu4e setup steps for the current machine."
+  (cond
+   ((not (executable-find "msmtp"))
+    "1. Install msmtp (pacman -S msmtp)\n2. Configure ~/.msmtprc")
+   ((not (file-directory-p (expand-file-name "~/Mail")))
+    "1. Create ~/Mail and ~/.mbsyncrc\n2. Run: mbsync -a && mu init && mu index\n3. Copy lisp/custom/mail-user.el.example to mail-user.el")
+   ((not (my/mu4e-ready-p))
+    "Maildir exists but mu index is missing.\nRun: mu init && mu index")
+   (t nil)))
+
+(defun my/mu4e-launch ()
+  "Launch mu4e or show setup instructions when mail is not configured."
+  (interactive)
+  (if-let ((steps (my/mu4e-setup-instructions)))
+      (with-current-buffer (get-buffer-create "*mu4e-setup*")
+        (erase-buffer)
+        (insert "mu4e is not configured yet.\n\n")
+        (insert steps)
+        (insert "\n\nSee lisp/custom/mail-user.el.example for account templates.\n")
+        (pop-to-buffer (current-buffer)))
+    (call-interactively #'mu4e)))
 
 (use-package mu4e
   :ensure nil
   :defer t
-  :commands (mu4e mu4e-compose-new)
+  :commands (mu4e mu4e-compose-new my/mu4e-launch)
   :init
   (setq mu4e-mu-binary (executable-find "mu"))
   :config
@@ -25,47 +60,16 @@
         mail-specify-envelope-from t
         mail-envelope-from 'header)
 
-  (setq user-mail-address "josh@joshblais.com"
-        user-full-name "Joshua Blais")
   (setq mu4e-sent-messages-behavior 'sent)
-
-  (setq mu4e-contexts
-        (list
-         (make-mu4e-context
-          :name "joshuaPersonal"
-          :match-func (lambda (msg)
-                        (when msg
-                          (string-prefix-p "/joshuaPersonal"
-                                           (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address  . "josh@joshblais.com")
-                  (user-full-name     . "Joshua Blais")
-                  (mu4e-sent-folder   . "/joshuaPersonal/Sent")
-                  (mu4e-drafts-folder . "/joshuaPersonal/Drafts")
-                  (mu4e-trash-folder  . "/joshuaPersonal/Trash")
-                  (mu4e-refile-folder . "/joshuaPersonal/Archive")))
-
-         (make-mu4e-context
-          :name "RevereJosh"
-          :match-func (lambda (msg)
-                        (when msg
-                          (string-prefix-p "/RevereJosh"
-                                           (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address  . "josh@reverehome.ca")
-                  (user-full-name     . "Joshua Blais")
-                  (mu4e-sent-folder   . "/RevereJosh/Sent")
-                  (mu4e-drafts-folder . "/RevereJosh/Drafts")
-                  (mu4e-trash-folder  . "/RevereJosh/Trash")
-                  (mu4e-refile-folder . "/RevereJosh/Archive")))))
-
-  (setq mu4e-context-policy 'pick-first
-        mu4e-compose-context-policy 'ask)
 
   (setq mu4e-bookmarks
         '(("flag:unread AND NOT flag:trashed" "Unread messages"   ?u)
           ("date:today..now"                  "Today's messages"  ?t)
-          ("maildir:/joshuaPersonal/Inbox"    "Personal Inbox"    ?p)
           ("flag:flagged"                     "Flagged messages"  ?f)
           ("size:5M.."                        "Big messages"      ?b)))
+
+  (when (file-exists-p my/mail-user-config)
+    (load my/mail-user-config nil t))
 
   (setq mu4e-headers-thread-enable t
         mu4e-headers-show-threads t

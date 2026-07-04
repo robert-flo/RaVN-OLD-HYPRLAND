@@ -74,7 +74,7 @@ install_emacs_launcher() {
 
 install_emacs_helpers() {
   local helper src
-  for helper in emacs-mailto emacs-daemon-start emacs-new-vterm-frame; do
+  for helper in emacs-mailto emacs-daemon-start emacs-new-vterm-frame emacs-ensure-daemon emacs-launch-frame emacs-everywhere; do
     src="${cloneDir}/Configs/.local/bin/${helper}"
     if [[ -f "${src}" ]]; then
       cp -f "${src}" "${LOCAL_BIN}/${helper}"

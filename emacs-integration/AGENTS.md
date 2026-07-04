@@ -48,6 +48,7 @@ speculative work outside an explicit session request.
 | `dotfiles/zsh/.zshrc`                        | merge into `Configs/.config/zsh/.zshrc` + `Configs/.config/zsh/user.zsh` | RaVN's zsh is modular (`conf.d/`, `functions/`); do not blindly overwrite — see INSTRUCTIONS.md §Zsh handling |
 | `dotfiles/zsh/.zprofile`                     | `Configs/.zprofile` (create if absent)           | Confirm no clash with `Configs/.config/zsh/.zshenv` |
 | `dotfiles/hypr/scripts/emacs-launcher.go`    | `Configs/.local/bin/emacs-launcher` (compiled binary; keep `.go` source alongside or in a `src/` note) | RaVN has no `hypr/scripts/`; all executables live flat in `.local/bin/`, PATH-available |
+| (RaVN-only helpers)                          | `emacs-ensure-daemon`, `emacs-launch-frame`, `emacs-everywhere` alongside existing `emacs-new-vterm-frame` | Hyprland strips `-a ""`; ping must not use `-a ""` (spawns rogue daemon) |
 | Emacs-related binds in `dotfiles/hypr/*.conf`| `Configs/.config/hypr/userprefs.conf`            | `userprefs.conf` is flag `P` (populate-once, never overwritten by upstream HyDE updates) — the only safe place for personal binds. **Never add Emacs binds to `keybindings.conf`** (flag `P` too, but conventionally owned by HyDE core, keep it clean) |
 
 Package equivalences (Nix → Arch/AUR) are decided **by the user, one at a

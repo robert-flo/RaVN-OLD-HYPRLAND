@@ -23,6 +23,13 @@ Owned by the user (`robert-flo`).
 - Avoid adding Nix-specific packages or paths.
 - Store sensitive values in `~/.authinfo.gpg` or retrieve them via the `pass` utility.
 - When adding new modules, ensure they are required in `init.el` and registered in the `provide` form of the module file.
+- **Hyprland global keybinds** call `~/.local/bin/` helpers, not inline `emacsclient`:
+  - `emacs-ensure-daemon` — ping server (no `-a ""`); start `emacs.service` if down
+  - `emacs-launcher` — workspace switch + Elisp command
+  - `emacs-launch-frame` — Super+Shift+E new GUI frame
+  - `emacs-new-vterm-frame` — Super+E vterm frame
+  - `emacs-everywhere` — Super+Ctrl+E `thanos/type` (no workspace switch)
+- **mu4e per-user config**: copy `lisp/custom/mail-user.el.example` → `mail-user.el`; host needs `~/Mail`, `~/.mbsyncrc`, `~/.msmtprc`, `mu index`
 
 # Verification
 

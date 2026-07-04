@@ -55,8 +55,36 @@ func getCurrentWorkspace() (int, error) {
 	return workspace.ID, nil
 }
 
+func emacsDaemonPing() error {
+	// Never pass -a "" here; that auto-starts a second daemon when the server is down.
+	return exec.Command("emacsclient", "-n", "-e", "(+ 1 1)").Run()
+}
+
+func ensureEmacsDaemon() error {
+	if err := emacsDaemonPing(); err == nil {
+		return nil
+	}
+
+	_ = exec.Command("systemctl", "--user", "start", "emacs.service").Run()
+
+	deadline := time.Now().Add(45 * time.Second)
+	poll := 500 * time.Millisecond
+
+	for time.Now().Before(deadline) {
+		if err := emacsDaemonPing(); err == nil {
+			return nil
+		}
+		time.Sleep(poll)
+	}
+
+	return fmt.Errorf("emacs server did not become ready")
+}
+
 func executeEmacsCommand(command string) error {
-	cmd := exec.Command("emacsclient", "-n", "-e", command)
+	if err := ensureEmacsDaemon(); err != nil {
+		return err
+	}
+	cmd := exec.Command("emacsclient", "-a", "", "-n", "-e", command)
 	return cmd.Run()
 }
 
