@@ -205,6 +205,7 @@ shfmt                                                 # Shell script formatter
 astrojs-language-server                               # Astro LSP
 
 # --------------------------------------------------- // Development Tools
+go                                                    # Go programming language (emacs-launcher, etc.)
 gcc                                                   # The GNU Compiler Collection
 make                                                  # GNU utility to maintain groups of programs
 pkgconf                                               # Package compiler configuration utility

@@ -45,6 +45,10 @@ add_to_path "$HOME/.local/share/mise/shims"
 export EDITOR="emacsclient -nw"
 export VISUAL="emacsclient -nw"
 
+#  Go 
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin
+
 #  Waybar Tasks & Countdowns Custom Aliases 
 # Interactive Terminal UIs (TUI)
 alias todo="~/.local/share/waybar/scripts/todo/todo.sh --show-tui"
