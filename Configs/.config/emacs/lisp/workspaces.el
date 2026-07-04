@@ -16,6 +16,8 @@
   (bufferlo-mode 1)
   (bufferlo-anywhere-mode 1))
 
+(elpaca-wait)
+
 ;;; Helpers
 (defun +workspace--current-name ()
   (alist-get 'name (tab-bar--current-tab)))

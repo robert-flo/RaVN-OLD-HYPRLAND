@@ -2,4 +2,31 @@
 set -euo pipefail
 
 export GDK_BACKEND="${GDK_BACKEND:-wayland}"
-exec emacs --fg-daemon
+export TERM="${TERM:-xterm-256color}"
+export COLORTERM="${COLORTERM:-truecolor}"
+
+# Wait for Wayland display (mirrors nixos-config emacs-wayland.nix graphical-session dep).
+deadline=$((SECONDS + 30))
+until [[ -n ${WAYLAND_DISPLAY:-} || -n ${DISPLAY:-} ]]; do
+  if (( SECONDS >= deadline )); then
+    echo "emacs-daemon-start: no WAYLAND_DISPLAY or DISPLAY after 30s" >&2
+    exit 1
+  fi
+  sleep 0.5
+done
+
+emacs --fg-daemon &
+emacs_pid=$!
+
+until emacsclient -e "(+ 1 1)" &>/dev/null; do
+  if ! kill -0 "${emacs_pid}" 2>/dev/null; then
+    wait "${emacs_pid}"
+    exit 1
+  fi
+  sleep 0.5
+done
+
+# Initialize PGTK display path; daemon-only tty frames cannot make-frame.
+emacsclient -c -a "" -n -e "(delete-frame (selected-frame))" &>/dev/null || true
+
+wait "${emacs_pid}"

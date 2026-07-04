@@ -245,8 +245,23 @@
           (messages-buffer-mode . motion)
           (special-mode . motion))))
 
+(defun my/elpaca-meow-source-ok ()
+  "Return non-nil when elpaca's meow checkout contains meow.el."
+  (let ((src (expand-file-name "sources/meow/meow.el"
+                               (if (boundp 'elpaca-directory)
+                                   elpaca-directory
+                                 (expand-file-name "elpaca/" user-emacs-directory)))))
+    (file-readable-p src)))
+
 (use-package meow
+  :ensure (:host github :repo "meow-edit/meow")
   :demand t
+  :init
+  ;; Self-heal: elpaca can leave an empty checkout that never builds.
+  (when (and (require 'elpaca nil t)
+             (not (my/elpaca-meow-source-ok)))
+    (message "meow: repairing corrupt elpaca source checkout...")
+    (ignore-errors (elpaca-delete 'meow)))
   :config
   (meow-setup)
   (meow-global-mode 1)
@@ -276,6 +291,8 @@
           (?p . paragraph)
           (?l . line)
           (?d . defun))))
+
+(elpaca-wait)
 
 (defun studium/clipboard-kill-line-or-fold ()
   "Kill line to clipboard. If the line has a folded region, kill the entire fold."

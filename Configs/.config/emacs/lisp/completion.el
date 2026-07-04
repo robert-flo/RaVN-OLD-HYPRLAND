@@ -61,6 +61,8 @@
   (nerd-icons-completion-mode)
   (nerd-icons-completion-marginalia-setup))
 
+(elpaca-wait)
+
 (use-package corfu
   :ensure t
   :custom

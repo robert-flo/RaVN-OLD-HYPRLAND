@@ -74,7 +74,7 @@ install_emacs_launcher() {
 
 install_emacs_helpers() {
   local helper src
-  for helper in emacs-mailto emacs-daemon-start; do
+  for helper in emacs-mailto emacs-daemon-start emacs-new-vterm-frame; do
     src="${cloneDir}/Configs/.local/bin/${helper}"
     if [[ -f "${src}" ]]; then
       cp -f "${src}" "${LOCAL_BIN}/${helper}"
@@ -108,6 +108,68 @@ enable_emacs_service() {
     count_ok
   else
     warn_msg "No se pudo habilitar emacs.service (puede requerir sesión gráfica activa)."
+    count_skip
+  fi
+}
+
+repair_elpaca_meow_source() {
+  local meow_src="${EMACS_DIR}/elpaca/sources/meow"
+  local meow_el="${meow_src}/meow.el"
+
+  if [[ -f "${meow_el}" ]]; then
+    info "meow elpaca source OK."
+    count_skip
+    return 0
+  fi
+
+  if [[ ! -d "${meow_src}/.git" ]]; then
+    warn_msg "meow no está en elpaca/sources; se instalará en el próximo arranque de Emacs."
+    count_skip
+    return 0
+  fi
+
+  if run_with_status "Restaurando checkout corrupto de meow" \
+    git -C "${meow_src}" reset --hard HEAD; then
+    success "Checkout de meow restaurado."
+    count_ok
+  else
+    warn_msg "No se pudo restaurar meow; ejecuta M-x elpaca-rebuild RET meow RET en Emacs."
+    count_skip
+  fi
+}
+
+compile_vterm_module() {
+  local vterm_build="${EMACS_DIR}/elpaca/builds/vterm"
+  local vterm_module="${vterm_build}/vterm-module.so"
+
+  if [[ -f "${vterm_module}" ]]; then
+    info "vterm-module.so ya está compilado."
+    count_skip
+    return 0
+  fi
+
+  if [[ ! -f "${vterm_build}/vterm.el" && ! -L "${vterm_build}/vterm.el" ]]; then
+    warn_msg "vterm no está instalado en elpaca; omitiendo compilación del módulo nativo."
+    count_skip
+    return 0
+  fi
+
+  for cmd in cmake make gcc pkg-config; do
+    if ! command -v "${cmd}" &>/dev/null; then
+      warn_msg "Falta ${cmd}; no se puede compilar vterm-module."
+      count_skip
+      return 0
+    fi
+  done
+
+  if run_with_status "Compilando vterm-module.so" \
+    bash -c "mkdir -p '${vterm_build}/build' && \
+      cmake -S '${vterm_build}' -B '${vterm_build}/build' -G 'Unix Makefiles' -DUSE_SYSTEM_LIBVTERM=On && \
+      cmake --build '${vterm_build}/build'"; then
+    success "vterm-module.so compilado."
+    count_ok
+  else
+    warn_msg "Falló la compilación de vterm-module; Super+E / vterm no funcionará hasta compilarlo."
     count_skip
   fi
 }
@@ -186,6 +248,8 @@ setup_emacs() {
   install_emacs_launcher
   install_emacs_helpers
   bootstrap_elpaca
+  repair_elpaca_meow_source
+  compile_vterm_module
   enable_emacs_service
 }
 

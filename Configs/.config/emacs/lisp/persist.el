@@ -27,4 +27,6 @@
   (persistent-scratch-setup-default)
   (persistent-scratch-autosave-mode 1))
 
+(elpaca-wait)
+
 (provide 'persist)
