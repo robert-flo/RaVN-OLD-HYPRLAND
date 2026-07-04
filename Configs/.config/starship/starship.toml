@@ -71,8 +71,7 @@ $php\
 $crystal\
 $custom\
 $status\
-$os\
-$time"""
+$os"""
 
 continuation_prompt = '▶▶ '
 
@@ -114,7 +113,7 @@ style = "bg:#394260"
 
 
 [time]
-disabled = false
+disabled = true
 format = '[[  $time ](fg:#a0a9cb )]($style)'
 time_format = "%R"                            # Hour:Minute Format
 
