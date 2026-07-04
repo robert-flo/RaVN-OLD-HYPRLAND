@@ -4,7 +4,7 @@ After=graphical-session.target
 PartOf=graphical-session.target
 
 [Service]
-Type=notify
+Type=simple
 ExecStart=%h/.local/bin/emacs-daemon-start
 ExecStop=emacsclient --eval "(kill-emacs)"
 Restart=on-failure
