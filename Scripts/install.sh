@@ -467,6 +467,29 @@ EOF
 fi
 
 # ==============================================================================
+# Desktop launchers (webapps + TUIs)
+# ==============================================================================
+if [ ${flg_Restore} -eq 1 ] && [ -f "${scrDir}/launchers/install_launchers.sh" ]; then
+	cat <<"EOF"
+
+ _                       _                _
+| |    ___  __ _  __ _ (_)_ __ ___  __ _| |
+| |   / _ \/ _` |/ _` || | '_ ` _ \/ _` | |
+| |__|  __/ (_| | (_| || | | | | | | (_| | |
+|_____\___|\__, |\__,_|/ |_| |_| |_|\__,_|_|
+           |___/
+
+EOF
+
+	if [ "${flg_DryRun}" -eq 1 ]; then
+		print_log -n "[launchers] " -b "dry-run :: " "Would run ${scrDir}/launchers/install_launchers.sh"
+	else
+		print_log -g "[launchers] " -b " :: " "Installing webapps and TUIs..."
+		bash "${scrDir}/launchers/install_launchers.sh"
+	fi
+fi
+
+# ==============================================================================
 # Finalización de la instalación y registro de logs
 # ==============================================================================
 if [ $flg_Install -eq 1 ]; then
