@@ -41,6 +41,10 @@ eval "$(try init ~/src/tries)"
 # Add user-installed mise executables to PATH.
 add_to_path "$HOME/.local/share/mise/shims"
 
+#  Emacs 
+export EDITOR="emacsclient -nw"
+export VISUAL="emacsclient -nw"
+
 #  Waybar Tasks & Countdowns Custom Aliases 
 # Interactive Terminal UIs (TUI)
 alias todo="~/.local/share/waybar/scripts/todo/todo.sh --show-tui"

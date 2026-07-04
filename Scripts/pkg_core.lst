@@ -176,6 +176,14 @@ emacs-wayland                                         # Extensible, customizable
 cmake                                                 # Build system, dependency for compiling emacs-vterm
 libtool                                               # Generic library support script, dependency for compiling emacs-vterm
 mu                                                    # Mail directory indexer/searcher (includes mu4e)
+pass                                                  # Password store integration for Emacs
+isync                                                 # mbsync for mu4e mail sync
+wtype                                                 # Wayland text typing for emacs-everywhere
+xdotool                                               # X11 automation fallback
+ffmpegthumbnailer                                     # Dired video thumbnail previews
+poppler                                               # PDF utilities
+mediainfo                                             # Media metadata for dired previews
+graphviz                                              # Graph visualization utilities
 aspell                                                # Spell checker for flyspell
 aspell-en                                             # English dictionary for aspell
 aspell-es                                             # Spanish dictionary for aspell

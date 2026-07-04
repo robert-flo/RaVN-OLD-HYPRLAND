@@ -1,0 +1,15 @@
+[Unit]
+Description=Emacs daemon
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=notify
+ExecStart=%h/.local/bin/emacs-daemon-start
+ExecStop=emacsclient --eval "(kill-emacs)"
+Restart=on-failure
+PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR DISPLAY
+Environment=GDK_BACKEND=wayland
+
+[Install]
+WantedBy=graphical-session.target

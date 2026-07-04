@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+url="$1"
+exec emacsclient -c -a "" -n --eval "(mu4e-compose-mailto \"${url}\")"

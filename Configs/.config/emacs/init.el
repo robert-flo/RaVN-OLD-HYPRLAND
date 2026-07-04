@@ -195,8 +195,10 @@
         recentf-max-saved-items 100)
   (dolist (path '("\\.git/" "/tmp/" "/nix/store/"))
     (add-to-list 'recentf-exclude path))
-  (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-var-directory))
-  (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-etc-directory))
+  (when (boundp 'no-littering-var-directory)
+    (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-var-directory)))
+  (when (boundp 'no-littering-etc-directory)
+    (add-to-list 'recentf-exclude (recentf-expand-file-name no-littering-etc-directory)))
   (add-hook 'kill-emacs-hook #'recentf-cleanup -90))
 
 ;; Modules

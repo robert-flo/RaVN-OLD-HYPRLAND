@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export GDK_BACKEND="${GDK_BACKEND:-wayland}"
+exec emacs --fg-daemon

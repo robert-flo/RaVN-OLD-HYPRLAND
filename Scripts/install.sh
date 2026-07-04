@@ -373,6 +373,26 @@ EOF
 		bash "${scrDir}/dotbare_init.sh"
 	fi
 
+	# Bootstrap Studium Emacs (elpaca) after configs are restored
+	if [ -f "${scrDir}/install_emacs.sh" ]; then
+		cat <<"EOF"
+
+ _____ __  __    _    ___ _        _
+| ____|  \/  |  / \  |_ _| |      / \
+|  _| | |\/| | / _ \  | || |     / _ \
+| |___| |  | |/ ___ \ | || |___ / ___ \
+|_____|_|  |_/_/   \_\___|_____/_/   \_\
+
+EOF
+
+		if [ "${flg_DryRun}" -eq 1 ]; then
+			print_log -n "[emacs] " -b "dry-run :: " "Would run ${scrDir}/install_emacs.sh"
+		else
+			print_log -g "[emacs] " -b " :: " "Bootstrapping Studium Emacs..."
+			bash "${scrDir}/install_emacs.sh"
+		fi
+	fi
+
 fi
 
 

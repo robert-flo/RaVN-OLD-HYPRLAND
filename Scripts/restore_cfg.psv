@@ -49,6 +49,7 @@ P|${HOME}/.config/hypr|hyprland.conf|hyprland
 S|${HOME}/.local/share|hypr|hyprland
 S|${HOME}/.local/share|applications|hyprland
 O|${HOME}/.local/bin|hyde-shell hydectl dotbare-sync monitor-toggle.sh record.sh toggle_gaps.sh toggle-hdmi.sh toggle-opacity.sh|hyprland
+O|${HOME}/.local/bin|emacs-launcher emacs-launcher.go emacs-mailto emacs-daemon-start|emacs-wayland
 O|${HOME}/.local/bin|descargar-video descargar-video-x|yt-dlp gum
 S|${HOME}/.config|gtk-3.0|nwg-look
 S|${HOME}/.config|nwg-look|nwg-look
