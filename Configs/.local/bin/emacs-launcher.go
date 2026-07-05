@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -84,7 +85,11 @@ func executeEmacsCommand(command string) error {
 	if err := ensureEmacsDaemon(); err != nil {
 		return err
 	}
-	cmd := exec.Command("emacsclient", "-a", "", "-n", "-e", command)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "emacsclient", "-n", "-e", command)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
 	return cmd.Run()
 }
 
