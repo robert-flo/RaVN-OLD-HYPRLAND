@@ -24,11 +24,12 @@ Owned by the user (`robert-flo`).
 - Store sensitive values in `~/.authinfo.gpg` or retrieve them via the `pass` utility.
 - When adding new modules, ensure they are required in `init.el` and registered in the `provide` form of the module file.
 - **Hyprland global keybinds** call `~/.local/bin/` helpers, not inline `emacsclient`:
-  - `emacs-ensure-daemon` — ping server (no `-a ""`); start `emacs.service` if down
-  - `emacs-launcher` — workspace switch + Elisp command
+  - `emacs-launcher` — workspace switch + Elisp command (Go binary, respects ignore-errors)
   - `emacs-launch-frame` — Super+Shift+E new GUI frame
   - `emacs-new-vterm-frame` — Super+E vterm frame
   - `emacs-everywhere` — Super+Ctrl+E `thanos/type` (no workspace switch)
+- **Emacs startup**: Emacs is launched directly from Hyprland (`exec-once = emacs` in `userprefs.conf`) after importing Wayland environment variables into systemd. The Emacs server starts automatically via `(server-start)` hook in `tools.el`. No systemd daemon unit is used.
+- **External service setup** (pass, mu4e, EMMS): see [SERVICE-SETUP.md](SERVICE-SETUP.md).
 - **mu4e per-user config**: copy `lisp/custom/mail-user.el.example` → `mail-user.el`; host needs `~/Mail`, `~/.mbsyncrc`, `~/.msmtprc`, `mu index`
 
 # Verification

@@ -1,4 +1,6 @@
 // ~/.local/bin/emacs-launcher.go
+// Workspace-aware Emacs command launcher.
+// Emacs runs as a normal process launched at Hyprland startup; no daemon management needed.
 package main
 
 import (
@@ -56,35 +58,7 @@ func getCurrentWorkspace() (int, error) {
 	return workspace.ID, nil
 }
 
-func emacsDaemonPing() error {
-	// Never pass -a "" here; that auto-starts a second daemon when the server is down.
-	return exec.Command("emacsclient", "-n", "-e", "(+ 1 1)").Run()
-}
-
-func ensureEmacsDaemon() error {
-	if err := emacsDaemonPing(); err == nil {
-		return nil
-	}
-
-	_ = exec.Command("systemctl", "--user", "start", "emacs.service").Run()
-
-	deadline := time.Now().Add(45 * time.Second)
-	poll := 500 * time.Millisecond
-
-	for time.Now().Before(deadline) {
-		if err := emacsDaemonPing(); err == nil {
-			return nil
-		}
-		time.Sleep(poll)
-	}
-
-	return fmt.Errorf("emacs server did not become ready")
-}
-
 func executeEmacsCommand(command string) error {
-	if err := ensureEmacsDaemon(); err != nil {
-		return err
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "emacsclient", "-n", "-e", command)

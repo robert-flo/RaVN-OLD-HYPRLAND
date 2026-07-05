@@ -1,23 +1,5 @@
 #!/usr/bin/env bash
-# Ensure Emacs server is reachable (start systemd unit if needed).
-set -euo pipefail
-
-export GDK_BACKEND="${GDK_BACKEND:-wayland}"
-export TERM="${TERM:-xterm-256color}"
-export COLORTERM="${COLORTERM:-truecolor}"
-
-# Do not use -a "" for ping; it spawns a rogue emacs --daemon when no server exists.
-if emacsclient -n -e "(+ 1 1)" &>/dev/null; then
-  exit 0
-fi
-
-systemctl --user start emacs.service 2>/dev/null || true
-
-deadline=$((SECONDS + 45))
-until emacsclient -n -e "(+ 1 1)" &>/dev/null; do
-  if ((SECONDS >= deadline)); then
-    echo "emacs-ensure-daemon: Emacs server did not become ready" >&2
-    exit 1
-  fi
-  sleep 0.5
-done
+# Legacy no-op — Emacs is now launched directly at Hyprland startup (userprefs.conf exec-once).
+# The Emacs server starts automatically via (server-start) in tools.el.
+# Kept for backward compatibility with any scripts that still source or call it.
+exit 0
