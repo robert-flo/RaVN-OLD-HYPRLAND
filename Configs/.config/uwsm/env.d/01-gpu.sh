@@ -1,4 +1,5 @@
-# 00-gpu.sh - GPU detection
+# shellcheck shell=sh
+# 01-gpu.sh - GPU detection
 # This env script will detect the presence of various GPUs on the system
 # and set environment variables accordingly.
 # This is OVERRIDABLE by the user, so it can be customized as needed.
@@ -134,4 +135,3 @@ case "$key" in
 esac
 
 export GPU_SETUP
-echo "GPU setup detected: $GPU_SETUP"
