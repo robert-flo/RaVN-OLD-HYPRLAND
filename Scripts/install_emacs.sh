@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-#|---/ /+---------------------------+---/ /|#
-#|--/ /-| Studium Emacs bootstrap   |--/ /-|#
-#|-/ /--| deps, launcher, elpaca     |-/ /--|#
-#|/ /---+---------------------------+/ /---|#
+# shellcheck disable=SC2154
+#|---/ /+--------------------------------+---/ /|#
+#|--/ /-| Studium Emacs bootstrap        |--/ /-|#
+#|-/ /--| deps, launcher, elpaca, vterm  |-/ /--|#
+#|/ /---+--------------------------------+/ /---|#
 
 scrDir="$(dirname "$(realpath "$0")")"
 # shellcheck disable=SC1091
@@ -27,7 +28,7 @@ sync_emacs_config_from_nixos() {
   if [[ ! -f "${EMACS_INIT}" ]]; then
     step "Sincronizando Studium Emacs desde nixos-config"
     mkdir -p "${EMACS_DIR}"
-    if (( flg_DryRun == 1 )); then
+    if ((flg_DryRun == 1)); then
       print_log -y "[EMACS] " -b " :: " "Simulación: rsync ${NIXOS_EMACS_SRC}/ -> ${EMACS_DIR}/"
       return 0
     fi
@@ -70,46 +71,6 @@ install_emacs_launcher() {
 
   warn_msg "No se encontró emacs-launcher para instalar."
   count_skip
-}
-
-install_emacs_helpers() {
-  local helper src
-  for helper in emacs-mailto emacs-daemon-start emacs-new-vterm-frame emacs-ensure-daemon emacs-launch-frame emacs-everywhere; do
-    src="${cloneDir}/Configs/.local/bin/${helper}"
-    if [[ -f "${src}" ]]; then
-      cp -f "${src}" "${LOCAL_BIN}/${helper}"
-      chmod +x "${LOCAL_BIN}/${helper}"
-    fi
-  done
-}
-
-enable_emacs_service() {
-  local unit_src="${cloneDir}/Configs/.config/systemd/user/emacs.service"
-  local unit_dst="${confDir}/systemd/user/emacs.service"
-
-  if [[ ! -f "${unit_src}" ]]; then
-    warn_msg "No se encontró ${unit_src}"
-    count_skip
-    return 0
-  fi
-
-  mkdir -p "${confDir}/systemd/user"
-  cp -f "${unit_src}" "${unit_dst}"
-
-  if [[ ${flg_DryRun:-0} -eq 1 ]]; then
-    print_log -y "[EMACS] " -b " :: " "Simulación: systemctl --user enable --now emacs.service"
-    count_skip
-    return 0
-  fi
-
-  systemctl --user daemon-reload
-  if systemctl --user enable --now emacs.service 2>/dev/null; then
-    success "Servicio emacs.service habilitado."
-    count_ok
-  else
-    warn_msg "No se pudo habilitar emacs.service (puede requerir sesión gráfica activa)."
-    count_skip
-  fi
 }
 
 repair_elpaca_meow_source() {
@@ -213,6 +174,12 @@ setup_emacs() {
     return 0
   fi
 
+  if [[ ${flg_DryRun:-0} -eq 1 ]]; then
+    print_log -y "[EMACS] " -b " :: " "Simulación: se omitirían AUR, launcher, elpaca bootstrap y vterm"
+    count_skip
+    return 0
+  fi
+
   if chk_list "aurhlpr" "${aurList[@]}"; then
     local missing_aur=()
     local pkg
@@ -239,18 +206,10 @@ setup_emacs() {
     count_skip
   fi
 
-  if [[ ${flg_DryRun:-0} -eq 1 ]]; then
-    print_log -y "[EMACS] " -b " :: " "Simulación: se omitirían launcher, servicio y bootstrap"
-    count_skip
-    return 0
-  fi
-
   install_emacs_launcher
-  install_emacs_helpers
   bootstrap_elpaca
   repair_elpaca_meow_source
   compile_vterm_module
-  enable_emacs_service
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
