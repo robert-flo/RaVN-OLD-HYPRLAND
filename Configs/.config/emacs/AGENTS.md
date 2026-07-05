@@ -23,12 +23,12 @@ Owned by the user (`robert-flo`).
 - Avoid adding Nix-specific packages or paths.
 - Store sensitive values in `~/.authinfo.gpg` or retrieve them via the `pass` utility.
 - When adding new modules, ensure they are required in `init.el` and registered in the `provide` form of the module file.
-- **Hyprland global keybinds** call `~/.local/bin/` helpers, not inline `emacsclient`:
-  - `emacs-launcher` — workspace switch + Elisp command (Go binary, respects ignore-errors)
-  - `emacs-launch-frame` — Super+Shift+E new GUI frame
-  - `emacs-new-vterm-frame` — Super+E vterm frame
-  - `emacs-everywhere` — Super+Ctrl+E `thanos/type` (no workspace switch)
-- **Emacs startup**: Emacs is launched directly from Hyprland (`exec-once = emacs` in `userprefs.conf`) after importing Wayland environment variables into systemd. The Emacs server starts automatically via `(server-start)` hook in `tools.el`. No systemd daemon unit is used.
+- **Hyprland global keybinds** use direct `emacsclient -c -n -e` (new frame, no workspace switch):
+  - `emacs-launch-frame` — Super+Shift+E: new GUI frame
+  - `emacs-new-vterm-frame` — Super+E: new vterm frame
+  - `emacs-everywhere` — Super+Ctrl+E: `thanos/type` popup
+  - All other Emacs binds (org-agenda, mu4e, elfeed, dirvish, etc.) run `emacsclient -c -n -e '(progn (<fn>))'` directly in userprefs.conf — each opens a new frame on the current workspace.
+- **Emacs startup**: Emacs is launched from Hyprland (`exec-once = emacs` in `userprefs.conf`). The server starts via `(server-start)` at the end of `init.el` (after all `require` forms), preceded by `(ignore-errors (delete-file …))` to clean stale sockets from unclean shutdowns. No systemd daemon unit is used.
 - **External service setup** (pass, mu4e, EMMS): see [SERVICE-SETUP.md](SERVICE-SETUP.md).
 - **mu4e per-user config**: copy `lisp/custom/mail-user.el.example` → `mail-user.el`; host needs `~/Mail`, `~/.mbsyncrc`, `~/.msmtprc`, `mu index`
 
