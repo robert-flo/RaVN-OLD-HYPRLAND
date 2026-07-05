@@ -85,6 +85,9 @@ sshpass                                                # non-interactive ssh pas
 # --------------------------------------------------- // Utilities & Debugging
 curl                                                  # Command line tool for transferring data with URLs
 wget                                                  # Network utility to retrieve files from the Web
+knot                                                  # Knot DNS server (authoritative and recursive)
+speedtest-cli                                         # Command-line interface for testing internet bandwidth
+mtr                                                   # Network diagnostics tool (combines traceroute and ping)
 strace                                                # System call tracer
 lsof                                                  # List open files
 
@@ -128,6 +131,7 @@ zoxide                                                 # A smarter cd command fo
 tldr                                                   # Collaborative cheatsheets for console commands
 tmux                                                   # Terminal multiplexer
 skim                                                   # Fuzzy finder in Rust (alternative to fzf)
+bash-completion                                        # Programmable completion for the bash shell
 
 fastfetch                                              # system information fetch tool
 
