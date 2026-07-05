@@ -1,0 +1,16 @@
+[Unit]
+Description=Emacs text editor
+Documentation=https://www.gnu.org/software/emacs/
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/emacs --init-directory=%h/.config/emacs
+Restart=no
+Environment=GDK_BACKEND=wayland
+Environment=TERM=xterm-256color
+Environment=COLORTERM=truecolor
+
+[Install]
+WantedBy=graphical-session.target
