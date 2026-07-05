@@ -43,6 +43,7 @@ Owned by the RaVN installer pipeline. All scripts are sourced or invoked by `ins
 ## Subdirectories
 
 - `extra/` — Optional scripts: Flatpak install (`install_fpk.sh`), kernel module install (`install_mod.sh`), app restore (`restore_app.sh`), desktop link restore (`restore_lnk.sh`), drive mount helper (`drivext_mnt.sh`).
+- `launchers/` — Webapp, TUI, and edge-browser launcher installer (`install_launchers.sh`). Manifests (`webapps.sh`, `tuis.sh`, `edge-webapps.sh`) list every entry installed via `omarchy-webapp-install`, `omarchy-tui-install`, and `ravn-browser-webapp-install`. To add a new persistent webapp or TUI, append a `ravn_webapp_install` / `ravn_tui_install` row to the matching manifest instead of authoring `.desktop` files by hand — the launcher regenerates and tracks them.
 - `migrations/` — Version-tagged POSIX scripts run by `install.sh` during updates. Named `v<semver>.sh`.
 - `ravn/` — RaVN Framework v1: modular bootstrap framework with auto-discovered task modules. See child DOX.
 - `ravnvm/` — NixOS-based VM tool for testing RaVN branches. See child DOX.

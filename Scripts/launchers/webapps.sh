@@ -30,6 +30,7 @@ ravn_webapp_install 'M365 Copilot ai' 'https://m365.cloud.microsoft/chat/' 'M365
 ravn_webapp_install 'Manus ai' 'https://manus.im/app' 'Manus ai.png'
 ravn_webapp_install 'MiMo AI Studio' 'https://aistudio.xiaomimimo.com/#/c' 'mimo.png'
 ravn_webapp_install 'Mistral ai' 'https://chat.mistral.ai/chat' 'Mistral ai.png'
+ravn_webapp_install 'minimax Agent' 'https://agent.minimax.io/' 'minimax.png'
 ravn_webapp_install 'Monica HQ' 'https://www.monicahq.com/' 'monica-hq.png'
 ravn_webapp_install 'Netflix' 'https://www.netflix.com/browse' 'Netflix.png'
 ravn_webapp_install 'NotebookLM' 'https://notebooklm.google.com/' 'NotebookLM.png'
