@@ -261,3 +261,6 @@
 (require 'create-daily)
 (require 'nm)
 (put 'narrow-to-region 'disabled nil)
+
+(ignore-errors (delete-file (expand-file-name server-name server-socket-dir)))
+(server-start)
