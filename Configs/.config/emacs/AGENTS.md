@@ -28,7 +28,11 @@ Owned by the user (`robert-flo`).
   - `emacs-new-vterm-frame` — Super+E: new vterm frame
   - `emacs-everywhere` — Super+Ctrl+E: `thanos/type` popup
   - All other Emacs binds (org-agenda, mu4e, elfeed, dirvish, etc.) run `emacsclient -c -n -e '(progn (<fn>))'` directly in userprefs.conf — each opens a new frame on the current workspace.
-- **Emacs startup**: Emacs is launched from Hyprland (`exec-once = emacs` in `userprefs.conf`). The server starts via `(server-start)` at the end of `init.el` (after all `require` forms), preceded by `(ignore-errors (delete-file …))` to clean stale sockets from unclean shutdowns. No systemd daemon unit is used.
+- **Emacs startup**:
+  - Launched from Hyprland (`exec-once = emacs` in `userprefs.conf`) after importing Wayland environment into systemd.
+  - Assigned to workspace 1 via `windowrule = workspace 1, class:^(Emacs)$`.
+  - The server starts via `(server-start)` at the end of `init.el` (after all `require` forms), preceded by `(ignore-errors (delete-file …))` to clean stale sockets from unclean shutdowns.
+  - A systemd user service (`emacs.service`) is provided for UWSm-managed sessions as a pre-built fallback; not enabled by default.
 - **External service setup** (pass, mu4e, EMMS): see [SERVICE-SETUP.md](SERVICE-SETUP.md).
 - **mu4e per-user config**: copy `lisp/custom/mail-user.el.example` → `mail-user.el`; host needs `~/Mail`, `~/.mbsyncrc`, `~/.msmtprc`, `mu index`
 
