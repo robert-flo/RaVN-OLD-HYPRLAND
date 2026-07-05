@@ -319,6 +319,22 @@ EOF
 	fi
 
 	#--------------------------------#
+	# Omarchy repository (early setup) #
+	#--------------------------------#
+	# Configure the [omarchy] repository before package installation so that
+	# Omarchy packages can be resolved during the main install phase.
+	RAVN_DIR="${scrDir}/ravn"
+	export RAVN_DIR
+	# shellcheck disable=SC1091
+	source "${RAVN_DIR}/lib/omarchy.sh"
+	if ! omarchy_repo_is_configured; then
+		print_log -g "[OMARCHY] " -b " :: " "Configuring Omarchy repository before package install..."
+		setup_omarchy_repo
+	else
+		print_log -g "[OMARCHY] " -b " :: " "Repository already configured"
+	fi
+
+	#--------------------------------#
 	# install packages from the list #
 	#--------------------------------#
 	"${scrDir}/install_pkg.sh" "${scrDir}/install_pkg.lst"

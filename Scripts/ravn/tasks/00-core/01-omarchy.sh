@@ -1,89 +1,68 @@
 #!/usr/bin/env bash
 # ─── RaVN Task: Omarchy ─────────────────────────────────────────────────────
-# Extracted from install_fnl.sh::setup_omarchy()
-# Clones/updates Omarchy, integrates [omarchy] repo into pacman.conf,
-# installs tobi-try + omarchy-walker, configures Walker + Elephant.
+# Installs Omarchy packages and configures Walker + Elephant integration.
+# The [omarchy] repository itself is configured earlier (before install_pkg.sh)
+# by the omarchy-repo task; this task uses the shared helper as a fallback so it
+# remains safe to run standalone.
 
 # shellcheck disable=SC2034
 PACKAGE="omarchy"
-DESCRIPTION="Omarchy desktop framework integration"
+DESCRIPTION="Omarchy packages and Walker/Elephant integration"
 CATEGORY="core"
 DEPENDS=()
 INTERACTIVE=false
 
+flg_DryRun=${flg_DryRun:-0}
+
+# shellcheck disable=SC1091
+source "${RAVN_DIR}/lib/omarchy.sh"
+
+# check — return 0 if all Omarchy packages and the repo are already configured.
 check() {
-  # Skip if [omarchy] repo is already in pacman.conf
-  grep -q '^\[omarchy\]' /etc/pacman.conf 2> /dev/null
+  omarchy_repo_is_configured &&
+    pkg_installed tobi-try &&
+    pkg_installed omarchy-walker
 }
 
+# install — ensure the repo is present, install Omarchy packages, and set up
+# Walker + Elephant.
 install() {
-  # Usar rama personalizada si se indica, de lo contrario por defecto 'master'
-  local omarchy_ref="${OMARCHY_REF:-master}"
-  # Usar repositorio personalizado si se especifica, de lo contrario por defecto 'basecamp/omarchy'
-  local omarchy_repo="${OMARCHY_REPO:-basecamp/omarchy}"
-
-  step "Configurando Omarchy (${omarchy_repo}@${omarchy_ref})"
-
-  # Definir el canal del mirror de Omarchy según la rama
-  local omarchy_mirror="stable"
-  if [[ "${omarchy_ref}" == "dev" ]]; then
-    omarchy_mirror="edge"
-  elif [[ "${omarchy_ref}" == "rc" ]]; then
-    omarchy_mirror="rc"
+  # Fallback: configure the repo if this task is run without the early phase.
+  if ! omarchy_repo_is_configured; then
+    setup_omarchy_repo
   fi
-  export OMARCHY_MIRROR="${omarchy_mirror}"
 
-  # 1. Asegurar la instalación de git usando los repositorios actuales del sistema
-  sudo pacman -Sy --noconfirm --needed git
+  step "Installing Omarchy packages"
 
-  # 2. Clonar/Actualizar e inicializar el repositorio
-  clone_or_update_repo "Omarchy" "$omarchy_repo" "$HOME/.local/share/omarchy" "$omarchy_ref"
+  # Install Omarchy packages.
+  run_with_status "Installing tobi-try" \
+    sudo pacman -S --needed --noconfirm tobi-try
 
-  # 3. Integrar el repositorio [omarchy] en /etc/pacman.conf sin pisar la configuración actual
-  info "Integrando el repositorio [omarchy] en /etc/pacman.conf..."
+  run_with_status "Installing omarchy-walker" \
+    sudo pacman -S --needed --noconfirm omarchy-walker
+}
 
-  # Remover cualquier configuración previa de [omarchy] para evitar duplicados
-  sudo sed -i '/^\[omarchy\]/,/^[[:space:]]*$/d' /etc/pacman.conf
-  # Eliminar saltos de línea adicionales al final del archivo
-  sudo sed -i -e :a -e '/^\n*$/{$d;N;ba}' /etc/pacman.conf
+# after — configure Walker and Elephant integration.
+after() {
+  info "Configuring Walker and Elephant integration..."
 
-  # Determinar el canal para la URL
-  local channel_name="${omarchy_mirror}"
+  mkdir -p "${HOME}/.config/autostart"
+  mkdir -p "${HOME}/.config/systemd/user/app-walker@autostart.service.d"
+  mkdir -p "${HOME}/.config/elephant/menus"
 
-  # Agregar el bloque al final de pacman.conf
-  sudo tee -a /etc/pacman.conf > /dev/null << EOF
+  cp "${OMARCHY_DEST}/default/walker/walker.desktop" "${HOME}/.config/autostart/"
+  cp "${OMARCHY_DEST}/default/walker/restart.conf" "${HOME}/.config/systemd/user/app-walker@autostart.service.d/"
 
-[omarchy]
-SigLevel = Optional TrustAll
-Server = https://pkgs.omarchy.org/${channel_name}/\$arch
-EOF
+  ln -snf "${OMARCHY_DEST}/default/elephant/omarchy_themes.lua" "${HOME}/.config/elephant/menus/omarchy_themes.lua"
+  ln -snf "${OMARCHY_DEST}/default/elephant/omarchy_background_selector.lua" "${HOME}/.config/elephant/menus/omarchy_background_selector.lua"
+  ln -snf "${OMARCHY_DEST}/default/elephant/omarchy_unlocks.lua" "${HOME}/.config/elephant/menus/omarchy_unlocks.lua"
 
-  # Sincronizar las bases de datos de pacman
-  sudo pacman -Fy
-
-  sudo pacman -S --needed --noconfirm tobi-try
-  sudo pacman -S --needed --noconfirm omarchy-walker
-
-  # 4. Configurar Walker y Elephant (Misma lógica que walker-elephant.sh de Omarchy)
-  info "Configurando integración de Walker y Elephant..."
-
-  # Asegurar la existencia de los directorios necesarios
-  mkdir -p "$HOME/.config/autostart"
-  mkdir -p "$HOME/.config/systemd/user/app-walker@autostart.service.d"
-  mkdir -p "$HOME/.config/elephant/menus"
-
-  # Copiar configuraciones de autostart y reinicio de Walker
-  cp "$HOME/.local/share/omarchy/default/walker/walker.desktop" "$HOME/.config/autostart/"
-  cp "$HOME/.local/share/omarchy/default/walker/restart.conf" "$HOME/.config/systemd/user/app-walker@autostart.service.d/"
-
-  # Crear enlaces simbólicos para los menús de Elephant (enlazados a upstream)
-  ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_themes.lua" "$HOME/.config/elephant/menus/omarchy_themes.lua"
-  ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_background_selector.lua" "$HOME/.config/elephant/menus/omarchy_background_selector.lua"
-  ln -snf "$HOME/.local/share/omarchy/default/elephant/omarchy_unlocks.lua" "$HOME/.config/elephant/menus/omarchy_unlocks.lua"
-
-  # Crear el hook de pacman para reiniciar walker tras actualizaciones
-  sudo mkdir -p /etc/pacman.d/hooks
-  sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null << EOF
+  # Create the pacman hook to restart Walker after upgrades.
+  if ((flg_DryRun == 1)); then
+    info "[dry-run] Would create /etc/pacman.d/hooks/walker-restart.hook"
+  else
+    sudo mkdir -p /etc/pacman.d/hooks
+    sudo tee /etc/pacman.d/hooks/walker-restart.hook > /dev/null << EOF
 [Trigger]
 Type = Package
 Operation = Upgrade
@@ -94,8 +73,9 @@ Target = elephant*
 [Action]
 Description = Restarting Walker services after system update
 When = PostTransaction
-Exec = $HOME/.local/share/omarchy/bin/omarchy-restart-walker
+Exec = ${OMARCHY_DEST}/bin/omarchy-restart-walker
 EOF
+  fi
 
-  success "Omarchy configurado correctamente."
+  success "Omarchy integration configured"
 }

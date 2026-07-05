@@ -13,6 +13,8 @@ Owned by the RaVN installer pipeline. Called by `install.sh` as a replacement fo
 - **Discovery**: Modules are auto-discovered via `find tasks/ -name "*.sh" | sort`. No hardcoded arrays or registration functions.
 - **Naming**: Category directories and files both use numeric prefixes for ordering (e.g., `00-core/01-omarchy.sh`). Categories sort first, then files within each category.
 - **Dependency ordering**: `00-core/` runs before `10-apps/` by design. Modules in `10-apps/` that require `omarchy-npx-install` (codex, copilot, ghui, opencode, playwright) depend on `00-core/01-omarchy.sh` completing first.
+- **Omarchy channel**: `00-core/00-omarchy-repo.sh` pins the `[omarchy]` repository to the `edge` channel and is idempotent — it skips when the correct block is already present in `/etc/pacman.conf`. It does not replace the existing `pacman.conf` or the system mirrorlist. The repository is configured early (before `install_pkg.sh`) so that Omarchy packages can be resolved during the main install phase.
+- **Shared helpers**: `lib/omarchy.sh` contains `setup_omarchy_repo()` and `omarchy_repo_is_configured()` used by both the early repo task and the full `00-core/01-omarchy.sh` task.
 - **Lifecycle order**: `before → check → install → after → cleanup`. The `check()` function returns 0 to skip, 1 to proceed.
 - **Interactive modules**: Set `INTERACTIVE=true` in the module header. The pipeline prompts for confirmation — modules must not prompt themselves.
 - **Logging**: Per-package logs go to `cache/logs/<package>.log`.
