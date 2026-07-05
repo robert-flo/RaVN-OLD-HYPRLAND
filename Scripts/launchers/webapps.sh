@@ -37,6 +37,7 @@ ravn_webapp_install 'NotebookLM' 'https://notebooklm.google.com/' 'NotebookLM.pn
 ravn_webapp_install 'Notion ' 'https://www.notion.so/OMARCHY-28ae971e6e8b8025b230ec19f39596e7?showMoveTo=true&saveParent=true' 'Notion .png'
 ravn_webapp_install 'OpenClaw Dashboard' 'http://127.0.0.1:18789' 'OpenClaw.png'
 ravn_webapp_install 'Perplexity ai' 'https://www.perplexity.ai/' 'Perplexity ai.png'
+ravn_webapp_install 'Raindrop' 'https://app.raindrop.io/my/0' 'Raindrop.png'
 ravn_webapp_install 'Platzi' 'https://platzi.com/home/' 'Platzi.png'
 ravn_webapp_install 'Qwen Coder' 'https://coder.qwen.ai/' 'Qwen ai.png'
 ravn_webapp_install 'Qwen ai' 'https://chat.qwen.ai/' 'Qwen ai.png'
