@@ -30,7 +30,7 @@ Owned by the user (`robert-flo`).
   - All other Emacs binds (org-agenda, mu4e, elfeed, dirvish, etc.) run `emacsclient -c -n -e '(progn (<fn>))'` directly in userprefs.conf — each opens a new frame on the current workspace.
 - **Emacs startup**:
   - Launched from Hyprland (`exec-once = emacs` in `userprefs.conf`) after importing Wayland environment into systemd.
-  - Assigned to workspace 1 via `windowrule = workspace 1, class:^(Emacs)$`.
+  - Assigned to workspace 1 via `windowrule = workspace 1,match:class ^(Emacs)$`.
   - The server starts via `(server-start)` at the end of `init.el` (after all `require` forms), preceded by `(ignore-errors (delete-file …))` to clean stale sockets from unclean shutdowns.
   - A systemd user service (`emacs.service`) is provided for UWSm-managed sessions as a pre-built fallback; not enabled by default.
 - **External service setup** (pass, mu4e, EMMS): see [SERVICE-SETUP.md](SERVICE-SETUP.md).
