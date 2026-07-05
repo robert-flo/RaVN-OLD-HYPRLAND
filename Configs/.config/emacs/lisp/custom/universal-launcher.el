@@ -395,7 +395,9 @@
   "Get system commands from PATH."
   (let ((commands '()))
     (dolist (dir (parse-colon-path (getenv "PATH")))
-      (when (file-directory-p dir)
+      (when (and (stringp dir)
+                 (not (string-empty-p dir))
+                 (file-directory-p dir))
         (dolist (file (directory-files dir t))
           (when (and (file-executable-p file)
                      (not (file-directory-p file))
@@ -441,12 +443,13 @@
                                    (string-suffix-p "/" url-candidate))
                               (substring url-candidate 0 -1)
                             url-candidate))
-                     (desc (or (org-element-interpret-data
-                                (org-element-contents link))
-                               (universal-launcher--extract-domain url))))
+                      (desc (or (org-element-interpret-data
+                                 (org-element-contents link))
+                                (universal-launcher--extract-domain url)
+                                "")))
                 (when url ; Ensure URL is not nil
                   (push (cons (if (string-empty-p desc)
-                                  (universal-launcher--extract-domain url)
+                                  (or (universal-launcher--extract-domain url) "")
                                 desc)
                               url)
                         bookmarks))))))
@@ -473,12 +476,13 @@
 
 (defun universal-launcher--extract-domain (url)
   "Extract readable domain name from URL."
-  (if (string-match "https?://\\([^/]+\\)" url)
-      (let ((domain (match-string 1 url)))
-        (if (string-match "^www\\." domain)
-            (substring domain 4)
-          domain))
-    url))
+  (when (stringp url)
+    (if (string-match "https?://\\([^/]+\\)" url)
+        (let ((domain (match-string 1 url)))
+          (if (string-match "^www\\." domain)
+              (substring domain 4)
+            domain))
+      url)))
 
 (defun universal-launcher--focus-running-application (app-info)
   "Focus running application using APP-INFO."
@@ -860,7 +864,8 @@ Combines frequency (usage count) with recency (time decay)."
          (let* ((heading (org-get-heading t t t t))
                 (todo-state (org-get-todo-state))
                 (priority (org-get-priority (thing-at-point 'line t)))
-                (tags (org-get-tags))
+                (tags (and (listp (org-get-tags))
+                           (cl-remove-if-not #'stringp (org-get-tags))))
                 (display (format "%s %s %s%s"
                                  icon
                                  (propertize (or todo-state "TODO")
