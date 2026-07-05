@@ -27,6 +27,6 @@ until emacsclient -e "(+ 1 1)" &>/dev/null; do
 done
 
 # Initialize PGTK display path; daemon-only tty frames cannot make-frame.
-emacsclient -c -a "" -n -e "(delete-frame (selected-frame))" &>/dev/null || true
+emacsclient -c -n -e "(delete-frame (selected-frame))" &>/dev/null || true
 
 wait "${emacs_pid}"

@@ -8,4 +8,4 @@ export TERM="${TERM:-xterm-256color}"
 export COLORTERM="${COLORTERM:-truecolor}"
 
 "${HOME}/.local/bin/emacs-ensure-daemon"
-exec emacsclient -a "" -n --eval '(thanos/type)'
+exec emacsclient -n --eval '(thanos/type)'

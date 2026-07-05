@@ -9,8 +9,8 @@ export COLORTERM="${COLORTERM:-truecolor}"
 "${HOME}/.local/bin/emacs-ensure-daemon"
 
 # PGTK daemon may boot with a tty initial frame; seed GDK once so make-frame works.
-if ! emacsclient -a "" -n -e "(display-graphic-p (selected-frame))" 2>/dev/null | grep -q t; then
-  emacsclient -c -a "" -n -e "(delete-frame (selected-frame))" 2>/dev/null || true
+if ! emacsclient -n -e "(display-graphic-p (selected-frame))" 2>/dev/null | grep -q t; then
+  emacsclient -c -n -e "(delete-frame (selected-frame))" 2>/dev/null || true
 fi
 
-exec emacsclient -a "" -n -e '(my/new-frame-with-vterm)'
+exec emacsclient -n -e '(my/new-frame-with-vterm)'
