@@ -91,6 +91,33 @@ To protect the user's active system configurations from accidental resets or unc
 - **Workflow Benefit**: Developing under `~/Work` isolates development changes from host configuration restoration processes. This eliminates the need to manually disable ravn tracking (e.g. setting `ravn=false` in `Scripts/ravn/config/packages.conf`) to protect local changes from being overwritten during installer or `restore_cfg.sh` runs.
 
 
+# Task Execution Workflow
+
+> [!IMPORTANT]
+> **MANDATORY & NON-NEGOTIABLE**: Whenever a new task or feature is requested, the agent must execute these phases in strict sequence. No phase may be skipped. Each phase cross-references the governing section that defines its rules — do not restate or bypass those rules.
+
+## Phase 1 — Environment & Task Setup
+
+1. **Create an isolated worktree** for the task via `git-create-worktree` (see § Git Worktree Workflow). No direct commits to `dev`.
+2. **Determine the best implementation approach** for the requested task. When feasible, prefer creating a task module under `Scripts/ravn/tasks/<category>/<NN>-<name>.sh` following the module contract (see [Scripts/ravn/AGENTS.md](Scripts/ravn/AGENTS.md) § Adding a task module); otherwise choose the most appropriate mechanism (script, config edit, migration, etc.).
+3. **Register new packages** in [Scripts/pkg_core.lst](Scripts/pkg_core.lst) with an accurate inline description (only if the task requires system packages).
+
+## Phase 2 — Configuration & Synchronization
+
+4. **Update configuration templates** in `Configs/` (shell/zsh aliases, etc.) and add tracking rows to [restore_cfg.psv](Scripts/restore_cfg.psv) as needed (see § Configuration Tracking).
+5. **Sync to live `$HOME`** immediately after every `Configs/` change (see § User Preferences → Live Synchronization).
+
+## Phase 3 — Testing & Validation
+
+6. **Run lint and syntax checks** on all touched scripts: `shellcheck`, `shfmt -d`, and `bash -n` (see § Verification).
+7. **Run an isolated Docker test** via [Scripts/ravn/test-task.sh](Scripts/ravn/test-task.sh) to validate the task in a clean `archlinux:latest` container (see [Scripts/ravn/AGENTS.md](Scripts/ravn/AGENTS.md) § Testing Tasks in Isolation).
+8. **Re-run the effective test on the live system** to confirm the change works end-to-end in the real environment, not just in isolation.
+
+## Phase 4 — Deployment
+
+9. **Commit, push, and merge into `dev`** via PR (see § Branching & Release Policy). `dev` must never receive direct commits.
+
+
 # DOX framework
 
 - DOX is highly performant AGENTS.md hierarchy installed here

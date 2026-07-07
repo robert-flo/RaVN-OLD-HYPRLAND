@@ -68,3 +68,11 @@ add_to_path "$HOME/.luarocks/bin"
 export PATH=$(echo -n "$PATH" | awk -v RS=: '$0 != "" && !x[$0]++' | paste -sd:)
 # mimocode
 export PATH=/home/dominus/.mimocode/bin:$PATH
+
+# kilo
+export PATH=/home/ravn/.kilo/bin:$PATH
+export RUSTICL_ENABLE=iris
+export LIBVA_DRIVER_NAME=i965
+export VDPAU_DRIVER=va_gll
+
+
