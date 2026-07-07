@@ -160,6 +160,7 @@ docker                                                 # Pack, ship and run appl
 docker-compose                                         # Define and run multi-container applications with Docker
 docker-buildx                                          # Docker CLI plugin for extended build capabilities
 lazydocker                                             # Docker UI for terminal
+ufw-docker                                             # UFW integration for Docker
 qbittorrent                                            # BitTorrent client
 
 
