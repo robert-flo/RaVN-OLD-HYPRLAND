@@ -1,0 +1,8 @@
+onboarding = false
+
+# Dev workspace bootstrap — prefix+shift+d
+[[keys.command]]
+key = "prefix+shift+d"
+type = "pane"
+command = "herdr-dev-session"
+description = "create dev workspace"
