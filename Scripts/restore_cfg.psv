@@ -51,6 +51,7 @@ S|${HOME}/.local/share|applications|hyprland
 O|${HOME}/.local/bin|hyde-shell hydectl dotbare-sync monitor-toggle.sh record.sh toggle_gaps.sh toggle-hdmi.sh toggle-opacity.sh|hyprland
 O|${HOME}/.local/bin|emacs-launcher emacs-launcher.go emacs-mailto emacs-daemon-start emacs-new-vterm-frame emacs-ensure-daemon emacs-launch-frame emacs-everywhere|emacs-wayland
 O|${HOME}/.local/bin|descargar-video descargar-video-x|yt-dlp gum
+O|${HOME}/.local/bin|play-yt|mpv yt-dlp
 S|${HOME}/.config|gtk-3.0|nwg-look
 S|${HOME}/.config|nwg-look|nwg-look
 S|${HOME}/.config|xsettingsd|nwg-look

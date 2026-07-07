@@ -22,6 +22,7 @@ Owned by the RaVN installer pipeline. Restored to user environments via [restore
 | `hyde-ipc` | IPC daemon for HyDE services | - |
 | `dotbare-sync` | Synchronization tool to mirror active system configs back to git | `dotbare` |
 | `descargar-video` / `descargar-video-x` | Interactive media download wrappers | `yt-dlp`, `gum` |
+| `play-yt` | Stream YouTube videos in MPV with forced H.264/VA-API | `mpv`, `yt-dlp` |
 
 ---
 
