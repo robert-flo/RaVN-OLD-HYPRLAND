@@ -103,7 +103,8 @@ qt6-wayland                                            # wayland support in qt6
 # --------------------------------------------------- // Applications
 # firefox                                              # browser
 brave-origin-beta-bin                                  # browser
-google-chrome                                          # browser
+google-chrome                                          # browser (stable)
+google-chrome-dev                                      # browser (dev channel)
 microsoft-edge-stable-bin                              # browser
 kitty                                                  # terminal
 konsole                                                # terminal
