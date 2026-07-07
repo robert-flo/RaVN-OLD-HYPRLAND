@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# ==============================================================================
+# SCRIPT: Reproductor de YouTube Optimizado para GPU Intel Skylake (Gen 9)
+# Descripción: Recibe un enlace de YouTube y fuerza la reproducción en MPV
+#              usando el códec H.264 (avc1) para activar la aceleración por
+#              hardware nativa (VA-API) sin saturar la CPU ni dar errores de AV1.
+# Uso: ./play-yt.sh <enlace_de_youtube>
+# ==============================================================================
+
+# 1. Validación de parámetros
+# Comprobamos si el usuario pasó un argumento (el enlace del video)
+if [ -z "$1" ]; then
+  echo "❌ Error: No proporcionaste ningún enlace de YouTube."
+  echo "Uso correcto: $0 https://www.youtube.com/watch?v=XXXXXX"
+  exit 1
+fi
+
+# 2. Asignación de la URL
+# Guardamos el primer parámetro ($1) en una variable clara
+# Al envolverla en comillas aquí dentro, Bash maneja correctamente los caracteres especiales como '&' o '?'
+YOUTUBE_URL="$1"
+
+echo "🚀 Iniciando reproducción optimizada por hardware..."
+echo "📺 Enlace: $YOUTUBE_URL"
+echo "🔧 Códec forzado: H.264 (avc1) | Backend: VA-API (i965)"
+echo "------------------------------------------------------------"
+
+# 3. Ejecución maestra de MPV
+# --hwdec=vaapi: Enciende el motor de video de tu GPU Intel de forma nativa.
+# --ytdl-format=...: Filtra y exige estrictamente el formato H.264 compatible
+#                    con tu Intel HD 530, ignorando los pesados AV1/VP9.
+if mpv --hwdec=vaapi --ytdl-format="bv[vcodec^=avc1]+ba/b" "$YOUTUBE_URL"; then
+  echo "------------------------------------------------------------"
+  echo "✅ Reproducción finalizada correctamente."
+else
+  echo "------------------------------------------------------------"
+  echo "⚠️ Hubo un problema al intentar reproducir el video."
+  echo "Asegúrate de que 'yt-dlp' esté actualizado con: sudo pacman -Syu yt-dlp"
+fi
