@@ -120,6 +120,7 @@ alacritty                                              # GPU-accelerated termina
 warp-terminal-bin                                      # terminal emulator
 yt-dlp                                                 # The media downloading engine
 ffmpeg                                                 # Required by yt-dlp to merge audio/video streams and extract MP3
+mpv                                                    # Media player for local and streaming video
 
 # --------------------------------------------------- // Shell
 starship|zsh                                           # customizable shell prompt written in Rust
