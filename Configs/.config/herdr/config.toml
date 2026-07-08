@@ -292,12 +292,12 @@ description = "open yazi file explorer"
 
 [[keys.command]]
 key = "prefix+f"
-type = "shell"
-command = "herdr plugin action invoke open-file-viewer --plugin herdr-file-viewer"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"
 description = "open file viewer (split)"
 
 [[keys.command]]
 key = "prefix+shift+f"
-type = "shell"
-command = "herdr plugin action invoke open-file-viewer-tab --plugin herdr-file-viewer"
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer (tab)"
