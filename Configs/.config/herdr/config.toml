@@ -279,10 +279,16 @@ command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
 
 [[keys.command]]
+key = "prefix+="
+type = "pane"
+command = "yazi"
+description = "open yazi file explorer"
+
+[[keys.command]]
 key = "prefix+o"
-type = "plugin_action"
-command = "ray.file-explorer.open"
-description = "open file explorer"
+type = "pane"
+command = "yazi"
+description = "open yazi file explorer"
 
 [[keys.command]]
 key = "prefix+f"
