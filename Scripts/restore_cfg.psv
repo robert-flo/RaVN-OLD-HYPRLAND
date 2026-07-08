@@ -77,7 +77,7 @@ O|${HOME}/.local/share|wallbash|bash imagemagick
 S|${HOME}/.config|git|git
 S|${HOME}/.config|lazygit|lazygit
 P|${HOME}/.config/hunk|config.toml|hunk-bin
-O|${HOME}/.local/bin|git-bare-clone git-create-worktree git-issue-worktree git-setup global_fn.sh|git
+O|${HOME}/.local/bin|git-bare-clone git-create-worktree git-issue-worktree git-setup ravn-dot global_fn.sh|git
 
  Editor 
 P|${HOME}/.config/Code - OSS/User|settings.json|code
