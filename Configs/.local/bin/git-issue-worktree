@@ -11,74 +11,97 @@
 # │              Link GitHub issue to a new git worktree                        │
 # │                                                                              │
 # ╰──────────────────────────────────────────────────────────────────────────────╯
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║                      git-issue-worktree — Documentación                    ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+# # DESCRIPCIÓN
+# Crea un worktree vinculado a un issue de GitHub. Usa la GitHub CLI (gh) para
+# obtener el título del issue y delega la creación del worktree a
+# git-create-worktree. El branch se nombra como <prefijo>issue/<num>-<slug>.
+#
+# # USO BÁSICO
+#   git-issue-worktree <issue> <slug>
+#
+# # FLUJO COMPLETO
+#   1. Verifica gh + git instalados y autenticados
+#   2. Busca el issue en GitHub por número
+#   3. Delega en git-create-worktree con branch = <prefijo>issue/<num>-<slug>
+#   4. Muestra comandos siguientes: cd, commit, gh pr create
+#
+# # EJEMPLOS
+#
+#   ## Issue básico
+#   cd ~/Work/RaVN/dev
+#   git-issue-worktree 42 fix-dark-mode
+#   # → Busca issue #42, crea branch "robert-flo/issue/42-fix-dark-mode"
+#   # → Worktree en ~/Work/RaVN/42-fix-dark-mode/
+#   # → Muestra comando para gh pr create
+#
+#   ## Issue desde otro directorio
+#   git-issue-worktree -r ~/Work/RaVN/dev 15 auth
+#   # → Busca issue #15 del repo en ~/Work/RaVN/dev
+#
+#   ## Con base custom (no main)
+#   git-issue-worktree -B origin/dev 33 refactor
+#   # → Branch desde origin/dev en vez de origin/main
+#
+#   ## Con prefijo custom
+#   git-issue-worktree -p "hotfix/" 8 login-crash
+#   # → Branch "hotfix/issue/8-login-crash"
+#
+# # COMBINACIONES
+#
+#   | Modo                                    | Comando                                              | Resultado                                             |
+#   |-----------------------------------------|------------------------------------------------------|-------------------------------------------------------|
+#   | Básico (CWD)                            | git-issue-worktree 42 fix-login                      | Crea robert-flo/issue/42-fix-login ← origin/main     |
+#   | Especificando repo                      | git-issue-worktree -r ~/Work/Other 7 add-docs        | Worktree en ~/Work/Other/7-add-docs/                  |
+#   | Base custom                             | git-issue-worktree -B origin/dev 15 theme            | Branch desde origin/dev                               |
+#   | Prefijo custom                          | git-issue-worktree -p "bug/" 3 memory-leak           | Branch "bug/issue/3-memory-leak"                      |
+#   | Flujo completo                          | git-issue-worktree 22 api-endpoint                   | + muestra gh pr create --body "Closes #22"            |
+#   | Verbose                                 | git-issue-worktree -v 10 refactor                    | Debug de cada paso                                    |
 
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
+
+#--------------------------------#
+# import variables and functions #
+#--------------------------------#
+# Establece el directorio de trabajo del script e importa variables y funciones globales
+# desde global_fn.sh. Si no se puede cargar el archivo, el script termina con error.
+scrDir="$(dirname "$(realpath "$0")")"
+# shellcheck disable=SC1091
+if ! source "${scrDir}/global_fn.sh"; then
+  echo "Error: unable to source global_fn.sh..."
+  exit 1
+fi
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Configuration                                                                │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 # shellcheck disable=SC2034
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd -P)
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 script_name=$(basename "${BASH_SOURCE[0]}")
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
-# │ Colors & Styling                                                             │
+# │ Specific Icons                                                               │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[0;33m'
-readonly BLUE='\033[0;34m'
-readonly MAGENTA='\033[0;35m'
-readonly CYAN='\033[0;36m'
-readonly WHITE='\033[1;37m'
-readonly GRAY='\033[0;90m'
-readonly NC='\033[0m'
-
-# Nerd Font Icons
-readonly ICON_CHECK=""
-readonly ICON_CROSS=""
-readonly ICON_ARROW=""
-readonly ICON_WARN=""
-readonly ICON_INFO=""
-readonly ICON_BRANCH=""
+readonly ICON_BRANCH="󰘾"
 readonly ICON_FOLDER="󰉋"
-readonly ICON_ISSUE=""
-readonly ICON_ROCKET="󱓞"
-readonly ICON_GEAR="󰒓"
+readonly ICON_ISSUE=""
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Helper Functions                                                             │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-print_header() {
-    echo ""
-    echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
-    echo -e "${CYAN}│${NC}  ${WHITE}$1${NC}"
-    echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
-}
-
-print_section() {
-    echo ""
-    echo -e "${MAGENTA}  $1${NC}"
-    echo -e "${GRAY}  ──────────────────────────────────────────────────────────${NC}"
-}
-
-print_step()    { echo -e "  ${GRAY}${ICON_ARROW}${NC} $1"; }
-print_success() { echo -e "  ${GREEN}${ICON_CHECK}${NC} $1"; }
-print_error()   { echo -e "  ${RED}${ICON_CROSS}${NC} $1" >&2; }
-print_warn()    { echo -e "  ${YELLOW}${ICON_WARN}${NC} $1"; }
-print_info()    { echo -e "  ${BLUE}${ICON_INFO}${NC} $1"; }
-
 die() {
-    print_error "$1"
-    exit "${2-1}"
+  print_error "$1"
+  exit "${2-1}"
 }
 
 cleanup() {
-    trap - SIGINT SIGTERM ERR EXIT
+  trap - SIGINT SIGTERM ERR EXIT
 }
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -86,29 +109,29 @@ cleanup() {
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 usage() {
-    echo ""
-    echo -e "${WHITE}Usage:${NC} $script_name ${GRAY}[-h] [-v] [-r <repo>] [-B <base>] [-p <prefix>]${NC} ${CYAN}<issue> <slug>${NC}"
-    echo ""
-    echo -e "  Link a GitHub issue to a new git worktree."
-    echo ""
-    echo -e "${WHITE}Arguments:${NC}"
-    echo -e "  ${CYAN}<issue>${NC}                GitHub issue number (e.g., 1, 42)"
-    echo -e "  ${CYAN}<slug>${NC}                 Short description (e.g., base-snapshot, login-fix)"
-    echo ""
-    echo -e "${WHITE}Options:${NC}"
-    echo -e "  ${CYAN}-h, --help${NC}             Print this help and exit"
-    echo -e "  ${CYAN}-v, --verbose${NC}          Print script debug info"
-    echo -e "  ${CYAN}-r, --repo${NC}    ${GRAY}<path>${NC}    Repository root directory ${GRAY}(default: current directory)${NC}"
-    echo -e "  ${CYAN}-B, --base${NC}    ${GRAY}<branch>${NC}  Base branch for new worktree ${GRAY}(default: origin/main)${NC}"
-    echo -e "  ${CYAN}-p, --prefix${NC}  ${GRAY}<prefix>${NC}  Prefix for branch name ${GRAY}(default: <github.user>/)${NC}"
-    echo ""
-    echo -e "${WHITE}Steps performed:${NC}"
-    echo -e "  ${GRAY}1.${NC} Validate GitHub CLI is installed and authenticated"
-    echo -e "  ${GRAY}2.${NC} Fetch issue details from GitHub"
-    echo -e "  ${GRAY}3.${NC} Create worktree linked to issue"
-    echo -e "  ${GRAY}4.${NC} Display next steps for the user"
-    echo ""
-    exit 0
+  echo ""
+  echo -e "${WHITE}Usage:${NC} $script_name ${GRAY}[-h] [-v] [-r <repo>] [-B <base>] [-p <prefix>]${NC} ${CYAN}<issue> <slug>${NC}"
+  echo ""
+  echo -e "  Link a GitHub issue to a new git worktree."
+  echo ""
+  echo -e "${WHITE}Arguments:${NC}"
+  echo -e "  ${CYAN}<issue>${NC}                GitHub issue number (e.g., 1, 42)"
+  echo -e "  ${CYAN}<slug>${NC}                 Short description (e.g., base-snapshot, login-fix)"
+  echo ""
+  echo -e "${WHITE}Options:${NC}"
+  echo -e "  ${CYAN}-h, --help${NC}             Print this help and exit"
+  echo -e "  ${CYAN}-v, --verbose${NC}          Print script debug info"
+  echo -e "  ${CYAN}-r, --repo${NC}    ${GRAY}<path>${NC}    Repository root directory ${GRAY}(default: current directory)${NC}"
+  echo -e "  ${CYAN}-B, --base${NC}    ${GRAY}<branch>${NC}  Base branch for new worktree ${GRAY}(default: origin/main)${NC}"
+  echo -e "  ${CYAN}-p, --prefix${NC}  ${GRAY}<prefix>${NC}  Prefix for branch name ${GRAY}(default: <github.user>/)${NC}"
+  echo ""
+  echo -e "${WHITE}Steps performed:${NC}"
+  echo -e "  ${GRAY}1.${NC} Validate GitHub CLI is installed and authenticated"
+  echo -e "  ${GRAY}2.${NC} Fetch issue details from GitHub"
+  echo -e "  ${GRAY}3.${NC} Create worktree linked to issue"
+  echo -e "  ${GRAY}4.${NC} Display next steps for the user"
+  echo ""
+  exit 0
 }
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -116,47 +139,47 @@ usage() {
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 parse_params() {
-    prefix=""
-    base='origin/main'
-    repo_dir=''
-    issue_num=''
-    slug=''
+  prefix=""
+  base='origin/main'
+  repo_dir=''
+  issue_num=''
+  slug=''
 
-    while :; do
-        case "${1-}" in
-        -h | --help)     usage ;;
-        -v | --verbose)  set -x ;;
-        --no-color)      : ;;
-        -r | --repo)
-            repo_dir="${2-}"
-            shift
-            ;;
-        -B | --base)
-            base="${2-}"
-            shift
-            ;;
-        -p | --prefix)
-            prefix="${2-}"
-            shift
-            ;;
-        -?*) die "Unknown option: $1" ;;
-        *)   break ;;
+  while :; do
+    case "${1-}" in
+    -h | --help) usage ;;
+    -v | --verbose) set -x ;;
+    --no-color) : ;;
+    -r | --repo)
+      repo_dir="${2-}"
+      shift
+      ;;
+    -B | --base)
+      base="${2-}"
+      shift
+      ;;
+    -p | --prefix)
+      prefix="${2-}"
+      shift
+      ;;
+    -?*) die "Unknown option: $1" ;;
+    *) break ;;
     esac
-        shift
+    shift
   done
 
-    args=("$@")
-    ((${#args[@]} < 2))   && usage
+  args=("$@")
+  ((${#args[@]} < 2)) && usage
 
-    issue_num="${args[0]}"
-    slug="${args[1]}"
+  issue_num="${args[0]}"
+  slug="${args[1]}"
 
-    # Validate issue_num is numeric
-    if ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
-        die "Invalid issue number: ${CYAN}$issue_num${NC}. Must be numeric."
+  # Validate issue_num is numeric
+  if ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
+    die "Invalid issue number: ${CYAN}$issue_num${NC}. Must be numeric."
   fi
 
-    return 0
+  return 0
 }
 
 parse_params "$@"
@@ -169,20 +192,20 @@ print_header "${ICON_ISSUE} $script_name"
 
 # Check if GitHub CLI is installed
 print_section "${ICON_GEAR} [1/4] Checking dependencies"
-if ! command -v gh &> /dev/null; then
-    die "GitHub CLI (${CYAN}gh${NC}) is not installed or not in PATH. Install it from: https://cli.github.com"
+if ! command -v gh &>/dev/null; then
+  die "GitHub CLI (${CYAN}gh${NC}) is not installed or not in PATH. Install it from: https://cli.github.com"
 fi
 print_success "GitHub CLI found"
 
 # Check if git is installed
-if ! command -v git &> /dev/null; then
-    die "Git is not installed or not in PATH"
+if ! command -v git &>/dev/null; then
+  die "Git is not installed or not in PATH"
 fi
 print_success "Git found"
 
 # Check if git-create-worktree script exists
 if [[ ! -f "$script_dir/git-create-worktree" ]]; then
-    die "git-create-worktree script not found at ${GRAY}$script_dir/git-create-worktree${NC}"
+  die "git-create-worktree script not found at ${GRAY}$script_dir/git-create-worktree${NC}"
 fi
 print_success "git-create-worktree found"
 
@@ -197,8 +220,8 @@ else
 fi
 
 # Verify we're in a git repository
-if ! git rev-parse --git-dir > /dev/null 2>&1; then
-    die "Not a git repository. Use ${CYAN}-r, --repo${NC} to specify the repository path."
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  die "Not a git repository. Use ${CYAN}-r, --repo${NC} to specify the repository path."
 fi
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -208,8 +231,8 @@ fi
 print_section "${ICON_ISSUE} [2/4] Fetching issue #$issue_num from GitHub"
 
 # Try to get issue information
-issue_data=$(gh issue view "$issue_num" --json "number,title,state" 2> /dev/null) || {
-    die "Could not fetch issue #${CYAN}$issue_num${NC}. Does it exist? (Check your repo context with ${CYAN}gh repo set-default${NC})"
+issue_data=$(gh issue view "$issue_num" --json "number,title,state" 2>/dev/null) || {
+  die "Could not fetch issue #${CYAN}$issue_num${NC}. Does it exist? (Check your repo context with ${CYAN}gh repo set-default${NC})"
 }
 
 # Parse issue data
@@ -234,11 +257,11 @@ print_info "Slug:   ${CYAN}$slug${NC}"
 
 # Call git-create-worktree script
 "$script_dir/git-create-worktree" \
-    -r "$repo_dir" \
-    -B "$base" \
-    -b "$branch_name" \
-    -p "" \
-    "$worktree_name" || die "Failed to create worktree"
+  -r "$repo_dir" \
+  -B "$base" \
+  -b "$branch_name" \
+  -p "" \
+  "$worktree_name" || die "Failed to create worktree"
 
 # Construct the full path to the worktree
 # repo_dir is like ~/Work/fake/dev, we go up one level to ~/Work/fake/
