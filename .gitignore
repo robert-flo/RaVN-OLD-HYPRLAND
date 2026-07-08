@@ -106,3 +106,5 @@ zig-out/
 
 # Julia
 julia-*/
+/.commandcode/taste
+/.openclaude
