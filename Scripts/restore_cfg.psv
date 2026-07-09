@@ -202,3 +202,6 @@ S|${HOME}/.config|fontconfig|noto-fonts-emoji
  Antigravity IDE 
 P|${HOME}/.gemini/antigravity-cli|settings.json|git
 
+#
+#  System Monitor 
+O|${HOME}/.local/bin|top-why|python
