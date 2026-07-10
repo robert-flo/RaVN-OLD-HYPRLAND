@@ -266,6 +266,7 @@ pane_history = false
 
 ##########################################################################
 
+# herdr plugin install cloudmanic/herdr-plus
 [[keys.command]]
 key = "prefix+up"
 type = "plugin_action"
@@ -278,38 +279,16 @@ type = "plugin_action"
 command = "cloudmanic.herdr-plus.quick-actions"
 description = "herdr-plus: quick actions"
 
+# herdr plugin install robert-flo/herdr-terminal-file-manager
 [[keys.command]]
-key = "prefix+="
-type = "pane"
-command = "yazi"
-description = "open yazi file explorer"
-
-[[keys.command]]
-key = "prefix+o"
-type = "pane"
-command = "yazi"
-description = "open yazi file explorer"
-
-[[keys.command]]
-key = "prefix+f"
+key = "prefix+y"
 type = "plugin_action"
-command = "herdr-file-viewer.open-file-viewer"
-description = "open file viewer (split)"
+command = "robert-flo.elio.open"
+description = "open file explorer"
 
 [[keys.command]]
-key = "prefix+shift+f"
+key = "prefix+Y"
 type = "plugin_action"
-command = "herdr-file-viewer.open-file-viewer-tab"
-description = "open file viewer (tab)"
+command = "robert-flo.elio.open-tab"
+description = "open file explorer in a new tab"
 
-[[keys.command]]
-key = "prefix+shift+up"
-type = "plugin_action"
-command = "sessionizer.open"
-description = "open project workspace"
-
-[[keys.command]]
-key = "prefix+shift+down"
-type = "plugin_action"
-command = "sessionizer.worktree-open"
-description = "open worktree workspace"
