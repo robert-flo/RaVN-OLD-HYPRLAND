@@ -1,20 +1,52 @@
 {
-  // ──── Editor ────────────────────────────────────────────────
-  "editor.renderWhitespace": "trailing",
-  "editor.formatOnSave": true,
+  // ──── Workbench ────────────────────────────────────────────
+  "workbench.colorTheme": "One Dark Pro Flat",
+  "workbench.iconTheme": "flow-dim",
+  "flow-icons.licenseKey": "",
+  "workbench.activityBar.location": "top",
+  "workbench.sideBar.location": "right",
+  "workbench.statusBar.visible": false,
+  "window.menuBarVisibility": "toggle",
+  "window.customTitleBarVisibility": "auto",
 
-  // ──── Shell: Formatter (shfmt) ──────────────────────────────
+  // ──── Editor ───────────────────────────────────────────────
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.fontFamily": "'JetbrainsMono Nerd Font','Maple Mono', monospace",
+  "editor.fontSize": 12,
+  "editor.fontLigatures": true,
+  "editor.minimap.side": "left",
+  "editor.renderWhitespace": "trailing",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.scrollbar.verticalScrollbarSize": 0,
+
+  // ──── Language-specific formatters ─────────────────────────
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": true
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ──── Shell: formatter ─────────────────────────────────────
   "shellformat.path": "shfmt",
   "shellformat.flag": "-i 2 -sr -kp -ci",
-  "shellformat.effectLanguages": [
-    "shellscript"
-  ],
+  "shellformat.effectLanguages": ["shellscript"],
 
-  // ──── Shell: Linter (shellcheck) ────────────────────────────
+  // ──── Shell: linter ────────────────────────────────────────
   "shellcheck.enable": true,
   "shellcheck.run": "onType",
   "shellcheck.executablePath": "/usr/bin/shellcheck",
@@ -34,5 +66,34 @@
     "**/Scripts/restore_cfg.sh": true,
     "**/Scripts/restore_shl.sh": true,
     "**/Scripts/uninstall.sh": true
-  }
+  },
+
+  // ──── Terminal ─────────────────────────────────────────────
+  "terminal.integrated.fontFamily": "JetBrainsMonoNL NF",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.external.linuxExec": "kitty",
+  "terminal.explorerKind": "both",
+  "terminal.sourceControlRepositoriesKind": "both",
+
+  // ──── Git ──────────────────────────────────────────────────
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "gitlens.ai.model": "gitkraken",
+  "gitlens.ai.gitkraken.model": "gemini:gemini-2.5-flash",
+
+  // ──── JavaScript / TypeScript ──────────────────────────────
+  "js/ts.suggest.autoImports": true,
+
+  // ──── Security, privacy, and extensions ────────────────────
+  "security.workspace.trust.untrustedFiles": "newWindow",
+  "security.workspace.trust.startupPrompt": "never",
+  "security.workspace.trust.enabled": false,
+  "telemetry.telemetryLevel": "off",
+  "extensions.autoUpdate": "off",
+
+  // ──── Tasks and chat ───────────────────────────────────────
+  "task.allowAutomaticTasks": "on",
+  "chat.tips.enabled": false
 }
