@@ -184,6 +184,7 @@ S|${HOME}/.config|wlogout|wlogout
 S|${HOME}/.config|elephant|hyprland
 S|${HOME}/.config|omarchy|hyprland
 S|${HOME}/.config|walker|hyprland
+O|${HOME}/.config|elio|elio
 
  Lock Screen 
 S|${HOME}/.config|swaylock|swaylock-effects

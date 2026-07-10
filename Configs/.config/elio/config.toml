@@ -1,0 +1,107 @@
+ [places]
+ show_devices = true
+ entries = [
+   "home",
+   "desktop",
+   "documents",
+   { builtin = "downloads", icon = "" },
+   "pictures",
+   "music",
+   "videos",
+   "root",
+   { title = "Projects", path = "~/Work", icon = "󰚝" },
+   "trash",
+ ]
+
+[goto]
+entries = [
+   "top",
+   "home",
+   "config",
+   { title = "Work", path = "~/Work/", key = "w" },
+   { title = "HyDE", path = "~/Work/HyDE/master", key = "H" },
+   { title = "RaVN", path = "~/Work/Ravn/dev", key = "r" },
+   { title = "Ivar", path = "~/Work/Ivar/dev", key = "i" },
+   { title = "Rollo", path = "~/Work/Rollo/dev", key = "R" },
+   { builtin = "downloads", key = "D" },
+   "trash",
+]
+
+[layout.panes]
+places = 0
+files = 40
+preview = 60
+
+# Rebind browser action keys. Each value may be a single key, a list, or [].
+#
+# Keys may be one-character strings, named keys, or modifier bindings.
+# Supported named keys: "left", "right", "up", "down", "enter", "space",
+# "tab", "backtab", "shift+tab", "backspace", "delete", "del", "pageup",
+# "pagedown", "home", "end", "f1".."f12".
+# Named keys and modifiers are case-insensitive: "F2", "PageUp", "Ctrl+O".
+#
+# Examples: open_with = ["O", "w"], open = "ctrl+o", nav_right = "shift+right".
+# For shifted letters, use uppercase characters: "O", not "shift+o".
+#
+# Setting a key replaces that action's full default list, not just one entry.
+# Example: nav_down = "j" removes the default "down" arrow binding.
+#
+# Use [] to unbind an action.
+# Example: nav_right = [] frees "l" and "right".
+# Then open_or_enter = ["enter", "l", "right"] can use them.
+#
+# In chooser mode (--chooser-file), choose takes priority over normal actions
+# that use the same key.
+#
+# Reserved bare keys: ? + =
+# Reserved shortcuts: Ctrl+C, Ctrl+Plus/Minus
+# Omit any key to keep the built-in default shown in the comment.
+#
+# [keys]
+# nav_left             = ["h", "left"]
+# nav_down             = ["j", "down"]
+# nav_up               = ["k", "up"]
+# nav_right            = ["l", "right"]
+# quit                 = "q"
+# quit_without_cd      = "Q"
+# yank                 = "y"
+# cut                  = "x"
+# paste                = "p"
+# extract_archive      = "e"
+# create_archive       = "C"
+# symlink_absolute     = "-"
+# symlink_relative     = "_"
+# trash                = ["d", "del"]
+# delete_permanently   = ["D", "shift+del"]
+# create               = "a"
+# rename               = ["r", "F2"]
+# restore_from_trash   = "r"
+# copy_path            = "c"
+# search_folders       = "f"
+# search_files         = "ctrl+f"
+# zoxide               = "z"
+# shell                = "!"
+# open                 = "o"
+# open_with            = "O"
+# open_or_enter        = "enter"
+# choose               = "enter"  # confirm chooser selection
+# go_to                = "g"
+# filter_directory     = "/"
+# toggle_selection     = "space"
+# cycle_places_next    = "tab"
+# cycle_places_previous = "backtab"
+# go_parent            = "backspace"
+# page_up              = "pageup"
+# page_down            = "pagedown"
+# jump_first           = "home"
+# jump_last            = ["G", "end"]
+# select_all           = "ctrl+a"
+# history_back         = "alt+left"
+# history_forward      = "alt+right"
+# sort                 = "s"
+# toggle_view          = "v"
+# toggle_hidden        = "."
+# scroll_preview_up    = ["K", "["]   # Shift+K, [
+# scroll_preview_down  = ["J", "]"]   # Shift+J, ]
+# scroll_preview_left  = "H"           # Shift+H
+# scroll_preview_right = "L"           # Shift+L
