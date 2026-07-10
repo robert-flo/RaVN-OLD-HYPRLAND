@@ -33,7 +33,6 @@ __pycache__/
 Thumbs.db
 
 # Editors
-.vscode/
 .idea/
 
 # Coverage reports
@@ -106,5 +105,5 @@ zig-out/
 
 # Julia
 julia-*/
-/.commandcode/taste
+
 /.openclaude
