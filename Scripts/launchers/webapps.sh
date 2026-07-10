@@ -5,6 +5,7 @@
 ravn_webapp_install 'Basecamp' 'https://launchpad.37signals.com' 'Basecamp.png'
 ravn_webapp_install 'Canva ai' 'https://www.canva.com/?success=true&continue_in_browser=true' 'Canva ai.png'
 ravn_webapp_install 'ChatGPT' 'https://chatgpt.com/' 'ChatGPT.png'
+ravn_webapp_install 'ChatGPT Codex Cloud' 'https://chatgpt.com/codex/cloud' 'ChatGPT.png'
 ravn_webapp_install 'Claro Video' 'https://www.clarovideo.com/elsalvador/homeuser' 'Claro Video.png'
 ravn_webapp_install 'Claude AI' 'https://claude.ai/new' 'Claude AI.png'
 ravn_webapp_install 'Deepseek ai' 'https://chat.deepseek.com/' 'Deepseek ai.png'
