@@ -3,7 +3,11 @@ group = "Rollo"
 working_dir = "~/Work/Rollo/dev"
 
 [[tabs]]
-name = "opencode"
+name = "Codex"
+command = "codex --dangerously-bypass-approvals-and-sandbox"
+
+[[tabs]]
+name = "Opencode"
 command = "opencode"
 
 [[tabs]]

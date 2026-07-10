@@ -3,7 +3,11 @@ group = "Ivar"
 working_dir = "~/Work/Ivar/dev"
 
 [[tabs]]
-name = "opencode"
+name = "Codex"
+command = "codex --dangerously-bypass-approvals-and-sandbox"
+
+[[tabs]]
+name = "Opencode"
 command = "opencode"
 
 [[tabs]]

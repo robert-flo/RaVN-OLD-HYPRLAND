@@ -3,7 +3,11 @@ group = "RaVN"
 working_dir = "~/Work/RaVN/dev"
 
 [[tabs]]
-name = "opencode"
+name = "Codex"
+command = "codex --dangerously-bypass-approvals-and-sandbox"
+
+[[tabs]]
+name = "Opencode"
 command = "opencode"
 
 [[tabs]]

@@ -2,7 +2,11 @@ name = "herdr-terminal-file-manager"
 working_dir = "~/Work/herdr-terminal-file-manager"
 
 [[tabs]]
-name = "opencode"
+name = "Codex"
+command = "codex --dangerously-bypass-approvals-and-sandbox"
+
+[[tabs]]
+name = "Opencode"
 command = "opencode"
 
 [[tabs]]

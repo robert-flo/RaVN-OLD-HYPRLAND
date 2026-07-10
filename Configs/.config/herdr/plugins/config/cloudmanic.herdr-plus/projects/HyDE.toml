@@ -2,7 +2,11 @@ name = "HyDE"
 working_dir = "~/Work/HyDE"
 
 [[tabs]]
-name = "opencode"
+name = "Codex"
+command = "codex --dangerously-bypass-approvals-and-sandbox"
+
+[[tabs]]
+name = "Opencode"
 command = "opencode"
 
 [[tabs]]
