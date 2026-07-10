@@ -1,0 +1,19 @@
+name = "Ivar master"
+group = "Ivar"
+working_dir = "~/Work/Ivar/master"
+
+[[tabs]]
+name = "opencode"
+command = "opencode"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"
+
+[[tabs]]
+name = "neovim"
+command = "nvim"
+
+[[tabs]]
+name = "elio"
+command = "elio"

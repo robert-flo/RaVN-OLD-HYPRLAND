@@ -88,6 +88,7 @@ S|${HOME}/.config|neovide|neovide
 P|${HOME}/.config/zed|settings.json|zed
 P|${HOME}/.config/herdr|config.toml|herdr
 P|${HOME}/.config/herdr/plugins/config/sessionizer|config.toml|herdr
+P|${HOME}/.config/herdr/plugins/config|cloudmanic.herdr-plus|herdr
 P|${HOME}/.config/helix|config.toml languages.toml|helix
 S|${HOME}/.config|emacs|emacs-wayland
 

@@ -1,0 +1,18 @@
+name = "herdr-terminal-file-manager"
+working_dir = "~/Work/herdr-terminal-file-manager"
+
+[[tabs]]
+name = "opencode"
+command = "opencode"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"
+
+[[tabs]]
+name = "neovim"
+command = "nvim"
+
+[[tabs]]
+name = "elio"
+command = "elio"

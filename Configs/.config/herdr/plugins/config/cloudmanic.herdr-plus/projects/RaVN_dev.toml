@@ -1,0 +1,19 @@
+name = "RaVN dev"
+group = "RaVN"
+working_dir = "~/Work/RaVN/dev"
+
+[[tabs]]
+name = "opencode"
+command = "opencode"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"
+
+[[tabs]]
+name = "neovim"
+command = "nvim"
+
+[[tabs]]
+name = "elio"
+command = "elio"

@@ -1,0 +1,19 @@
+name = "Rollo master"
+group = "Rollo"
+working_dir = "~/Work/Rollo/master"
+
+[[tabs]]
+name = "opencode"
+command = "opencode"
+
+[[tabs]]
+name = "lazygit"
+command = "lazygit"
+
+[[tabs]]
+name = "neovim"
+command = "nvim"
+
+[[tabs]]
+name = "elio"
+command = "elio"
