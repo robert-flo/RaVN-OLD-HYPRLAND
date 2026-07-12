@@ -1,19 +1,87 @@
 #!/usr/bin/env bash
-#|---/ /+------------------+---/ /|#
-#|--/ /-| Global functions |--/ /-|#
-#|-/ /--| Roberto Flores   |-/ /--|#
-#|/ /---+------------------+/ /---|#
 
-set -e
+# Prevent duplicate loading when this library is sourced more than once.
+if [[ ${_GLOBAL_FN_SOURCED:-0} -eq 1 ]]; then
+  # shellcheck disable=SC2317
+  return 0 2> /dev/null || exit 0
+fi
+readonly _GLOBAL_FN_SOURCED=1
 
-scrDir="$(dirname "$(realpath "$0")")"
-cloneDir="$(dirname "${scrDir}")" # fallback, we will use CLONE_DIR now
-cloneDir="${CLONE_DIR:-${cloneDir}}"
+# ╭──────────────────────────────────────────────────────────────────────────────╮
+# │                                                                              │
+# │                        Global Functions & Variables                          │
+# │                         Reusable Shell Script Utils                          │
+# │                                                                              │
+# ╰──────────────────────────────────────────────────────────────────────────────╯
+
+# shellcheck disable=SC2034
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Colors & Styling                                                             │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
+# Colors and icons use a terminal-friendly presentation by default. Disable
+# styling automatically for pipes, Docker/CI output, dumb terminals, or when
+# the caller explicitly requests the NO_COLOR convention.
+if [[ -t 1 && ${TERM:-dumb} != "dumb" && -z ${NO_COLOR:-} ]]; then
+  readonly RED=$'\033[0;31m'
+  readonly GREEN=$'\033[0;32m'
+  readonly YELLOW=$'\033[0;33m'
+  readonly BLUE=$'\033[0;34m'
+  readonly MAGENTA=$'\033[0;35m'
+  readonly CYAN=$'\033[0;36m'
+  readonly WHITE=$'\033[1;37m'
+  readonly GRAY=$'\033[0;90m'
+  readonly NC=$'\033[0m'
+  readonly ICON_CHECK="✓"
+  readonly ICON_CROSS="✗"
+  readonly ICON_ARROW="→"
+  readonly ICON_WARN="⚠"
+  readonly ICON_INFO="ℹ"
+else
+  readonly RED=""
+  readonly GREEN=""
+  readonly YELLOW=""
+  readonly BLUE=""
+  readonly MAGENTA=""
+  readonly CYAN=""
+  readonly WHITE=""
+  readonly GRAY=""
+  readonly NC=""
+  readonly ICON_CHECK="[OK]"
+  readonly ICON_CROSS="[ERROR]"
+  readonly ICON_ARROW=">"
+  readonly ICON_WARN="[WARN]"
+  readonly ICON_INFO="[INFO]"
+fi
+
+# These are retained as public constants; they are not rendered in logs.
+# shellcheck disable=SC2034
+readonly ICON_KEY="[KEY]"
+# shellcheck disable=SC2034
+readonly ICON_LOCK="[LOCK]"
+# shellcheck disable=SC2034
+readonly ICON_GIT="[GIT]"
+# shellcheck disable=SC2034
+readonly ICON_GITHUB="[GITHUB]"
+# shellcheck disable=SC2034
+readonly ICON_GEAR="[GEAR]"
+# shellcheck disable=SC2034
+readonly ICON_ROCKET="[ROCKET]"
+# shellcheck disable=SC2034
+readonly ICON_PACKAGE="[PACKAGE]"
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Global Variables                                                             │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
+scrDir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+cloneDir="${CLONE_DIR:-$(dirname "$scrDir")}"
 confDir="${XDG_CONFIG_HOME:-$HOME/.config}"
 cacheDir="${XDG_CACHE_HOME:-$HOME/.cache}/ravn"
 aurList=("yay" "paru")
 shlList=("zsh" "fish")
-pacmanCmd=${cloneDir}/Configs/.local/lib/hyde/pm.sh
+pacmanCmd="${cloneDir}/Configs/.local/lib/hyde/pm.sh"
 
 export cloneDir
 export confDir
@@ -21,337 +89,364 @@ export cacheDir
 export aurList
 export shlList
 
-# Verifica si un paquete específico está instalado en el sistema usando pacman.
-# Parámetros:
-#   $1 : Nombre del paquete a comprobar (PkgIn).
-# Retorno:
-#   Retorna 0 si el paquete está instalado en el sistema, o 1 en caso contrario.
-pkg_installed() {
-  local PkgIn=$1
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Package Management                                                           │
+# └──────────────────────────────────────────────────────────────────────────────┘
 
-  if pacman -Q "${PkgIn}" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+pkg_installed() {
+  local package_name="$1"
+
+  pacman -Q "$package_name" &> /dev/null
 }
 
-# Busca cuál de los paquetes de una lista está instalado en el sistema.
-# Parámetros:
-#   $1    : Nombre de la variable dinámica a la que se le asignará el paquete encontrado.
-#   $2... : Lista de nombres de paquetes a verificar.
-# Funcionamiento:
-#   Itera sobre la lista de paquetes provistos. Si detecta que alguno está instalado (mediante
-#   pkg_installed), guarda el nombre del paquete en la variable dinámica especificada en el
-#   primer argumento, exporta dicha variable globalmente en el entorno y retorna 0.
-#   Si ninguno de los paquetes de la lista está instalado, retorna 1.
 chk_list() {
-  vrType="$1"
-  local inList=("${@:2}")
-  for pkg in "${inList[@]}"; do
-    if pkg_installed "${pkg}"; then
-      printf -v "${vrType}" "%s" "${pkg}"
-      # shellcheck disable=SC2163 # dynamic variable
-      export "${vrType}" # export the variable // reference of the variable
+  local variable_name="$1"
+  local package_name=""
+  local packages=("${@:2}")
+
+  for package_name in "${packages[@]}"; do
+    if pkg_installed "$package_name"; then
+      printf -v "$variable_name" '%s' "$package_name"
+      # shellcheck disable=SC2163 # Dynamic variable name is part of the public contract.
+      export "$variable_name"
       return 0
     fi
   done
-  # print_log -sec "install" -warn "no package found in the list..." "${inList[@]}"
+
   return 1
 }
 
 pkg_available() {
-  local PkgIn=$1
+  local package_name="$1"
 
-  if ${pacmanCmd} query "${PkgIn}" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+  "$pacmanCmd" query "$package_name" &> /dev/null
 }
 
 aur_available() {
-  local PkgIn=$1
+  local package_name="$1"
 
-  # shellcheck disable=SC2154
-  if ${pacmanCmd} info "${PkgIn}" &>/dev/null; then
-    return 0
-  else
-    return 1
-  fi
+  "$pacmanCmd" info "$package_name" &> /dev/null
 }
 
-# Detecta adaptadores de gráficos (GPU) de Nvidia en el sistema.
-# Opciones:
-#   --verbose : Imprime en consola todas las GPUs detectadas con su índice.
-#   --drivers : Mapea los códigos de GPU detectados contra la base de datos nvidia-db
-#               para sugerir/imprimir los controladores Nvidia correspondientes.
-#   Sin opción: Retorna 0 (éxito) si se detecta alguna GPU Nvidia, o 1 en caso contrario.
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Hardware Detection                                                           │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
 nvidia_detect() {
+  local gpu_name=""
+  local gpu_code=""
+  local index=""
+
   readarray -t dGPU < <(lspci -k | grep -E "(VGA|3D)" | awk -F ': ' '{print $NF}')
-  if [ "${1}" == "--verbose" ]; then
-    for indx in "${!dGPU[@]}"; do
-      echo -e "\033[0;32m[gpu$indx]\033[0m detected :: ${dGPU[indx]}"
-    done
-    return 0
-  fi
-  if [ "${1}" == "--drivers" ]; then
-    while read -r -d ' ' nvcode; do
-      awk -F '|' -v nvc="${nvcode}" 'substr(nvc,1,length($3)) == $3 {split(FILENAME,driver,"/"); print driver[length(driver)],"\nnvidia-utils"}' "${scrDir}"/nvidia-db/nvidia*dkms
-    done <<<"${dGPU[@]}"
-    return 0
-  fi
-  if grep -iq nvidia <<<"${dGPU[@]}"; then
-    return 0
-  else
-    return 1
-  fi
+
+  case "${1:-}" in
+    --verbose)
+      for index in "${!dGPU[@]}"; do
+        echo -e "${GREEN}[gpu${index}]${NC} detected :: ${dGPU[$index]}"
+      done
+      return 0
+      ;;
+    --drivers)
+      for gpu_name in "${dGPU[@]}"; do
+        gpu_code="${gpu_name%% *}"
+        awk -F '|' -v nvc="$gpu_code" 'substr(nvc, 1, length($3)) == $3 {split(FILENAME, driver, "/"); print driver[length(driver)], "\nnvidia-utils"}' "${scrDir}"/nvidia-db/nvidia*dkms
+      done
+      return 0
+      ;;
+  esac
+
+  grep -iq nvidia <<< "${dGPU[*]}"
 }
 
-# Temporizador interactivo para lecturas de teclado con cuenta regresiva.
-# Parámetros:
-#   $1 : Tiempo de espera máximo en segundos (timsec).
-#   $2 : Mensaje descriptivo a mostrar en la consola (msg).
-# Funcionamiento:
-#   Desactiva temporalmente el modo de salida por error (set +e) para evitar que falle el script
-#   en caso de timeout. Realiza una cuenta regresiva actualizando la línea actual en consola (\r).
-#   Si se pulsa cualquier tecla, detiene la espera inmediatamente. Finalmente exporta la variable
-#   PROMPT_INPUT con el carácter ingresado y reestablece el modo seguro (set -e).
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Interactive Utilities                                                        │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
 prompt_timer() {
-  set +e
+  local message="$2"
+  local prompt_input="/dev/stdin"
+  local remaining_seconds="$1"
+
   unset PROMPT_INPUT
-  local timsec=$1
-  local msg=$2
-  local use_tty=0
-  if [[ -t 0 ]] && { true </dev/tty; } 2>/dev/null; then
-    use_tty=1
+
+  if [[ -t 0 && -r /dev/tty ]]; then
+    prompt_input="/dev/tty"
   fi
-  while [[ ${timsec} -ge 0 ]]; do
-    echo -ne "\r :: ${msg} (${timsec}s) : "
-    if ((use_tty)); then
-      read -rt 1 -n 1 PROMPT_INPUT </dev/tty && break
-    else
-      read -rt 1 -n 1 PROMPT_INPUT && break
+
+  while ((remaining_seconds >= 0)); do
+    echo -ne "\r :: ${message} (${remaining_seconds}s) : "
+    if IFS= read -r -t 1 -n 1 PROMPT_INPUT < "$prompt_input"; then
+      break
     fi
-    ((timsec--))
+    ((remaining_seconds--))
   done
+
   export PROMPT_INPUT
   echo ""
-  set -e
 }
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Helper Functions                                                             │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
+# cleanup() - Generic cleanup function template
+# Each script should override this function to define its own cleanup logic.
+# The trap is set in each individual script because it depends on script-specific resources.
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  # Override this function in your script to add custom cleanup logic
+  # Example:
+  #   if [[ -f /tmp/my_temp_file ]]; then
+  #     rm -f /tmp/my_temp_file
+  #   fi
+}
+
+print_header() {
+  echo ""
+  echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
+  echo -e "${CYAN}│${NC}  ${WHITE}$1${NC}"
+  echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
+}
+
+print_section() {
+  echo ""
+  echo -e "${MAGENTA}  $1${NC}"
+  echo -e "${GRAY}  ──────────────────────────────────────────────────────────${NC}"
+}
+
+print_step() {
+  echo -e "  ${GRAY}${ICON_ARROW}${NC} $1"
+}
+
+print_success() {
+  echo -e "  ${GREEN}${ICON_CHECK}${NC} $1"
+}
+
+print_error() {
+  echo -e "  ${RED}${ICON_CROSS}${NC} $1"
+}
+
+print_warn() {
+  echo -e "  ${YELLOW}${ICON_WARN}${NC} $1"
+}
+
+print_info() {
+  echo -e "  ${BLUE}${ICON_INFO}${NC} $1"
+}
+
+command_exists() {
+  command -v "$1" > /dev/null 2>&1
+}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Console Output & Logging                                                     │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
+info() {
+  print_info "$*"
+}
+
+success() {
+  print_success "$*"
+}
+
+warn_msg() {
+  print_warn "$*" >&2
+}
+
+error_msg() {
+  print_error "$*" >&2
+}
+
+step() {
+  print_step "$*"
+}
+
 print_log() {
+  local color=""
   local executable="${0##*/}"
-  local logFile="${cacheDir}/logs/${RAVN_LOG}/${executable}.log"
-  mkdir -p "$(dirname "${logFile}")"
-  local section=${log_section:-}
-  {
-    [ -n "${section}" ] && echo -ne "\e[32m[$section] \e[0m"
-    while (("$#")); do
-      case "$1" in
+  local log_file="${cacheDir}/logs/${RAVN_LOG:-}/${executable}.log"
+  local message=""
+  local section="${log_section:-}"
+
+  if [[ -n $section ]]; then
+    message+="${GREEN}[${section}] ${NC}"
+  fi
+
+  while (($#)); do
+    case "$1" in
       -r | +r)
-        echo -ne "\e[31m$2\e[0m"
+        message+="${RED}${2}${NC}"
         shift 2
-        ;; # Red
+        ;;
       -g | +g)
-        echo -ne "\e[32m$2\e[0m"
+        message+="${GREEN}${2}${NC}"
         shift 2
-        ;; # Green
+        ;;
       -y | +y)
-        echo -ne "\e[33m$2\e[0m"
+        message+="${YELLOW}${2}${NC}"
         shift 2
-        ;; # Yellow
+        ;;
       -b | +b)
-        echo -ne "\e[34m$2\e[0m"
+        message+="${BLUE}${2}${NC}"
         shift 2
-        ;; # Blue
+        ;;
       -m | +m)
-        echo -ne "\e[35m$2\e[0m"
+        message+="${MAGENTA}${2}${NC}"
         shift 2
-        ;; # Magenta
+        ;;
       -c | +c)
-        echo -ne "\e[36m$2\e[0m"
+        message+="${CYAN}${2}${NC}"
         shift 2
-        ;; # Cyan
+        ;;
       -wt | +w)
-        echo -ne "\e[37m$2\e[0m"
+        message+="${WHITE}${2}${NC}"
         shift 2
-        ;; # White
+        ;;
       -n | +n)
-        echo -ne "\e[96m$2\e[0m"
+        message+="\033[0;96m${2}${NC}"
         shift 2
-        ;; # Neon
+        ;;
       -stat)
-        echo -ne "\e[30;46m $2 \e[0m :: "
+        message+="\033[30;46m ${2} ${NC} :: "
         shift 2
-        ;; # status
+        ;;
       -crit)
-        echo -ne "\e[97;41m $2 \e[0m :: "
+        message+="\033[97;41m ${2} ${NC} :: "
         shift 2
-        ;; # critical
+        ;;
       -warn)
-        echo -ne "WARNING :: \e[30;43m $2 \e[0m :: "
+        message+="WARNING :: \033[30;43m ${2} ${NC} :: "
         shift 2
-        ;; # warning
+        ;;
       +)
-        echo -ne "\e[38;5;$2m$3\e[0m"
+        printf -v color '\033[38;5;%sm' "$2"
+        message+="${color}${3}${NC}"
         shift 3
-        ;; # Set color manually
+        ;;
       -sec)
-        echo -ne "\e[32m[$2] \e[0m"
+        message+="${GREEN}[${2}] ${NC}"
         shift 2
-        ;; # section use for logs
+        ;;
       -err)
-        echo -ne "ERROR :: \e[4;31m$2 \e[0m"
+        message+="ERROR :: \033[4;31m${2} ${NC}"
         shift 2
-        ;; #error
+        ;;
       *)
-        echo -ne "$1"
+        message+="$1"
         shift
         ;;
-      esac
-    done
-    echo ""
-  } | if [ -n "${RAVN_LOG}" ]; then
-    tee >(sed 's/\x1b\[[0-9;]*m//g' >>"${logFile}")
+    esac
+  done
+
+  message+="\n"
+  mkdir -p "$(dirname "$log_file")"
+
+  if [[ -n ${RAVN_LOG:-} ]]; then
+    printf '%b' "$message" | tee >(sed 's/\x1b\[[0-9;]*m//g' >> "$log_file")
   else
-    cat
+    printf '%b' "$message"
   fi
 }
 
-# ==============================================================================
-# Utilidades Profesionales de Instalación (Inspirado en Grok, Starship, Homebrew)
-# ==============================================================================
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Execution Helpers                                                            │
+# └──────────────────────────────────────────────────────────────────────────────┘
 
-# ─── Constantes de color con tput (degradación graceful) ─────────────────────
-# Usa tput para portabilidad; si no hay terminal, degrada a string vacío.
-# Referencia: https://github.com/starship/starship/blob/master/install/install.sh
-if [[ -t 1 ]]; then
-  _BOLD="$(tput bold 2>/dev/null || printf '')"
-  _DIM="$(tput dim 2>/dev/null || printf '')"
-  _UNDERLINE="$(tput smul 2>/dev/null || printf '')"
-  _RED="$(tput setaf 1 2>/dev/null || printf '')"
-  _GREEN="$(tput setaf 2 2>/dev/null || printf '')"
-  _YELLOW="$(tput setaf 3 2>/dev/null || printf '')"
-  _BLUE="$(tput setaf 4 2>/dev/null || printf '')"
-  _MAGENTA="$(tput setaf 5 2>/dev/null || printf '')"
-  _CYAN="$(tput setaf 6 2>/dev/null || printf '')"
-  _RESET="$(tput sgr0 2>/dev/null || printf '')"
-else
-  _BOLD="" _DIM="" _UNDERLINE="" _RED="" _GREEN="" _YELLOW=""
-  _BLUE="" _MAGENTA="" _CYAN="" _RESET=""
-fi
-
-# ─── Funciones de logging con iconos Unicode ─────────────────────────────────
-# Patrón Starship: funciones semánticas con indicadores visuales claros.
-info() { printf '%s\n' "  ${_BOLD}${_CYAN}▸${_RESET} $*"; }
-success() { printf '%s\n' "  ${_GREEN}✓${_RESET} $*"; }
-warn_msg() { printf '%s\n' "  ${_YELLOW}⚠${_RESET} $*" >&2; }
-error_msg() { printf '%s\n' "  ${_RED}✗${_RESET} $*" >&2; }
-step() { printf '%s\n' "${_BOLD}${_BLUE}==>${_RESET}${_BOLD} $*${_RESET}"; }
-
-# ─── Spinner animado con caracteres braille ──────────────────────────────────
-# Muestra una animación mientras un proceso se ejecuta en segundo plano.
-# Uso: long_command & spin $! "Mensaje de operación..."
-# Al terminar, muestra ✓ (éxito) o ✗ (fallo) según el exit code.
 spin() {
-  local pid=$1 msg="${2:-Working...}"
-  local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-  local i=0
+  local character=""
+  local exit_code=0
+  local index=0
+  local message="${2:-Working...}"
+  local pid="$1"
+  local spinner="⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
-  # Si no hay terminal interactiva, solo esperar sin animación
   if [[ ! -t 1 ]]; then
-    wait "$pid" 2>/dev/null
-    return $?
+    wait "$pid" || exit_code=$?
+    return "$exit_code"
   fi
 
-  # Ocultar cursor durante la animación
-  tput civis 2>/dev/null || true
+  tput civis 2> /dev/null || true
 
-  while kill -0 "$pid" 2>/dev/null; do
-    local char="${spinstr:$i:1}"
-    printf "\r  ${_CYAN}%s${_RESET} %s" "$char" "$msg"
-    i=$(((i + 1) % ${#spinstr}))
+  while kill -0 "$pid" 2> /dev/null; do
+    character="${spinner:$index:1}"
+    printf "\r  ${CYAN}%s${NC} %s" "$character" "$message"
+    index=$(((index + 1) % ${#spinner}))
     sleep 0.08
   done
 
-  # Restaurar cursor
-  tput cnorm 2>/dev/null || true
+  tput cnorm 2> /dev/null || true
+  wait "$pid" || exit_code=$?
 
-  wait "$pid" 2>/dev/null
-  local exit_code=$?
-
-  if [[ $exit_code -eq 0 ]]; then
-    printf "\r  ${_GREEN}✓${_RESET} %s\n" "$msg"
+  if ((exit_code == 0)); then
+    printf "\r  ${GREEN}${ICON_CHECK}${NC} %s\n" "$message"
   else
-    printf "\r  ${_RED}✗${_RESET} %s\n" "$msg"
+    printf "\r  ${RED}${ICON_CROSS}${NC} %s\n" "$message"
   fi
-  return $exit_code
+
+  return "$exit_code"
 }
 
-# ─── Ejecutar con indicador de estado ────────────────────────────────────────
-# Ejecuta un comando con spinner animado. Respeta el modo dry-run.
-# Si el comando usa sudo, pre-valida las credenciales antes de backgroundear
-# para evitar que el spinner sobreescriba el prompt de contraseña.
-# Uso: run_with_status "Sincronizando pacman" sudo pacman -Fy
 run_with_status() {
-  local msg="$1"
+  local message="$1"
   shift
 
-  if [[ ${flg_DryRun:-0} -eq 1 ]]; then
-    printf "  ${_YELLOW}⊘${_RESET} ${_DIM}%s (dry-run)${_RESET}\n" "$msg"
+  if ((${flg_DryRun:-0} == 1)); then
+    echo -e "  ${YELLOW}⊘${NC} ${message} (dry-run)"
     return 0
   fi
 
-  # Pre-cachar credenciales de sudo antes de backgroundear el proceso,
-  # para que el prompt de contraseña no pelee con el spinner.
-  if [[ "$1" == "sudo" ]]; then
-    sudo -v 2>/dev/null || true
+  if [[ ${1:-} == "sudo" ]]; then
+    sudo -v 2> /dev/null || true
   fi
 
-  "$@" &>/dev/null &
-  spin $! "$msg"
+  "$@" &> /dev/null &
+  spin "$!" "$message"
 }
 
-# ─── Retry con backoff exponencial ───────────────────────────────────────────
-# Patrón Homebrew: reintenta un comando N veces, duplicando la pausa cada vez.
-# Uso: retry 3 git clone https://github.com/...
 retry() {
-  local max_tries="$1" n="$1" pause=2
+  local max_tries="$1"
+  local pause_seconds=2
+  local remaining_tries="$1"
   shift
 
   if "$@"; then
     return 0
   fi
 
-  while ((--n > 0)); do
-    warn_msg "Reintentando en ${pause}s (${n} intentos restantes): $*"
-    sleep "$pause"
-    ((pause *= 2))
+  remaining_tries=$((remaining_tries - 1))
+  while ((remaining_tries > 0)); do
+    warn_msg "Reintentando en ${pause_seconds}s (${remaining_tries} intentos restantes): $*"
+    sleep "$pause_seconds"
+    pause_seconds=$((pause_seconds * 2))
+
     if "$@"; then
       return 0
     fi
+
+    remaining_tries=$((remaining_tries - 1))
   done
 
   error_msg "Falló después de ${max_tries} intentos: $*"
   return 1
 }
 
-# ─── Abstracción de descarga curl/wget ───────────────────────────────────────
-# Patrón Grok: detecta automáticamente el downloader disponible y abstrae
-# las diferencias de interfaz entre curl y wget.
-# Uso: download_file "https://url" "/path/to/output"
-#      download_file "https://url"  # stdout
-download_file() {
-  local url="$1" output="${2:-}"
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Download Helpers                                                             │
+# └──────────────────────────────────────────────────────────────────────────────┘
 
-  if command -v curl &>/dev/null; then
-    if [[ -n "$output" ]]; then
+download_file() {
+  local output="${2:-}"
+  local url="$1"
+
+  if command_exists curl; then
+    if [[ -n $output ]]; then
       curl -fsSL -o "$output" "$url"
     else
       curl -fsSL "$url"
     fi
-  elif command -v wget &>/dev/null; then
-    if [[ -n "$output" ]]; then
+  elif command_exists wget; then
+    if [[ -n $output ]]; then
       wget -q -O "$output" "$url"
     else
       wget -q -O - "$url"
@@ -362,59 +457,49 @@ download_file() {
   fi
 }
 
-# ─── Descarga silenciosa con spinner braille ─────────────────────────────────
-# Descarga un archivo desde una URL mostrando el spinner braille de estado.
-# Uso: download_with_spinner "https://url" "/path/to/output" ["Mensaje del spinner"]
-#
-# Ejemplos:
-#   # Uso estándar (mostrará "Descargando...")
-#   download_with_spinner "https://url-del-archivo" "/ruta/salida"
-#
-#   # Uso con mensaje personalizado
-#   download_with_spinner "https://url-del-archivo" "/ruta/salida" "Descargando recursos gráficos..."
 download_with_spinner() {
-  local url="$1" output="$2" msg="${3:-Descargando...}"
+  local message="${3:-Descargando...}"
+  local output="$2"
+  local url="$1"
 
-  download_file "$url" "$output" &>/dev/null &
-  spin $! "$msg"
+  download_file "$url" "$output" &> /dev/null &
+  spin "$!" "$message"
 }
 
-# ─── Clonar o actualizar un repositorio Git ──────────────────────────────────
-# Función genérica que unifica la lógica duplicada de clone/update.
-# Soporta: detección de repo existente, cambio de remote URL, retry automático.
-# Uso: clone_or_update_repo "NOMBRE" "user/repo" "/path/dest" "branch" [ssh]
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Repository Helpers                                                           │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
 clone_or_update_repo() {
+  local destination="$3"
   local name="$1"
-  local repo="$2"
-  local dest="$3"
+  local prefer_ssh="${5:-}"
   local ref="${4:-master}"
-  local prefer_ssh="${5:-}" # Pasa "ssh" para preferir SSH si hay llaves
+  local remote_url=""
+  local repository="$2"
 
-  local remote_url="https://github.com/${repo}.git"
+  remote_url="https://github.com/${repository}.git"
 
-  # Determinar URL de remote (SSH si se solicita y hay llaves autorizadas)
-  if [[ "$prefer_ssh" == "ssh" ]]; then
-    if { [[ -f "$HOME/.ssh/id_ed25519" ]] || [[ -f "$HOME/.ssh/id_rsa" ]]; } && ssh -T -o ConnectTimeout=3 -o BatchMode=yes git@github.com 2>&1 | grep -q "successfully authenticated"; then
-      remote_url="git@github.com:${repo}.git"
+  if [[ $prefer_ssh == "ssh" ]]; then
+    if { [[ -f $HOME/.ssh/id_ed25519 ]] || [[ -f $HOME/.ssh/id_rsa ]]; } && ssh -T -o ConnectTimeout=3 -o BatchMode=yes git@github.com 2>&1 | grep -q "successfully authenticated"; then
+      remote_url="git@github.com:${repository}.git"
       info "Llave SSH autorizada detectada. Usando protocolo SSH para ${name}."
-    else
-      if [[ -f "$HOME/.ssh/id_ed25519" || -f "$HOME/.ssh/id_rsa" ]]; then
-        warn_msg "Llave SSH detectada pero no autorizada en GitHub. Usando protocolo HTTPS para ${name}."
-      fi
+    elif [[ -f $HOME/.ssh/id_ed25519 || -f $HOME/.ssh/id_rsa ]]; then
+      warn_msg "Llave SSH detectada pero no autorizada en GitHub. Usando protocolo HTTPS para ${name}."
     fi
   fi
 
-  if [[ ${flg_DryRun:-0} -eq 1 ]]; then
-    printf "  ${_YELLOW}⊘${_RESET} ${_DIM}Clonar/actualizar ${name} (dry-run)${_RESET}\n"
+  if ((${flg_DryRun:-0} == 1)); then
+    echo -e "  ${YELLOW}⊘${NC} Clonar/actualizar ${name} (dry-run)"
     return 0
   fi
 
-  if [[ -d "${dest}/.git" ]]; then
+  if [[ -d $destination/.git ]]; then
     info "Actualizando ${name} existente..."
-    git -C "$dest" remote set-url origin "$remote_url" &>/dev/null || true
-    if retry 3 git -C "$dest" fetch origin "$ref" &>/dev/null &&
-      git -C "$dest" checkout "$ref" &>/dev/null &&
-      git -C "$dest" reset --hard "origin/${ref}" &>/dev/null; then
+    git -C "$destination" remote set-url origin "$remote_url" &> /dev/null || true
+    if retry 3 git -C "$destination" fetch origin "$ref" &> /dev/null &&
+      git -C "$destination" checkout "$ref" &> /dev/null &&
+      git -C "$destination" reset --hard "origin/${ref}" &> /dev/null; then
       success "${name} sincronizado en la rama ${ref}."
     else
       error_msg "No se pudo sincronizar ${name}."
@@ -422,13 +507,12 @@ clone_or_update_repo() {
     fi
   else
     info "Clonando ${name} desde: ${remote_url}"
-    if retry 3 git clone "$remote_url" "$dest" &>/dev/null; then
-      git -C "$dest" fetch origin "$ref" &>/dev/null &&
-        git -C "$dest" checkout "$ref" &>/dev/null
+    if retry 3 git clone "$remote_url" "$destination" &> /dev/null; then
+      git -C "$destination" fetch origin "$ref" &> /dev/null &&
+        git -C "$destination" checkout "$ref" &> /dev/null
 
-      # Post-clone: cambiar a SSH si aplica
-      if [[ "$prefer_ssh" == "ssh" ]] && [[ "$remote_url" == git@* ]]; then
-        git -C "$dest" remote set-url origin "$remote_url"
+      if [[ $prefer_ssh == "ssh" && $remote_url == git@* ]]; then
+        git -C "$destination" remote set-url origin "$remote_url"
       fi
       success "${name} sincronizado en la rama ${ref}."
     else
@@ -438,8 +522,10 @@ clone_or_update_repo() {
   fi
 }
 
-# ─── Contadores de instalación ───────────────────────────────────────────────
-# Llevar registro del estado de cada operación para el resumen final.
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Installation Statistics                                                      │
+# └──────────────────────────────────────────────────────────────────────────────┘
+
 _install_ok=0
 _install_fail=0
 _install_skip=0
@@ -448,98 +534,101 @@ _install_fail_list=()
 _install_skip_list=()
 
 count_ok() {
-  ((_install_ok++)) || true
+  _install_ok=$((_install_ok + 1))
   if [[ -n ${1:-} ]]; then
     _install_ok_list+=("$1")
   fi
 }
+
 count_fail() {
-  ((_install_fail++)) || true
+  _install_fail=$((_install_fail + 1))
   if [[ -n ${1:-} ]]; then
     _install_fail_list+=("$1")
   fi
 }
+
 count_skip() {
-  ((_install_skip++)) || true
+  _install_skip=$((_install_skip + 1))
   if [[ -n ${1:-} ]]; then
     _install_skip_list+=("$1")
   fi
 }
 
 print_item_list() {
+  local indent="      "
+  local item=""
+  local items=("${@:2}")
   local prefix="$1"
-  shift
-  local items=("$@")
   local total_items=${#items[@]}
-  if ((total_items == 0)); then
-    return
-  fi
+  local list=""
+  local index=""
+
+  ((total_items > 0)) || return 0
 
   if ((total_items <= 5)); then
-    local list_str=""
-    local item
     for item in "${items[@]}"; do
-      if [[ -z $list_str ]]; then
-        list_str="$item"
-      else
-        list_str="$list_str, $item"
-      fi
+      [[ -n $list ]] && list+=", "
+      list+="$item"
     done
-    printf "%s %s\n" "$prefix" "$list_str"
-  else
-    printf "%s\n" "$prefix"
-    local indent="      "
-    printf "%s%s" "$indent" "${items[0]}"
-    local i
-    for ((i = 1; i < total_items; i++)); do
-      if ((i % 4 == 0)); then
-        printf ",\n%s%s" "$indent" "${items[i]}"
-      else
-        printf ", %s" "${items[i]}"
-      fi
-    done
-    printf "\n"
+    printf "%b %s\n" "$prefix" "$list"
+    return 0
   fi
+
+  printf "%b\n" "$prefix"
+  printf "%s%s" "$indent" "${items[0]}"
+  for ((index = 1; index < total_items; index++)); do
+    if ((index % 4 == 0)); then
+      printf ",\n%s%s" "$indent" "${items[index]}"
+    else
+      printf ", %s" "${items[index]}"
+    fi
+  done
+  printf "\n"
 }
 
-# ─── Resumen final tipo dashboard ────────────────────────────────────────────
-# Imprime un resumen visual con bordes Unicode y colores.
-# Calcula dinámicamente el ancho del box para centrar el título.
 print_summary() {
+  local border=""
   local label="${1:-Installation}"
   local total=$((_install_ok + _install_fail + _install_skip))
-
-  # Ancho fijo del contenido interior (39 caracteres visibles)
-  local w=39
   local title="RaVN ${label} Summary"
+  local w=39
   local title_len=${#title}
-  local pad_left=$(((w - title_len) / 2))
-  local pad_right=$((w - title_len - pad_left))
-  local border
-  border=$(printf '─%.0s' $(seq 1 $w))
+  local pad_left=0
+  local pad_right=0
 
+  # Si el título excede el ancho de la caja, se trunca para no romper el layout
+  # (evita padding negativo y desalineación de las filas de estadísticas).
+  if ((title_len > w - 2)); then
+    title="${title:0:$((w - 5))}..."
+    title_len=${#title}
+  fi
+
+  pad_left=$(((w - title_len) / 2))
+  pad_right=$((w - title_len - pad_left))
+
+  border=$(printf '─%.0s' $(seq 1 "$w"))
   echo ""
-  echo "  ${_DIM}┌${border}┐${_RESET}"
-  printf "  ${_DIM}│${_RESET}${_BOLD}%*s%s%*s${_RESET}${_DIM}│${_RESET}\n" "$pad_left" "" "$title" "$pad_right" ""
-  echo "  ${_DIM}├${border}┤${_RESET}"
-  printf "  ${_DIM}│${_RESET}  ${_GREEN}✓${_RESET} Exitosos:%25s ${_DIM}│${_RESET}\n" "$_install_ok"
-  printf "  ${_DIM}│${_RESET}  ${_RED}✗${_RESET} Fallidos:%25s ${_DIM}│${_RESET}\n" "$_install_fail"
-  printf "  ${_DIM}│${_RESET}  ${_YELLOW}⊘${_RESET} Omitidos:%25s ${_DIM}│${_RESET}\n" "$_install_skip"
-  echo "  ${_DIM}├${border}┤${_RESET}"
-  printf "  ${_DIM}│${_RESET}  Total:${_BOLD}%30s${_RESET} ${_DIM}│${_RESET}\n" "$total"
-  echo "  ${_DIM}└${border}┘${_RESET}"
+  echo -e "  ${GRAY}┌${border}┐${NC}"
+  printf "  ${GRAY}│${NC}${WHITE}%*s%s%*s${NC}${GRAY}│${NC}\n" "$pad_left" "" "$title" "$pad_right" ""
+  echo -e "  ${GRAY}├${border}┤${NC}"
+  printf "  ${GRAY}│${NC}  ${GREEN}${ICON_CHECK}${NC} Exitosos:%25s ${GRAY}│${NC}\n" "$_install_ok"
+  printf "  ${GRAY}│${NC}  ${RED}${ICON_CROSS}${NC} Fallidos:%25s ${GRAY}│${NC}\n" "$_install_fail"
+  printf "  ${GRAY}│${NC}  ${YELLOW}⊘${NC} Omitidos:%25s ${GRAY}│${NC}\n" "$_install_skip"
+  echo -e "  ${GRAY}├${border}┤${NC}"
+  printf "  ${GRAY}│${NC}  Total:${WHITE}%30s${NC} ${GRAY}│${NC}\n" "$total"
+  echo -e "  ${GRAY}└${border}┘${NC}"
   echo ""
 
   if ((total > 0)); then
-    echo "  ${_BOLD}Detalles:${_RESET}"
+    echo -e "  ${WHITE}Detalles:${NC}"
     if ((${#_install_ok_list[@]} > 0)); then
-      print_item_list "    ${_GREEN}✓${_RESET} ${_BOLD}Exitosos (${#_install_ok_list[@]}):${_RESET}" "${_install_ok_list[@]}"
+      print_item_list "    ${GREEN}${ICON_CHECK}${NC} ${WHITE}Exitosos (${#_install_ok_list[@]}):${NC}" "${_install_ok_list[@]}"
     fi
     if ((${#_install_fail_list[@]} > 0)); then
-      print_item_list "    ${_RED}✗${_RESET} ${_BOLD}Fallidos (${#_install_fail_list[@]}):${_RESET}" "${_install_fail_list[@]}"
+      print_item_list "    ${RED}${ICON_CROSS}${NC} ${WHITE}Fallidos (${#_install_fail_list[@]}):${NC}" "${_install_fail_list[@]}"
     fi
     if ((${#_install_skip_list[@]} > 0)); then
-      print_item_list "    ${_YELLOW}⊘${_RESET} ${_BOLD}Omitidos (${#_install_skip_list[@]}):${_RESET}" "${_install_skip_list[@]}"
+      print_item_list "    ${YELLOW}⊘${NC} ${WHITE}Omitidos (${#_install_skip_list[@]}):${NC}" "${_install_skip_list[@]}"
     fi
     echo ""
   fi
