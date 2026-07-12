@@ -14,8 +14,8 @@
 #   (2s, 4s, 8s, ...). Returns 0 on first success, 1 after exhausting retries.
 
 # Verify that retry() is available from global_fn.sh
-if ! declare -f retry &> /dev/null; then
+if ! declare -f retry &>/dev/null; then
   echo "Error: retry() not found. Ensure global_fn.sh is sourced first." >&2
   # shellcheck disable=SC2317
-  return 1 2> /dev/null || exit 1
+  return 1 2>/dev/null || exit 1
 fi
