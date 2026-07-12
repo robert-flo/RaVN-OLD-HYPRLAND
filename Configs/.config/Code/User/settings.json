@@ -1,16 +1,64 @@
 {
-  // ──── Editor ────────────────────────────────────────────────
+  // ════════════════════════════════════════════════════════════
+  // Editor
+  // ════════════════════════════════════════════════════════════
   "editor.renderWhitespace": "trailing",
   "editor.formatOnSave": true,
-  // ──── Shell: Formatter (shfmt) ──────────────────────────────
-  "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format",
-    "editor.formatOnSave": true,
-  },
+  "editor.fontFamily": "'JetbrainsMono Nerd Font','Maple Mono', monospace",
+  "editor.fontSize": 12,
+  "editor.fontLigatures": true,
+  "editor.minimap.side": "left",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.scrollbar.verticalScrollbarSize": 0,
+  "editor.suggest.showStatusBar": true,
+
+  // ════════════════════════════════════════════════════════════
+  // Workbench / Window
+  // ════════════════════════════════════════════════════════════
+  "workbench.iconTheme": "flow-dim",
+  "workbench.colorTheme": "One Dark Pro Mix",
+  "workbench.statusBar.visible": false,
+  "workbench.activityBar.location": "top",
+  "workbench.sideBar.location": "right",
+  "window.menuBarVisibility": "toggle",
+  "window.customTitleBarVisibility": "auto",
+  "flow-icons.licenseKey": "FLOW-P3D0RB-HYIO76-JY5Y3W-SPF311",
+
+  // ════════════════════════════════════════════════════════════
+  // Lenguajes / IntelliSense
+  // ════════════════════════════════════════════════════════════
+  "python.languageServer": "Default",
+  "js/ts.suggest.autoImports": true,
+
+  // ════════════════════════════════════════════════════════════
+  // Terminal
+  // ════════════════════════════════════════════════════════════
+  "terminal.integrated.fontFamily": "JetBrainsMonoNL NF",
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.external.linuxExec": "kitty",
+  "terminal.explorerKind": "both",
+  "terminal.sourceControlRepositoriesKind": "both",
+
+  // ════════════════════════════════════════════════════════════
+  // Git / GitLens
+  // ════════════════════════════════════════════════════════════
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "gitlens.ai.model": "gitkraken",
+  "gitlens.ai.gitkraken.model": "gemini:gemini-2.5-flash",
+
+  // ════════════════════════════════════════════════════════════
+  // Shell: Formatter (shfmt)
+  // ════════════════════════════════════════════════════════════
   "shellformat.path": "shfmt",
   "shellformat.flag": "-i 2 -sr -kp -ci",
   "shellformat.effectLanguages": ["shellscript"],
-  // ──── Shell: Linter (shellcheck) ────────────────────────────
+
+  // ════════════════════════════════════════════════════════════
+  // Shell: Linter (shellcheck)
+  // ════════════════════════════════════════════════════════════
   "shellcheck.enable": true,
   "shellcheck.run": "onType",
   "shellcheck.executablePath": "/usr/bin/shellcheck",
@@ -31,31 +79,46 @@
     "**/Scripts/restore_shl.sh": true,
     "**/Scripts/uninstall.sh": true,
   },
-  "workbench.colorTheme": "One Dark Pro Mix",
-  "window.menuBarVisibility": "toggle",
-  "editor.fontSize": 12,
-  "editor.scrollbar.vertical": "hidden",
-  "editor.scrollbar.verticalScrollbarSize": 0,
+
+  // ════════════════════════════════════════════════════════════
+  // Seguridad, privacidad y extensiones
+  // ════════════════════════════════════════════════════════════
   "security.workspace.trust.untrustedFiles": "newWindow",
   "security.workspace.trust.startupPrompt": "never",
   "security.workspace.trust.enabled": false,
-  "editor.minimap.side": "left",
-  "editor.fontFamily": "'JetbrainsMono Nerd Font','Maple Mono', monospace",
-  "extensions.autoUpdate": "off",
-  "workbench.statusBar.visible": false,
-  "terminal.external.linuxExec": "kitty",
-  "terminal.explorerKind": "both",
-  "terminal.sourceControlRepositoriesKind": "both",
   "telemetry.telemetryLevel": "off",
-  "workbench.activityBar.location": "top",
-  "window.customTitleBarVisibility": "auto",
-  "workbench.sideBar.location": "right",
-  "git.autofetch": true,
-  "git.confirmSync": false,
-  "python.languageServer": "Default",
-  "flow-icons.licenseKey": "",
-  "console-ninja.featureSet": "Community",
-  "gitlens.ai.model": "gitkraken",
-  "gitlens.ai.gitkraken.model": "gemini:gemini-2.5-flash",
+  "extensions.autoUpdate": "off",
+
+  // ════════════════════════════════════════════════════════════
+  // Tasks, chat, misc
+  // ════════════════════════════════════════════════════════════
   "task.allowAutomaticTasks": "on",
+  "chat.tips.enabled": false,
+  "console-ninja.featureSet": "Community",
+
+  // ════════════════════════════════════════════════════════════
+  // Formateadores por lenguaje
+  // ════════════════════════════════════════════════════════════
+  "[astro]": {
+    "editor.defaultFormatter": "astro-build.astro-vscode",
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true,
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
 }
