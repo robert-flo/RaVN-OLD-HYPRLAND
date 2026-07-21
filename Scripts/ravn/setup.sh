@@ -35,6 +35,53 @@ done
 
 # ─── Main ────────────────────────────────────────────────────────────────────
 main() {
+  local action="${1:-}"
+
+  if [[ -z $action ]]; then
+    if ((flg_DryRun == 1)); then
+      discover_tasks
+      run_pipeline
+      return 0
+    fi
+    if [[ ! -t 0 ]]; then
+      error_msg "Sin subcomando en entorno no interactivo. Use: setup.sh run|verify|reset|update|check-updates <tarea>"
+      return 2
+    fi
+    run_menu
+    return
+  fi
+
+  if [[ $action == "verify" || $action == "run" || $action == "test" || $action == "matrix" || $action == "reset" || $action == "update" || $action == "check-updates" || $action == "baseline" || $action == "--baseline" ]]; then
+    if [[ $action == "baseline" || $action == "--baseline" ]]; then
+      action="run"
+      set -- BASELINE
+    elif [[ $action == "test" ]]; then
+      shift
+      discover_tasks
+      test_selected_tasks "$@"
+      return
+    elif [[ $action == "matrix" ]]; then
+      shift
+      if [[ ${1:-} == "grok" ]]; then
+        shift
+        bash "${RAVN_DIR}/tests/grok-matrix.sh" "$@"
+      else
+        bash "${RAVN_DIR}/tests/opencode-matrix.sh" "$@"
+      fi
+      return
+    elif [[ $action == "reset" ]]; then
+      shift
+      discover_tasks
+      reset_selected_tasks "$@"
+      return
+    else
+      shift
+    fi
+    discover_tasks
+    run_selected_tasks "$action" "$@"
+    return
+  fi
+
   step "Configuración Final"
   print_log -g "[FINAL CONFIG] " -b " :: " "Iniciando configuración final..."
 

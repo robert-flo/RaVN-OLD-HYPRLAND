@@ -3,6 +3,8 @@
 # Orchestrates task execution with lifecycle management, logging, counters,
 # spinners, and interactive prompts. Contains no installer logic.
 
+flg_DryRun=${flg_DryRun:-0}
+
 # run_task <file>
 #   Sources a task module and runs its full lifecycle:
 #   package.sh defaults → source task → check → before → install → after → cleanup
@@ -21,6 +23,12 @@ run_task() {
 
   local name="${PACKAGE:-$(basename "$file" .sh)}"
   local log="${log_dir}/${name}.log"
+
+  if ((flg_DryRun == 1)); then
+    info "${name}: Dry-run — omitiendo."
+    count_skip "$name"
+    return 0
+  fi
 
   # ── Configuration registry gate: skip if disabled in packages.conf ──
   if [[ -f "${RAVN_DIR}/config/packages.conf" ]]; then
@@ -52,12 +60,12 @@ run_task() {
   local start
   start=$(date +%s)
 
-  ( 
+  (
     # Run in subshell to isolate failures
     run_hook before "before"
     install
     run_hook after "after"
-  ) > "$log" 2>&1 &
+  ) >"$log" 2>&1 &
 
   local pid=$!
   local status=0
@@ -65,7 +73,7 @@ run_task() {
 
   # ── Always run cleanup ──
   if hook_defined cleanup; then
-    cleanup >> "$log" 2>&1 || true
+    cleanup >>"$log" 2>&1 || true
   fi
 
   local end
@@ -96,7 +104,7 @@ run_pipeline() {
   echo ""
 
   for file in "${TASKS[@]}"; do
-    run_task "$file" || true  # Don't abort pipeline on individual failures
+    run_task "$file" || true # Don't abort pipeline on individual failures
   done
 
   local pipeline_end

@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# omarchy:summary=Install an npx wrapper for a given npm package.
+# omarchy:args=<package> [command-name] [package-version] [node-version] [bin-name]
+
+if [[ -z $1 ]]; then
+	echo "Usage: omarchy-npx-install <package> [command-name]"
+	exit 1
+fi
+
+package=$1
+command=${2:-$1}
+version=${3:-latest}
+node_version=${4:-latest}
+bin_name=${5:-$command}
+
+mkdir -p "$HOME/.local/bin"
+
+cat >"$HOME/.local/bin/$command" <<EOF
+#!/bin/bash
+package="$package"
+version="$version"
+node_version="$node_version"
+bin_name="$bin_name"
+command="$command"
+
+if ! node_root="\$(mise where "node@\$node_version" 2>/dev/null)"; then
+  mise use -g --pin "node@\$node_version" >/dev/null
+  node_root="\$(mise where "node@\$node_version")"
+fi
+
+node_bin="\$node_root/bin/node"
+npx_bin="\$node_root/bin/npx"
+
+ensure_bin_runtime() {
+  local bin_path=\$1
+  local shebang
+
+  IFS= read -r shebang < "\$bin_path"
+
+  if [[ \$shebang == "#!"*"/bun"* || \$shebang == "#!"*"/env bun"* ]]; then
+    if omarchy-cmd-missing bun; then
+      echo "Installing bun runtime for \$package..."
+      omarchy-pkg-add bun
+      hash -r
+    fi
+  fi
+}
+
+exec_package_bin() {
+  local package_bin_path=\$1
+  shift
+
+  if [[ -n \$package_bin_path ]]; then
+    ensure_bin_runtime "\$package_bin_path"
+    PATH="\$node_root/bin:\$PATH" exec "\$package_bin_path" "\$@"
+  fi
+}
+
+# Execute the declared package bin directly inside npx. This avoids relying on
+# shell $(which) behavior inside a temporary npx environment.
+package_spec="\$package@\$version"
+PATH="\$node_root/bin:\$PATH" exec "\$node_bin" "\$npx_bin" --yes \
+  --prefer-online --package "\$package_spec" -- "\$bin_name" "\$@"
+EOF
+
+chmod +x "$HOME/.local/bin/$command"

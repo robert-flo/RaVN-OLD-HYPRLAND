@@ -241,7 +241,11 @@ fi
 print_section "${ICON_FOLDER} [1/2] Creating worktree"
 
 # Use absolute path for worktree location
-worktree_path="$(pwd)/$worktree"
+if [[ "$worktree" == /* ]]; then
+  worktree_path="$worktree"
+else
+  worktree_path="$(pwd)/$worktree"
+fi
 
 if [[ -n "$(git branch --list "$branch")" ]]; then
   print_step "Branch ${CYAN}$branch${NC} exists locally — attaching worktree"

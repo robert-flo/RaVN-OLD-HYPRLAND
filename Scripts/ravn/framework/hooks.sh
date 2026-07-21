@@ -5,7 +5,7 @@
 
 # _RAVN_NOOP_BODY stores the normalized body of a no-op function for comparison.
 # Used to detect if a task actually redefined a hook or left the default.
-readonly _RAVN_NOOP_BODY=$'{ \n    :;\n}'
+readonly _RAVN_NOOP_BODY="{:}"
 
 # hook_defined <function_name>
 #   Returns 0 if the function exists and its body differs from the default no-op.
@@ -13,13 +13,15 @@ hook_defined() {
   local fn="$1"
 
   # Function must exist
-  if ! declare -f "$fn" &> /dev/null; then
+  if ! declare -f "$fn" &>/dev/null; then
     return 1
   fi
 
-  # Extract the body (everything after the first line of declare -f output)
+  # Extract the body (everything after the first line of declare -f output).
+  # Normalize whitespace because Bash formats one-line and multi-line function
+  # declarations differently.
   local body
-  body=$(declare -f "$fn" | tail -n +2)
+  body=$(declare -f "$fn" | tail -n +2 | tr -d '[:space:]')
 
   # Compare against the no-op body
   [[ "$body" != "$_RAVN_NOOP_BODY" ]]

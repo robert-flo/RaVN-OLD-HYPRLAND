@@ -16,8 +16,8 @@ OMARCHY_DEST="${HOME}/.local/share/omarchy"
 
 # omarchy_repo_is_configured — return 0 if the [omarchy] block is present.
 omarchy_repo_is_configured() {
-  grep -q '^\[omarchy\]' /etc/pacman.conf 2> /dev/null &&
-    grep -q "https://pkgs.omarchy.org/${OMARCHY_CHANNEL}/" /etc/pacman.conf 2> /dev/null
+  grep -q '^\[omarchy\]' /etc/pacman.conf 2>/dev/null &&
+    grep -q "https://pkgs.omarchy.org/${OMARCHY_CHANNEL}/" /etc/pacman.conf 2>/dev/null
 }
 
 # setup_omarchy_repo — idempotent configuration of the Omarchy repository.
@@ -32,7 +32,7 @@ setup_omarchy_repo() {
   clone_or_update_repo "Omarchy" "${OMARCHY_REPO}" "${OMARCHY_DEST}" "${OMARCHY_REF}"
 
   # 3. Import and locally sign the Omarchy GPG key when missing.
-  if ! pacman-key -l 2> /dev/null | grep -q "${OMARCHY_KEY}"; then
+  if ! pacman-key -l 2>/dev/null | grep -q "${OMARCHY_KEY}"; then
     run_with_status "Importing Omarchy GPG key" \
       sudo pacman-key --recv-keys "${OMARCHY_KEY}" --keyserver keys.openpgp.org
 
@@ -56,14 +56,14 @@ setup_omarchy_repo() {
   if ((flg_DryRun == 1)); then
     info "[dry-run] Would remove any existing [omarchy] block and append the ${OMARCHY_CHANNEL} entry"
   else
-    if grep -q '^\[omarchy\]' /etc/pacman.conf 2> /dev/null; then
+    if grep -q '^\[omarchy\]' /etc/pacman.conf 2>/dev/null; then
       sudo sed -i '/^\[omarchy\]/,/^[[:space:]]*$/d' /etc/pacman.conf
     fi
     # Trim trailing blank lines
     sudo sed -i -e :a -e '/^\n*$/{$d;N;ba}' /etc/pacman.conf
 
     # Append the Omarchy repository block
-    sudo tee -a /etc/pacman.conf > /dev/null << EOF
+    sudo tee -a /etc/pacman.conf >/dev/null <<EOF
 
 [omarchy]
 SigLevel = Optional TrustAll
