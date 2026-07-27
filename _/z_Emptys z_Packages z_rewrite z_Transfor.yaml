@@ -1,0 +1,70 @@
+z_Emptys  z_Packages  z_rewrite  z_Transformer
+z_clones  z_Inbox   z_RaVN-DOT  z_Shipped
+
+
+󰣇 /z_clones ❯ ls
+bare-minimun                 git-setup                    my-worktree-helpers---hermes-agent-era  Rollo
+dotfiles                     git-setup-arch               neovim-robert-flo                       searxng
+dotfiles-aur                 herdr-terminal-file-manager  RaVN                                    shared_dir
+dotfiles---hermes-agent-era  HyDE                         ravn-installer-rewrite                  shared_dir-AUR
+final.sh                     Ivar                         RaVN-VM---hermes-agent-era              Valhalla
+
+󰣇 /z_Emptys ❯ ls
+dotfiles-aur  dotfiles---hermes-agent-era  my-worktree-helpers---hermes-agent-era  RaVN-VM---hermes-agent-era
+
+󰣇 /z_Packages ❯ ls
+git-setup-arch  shared_dir-AUR
+
+󰣇 /z_RaVN-DOT ❯ ls
+HyDE  Ivar  RaVN  Rollo  Valhall
+
+󰣇 /z_Transformer ❯ ls
+bare-minimun  final.sh  herdr-terminal-file-manager  neovim-robert-flo  ravn-installer-rewrite  searxng
+
+󰣇 /z_Shipped ❯ ls
+dotfiles  git-setup  shared_dir
+
+
+
+
+estos son 20 repositorios, todos pertenecen al usuario https://github.com/robert-flo/
+
+bare-minimun                 git-setup                    my-worktree-helpers---hermes-agent-era  Rollo
+dotfiles                     git-setup-arch               neovim-robert-flo                       searxng
+dotfiles-aur                 herdr-terminal-file-manager  RaVN                                    shared_dir
+dotfiles---hermes-agent-era  HyDE                         ravn-installer-rewrite                  shared_dir-AUR
+final.sh                     Ivar                         RaVN-VM---hermes-agent-era              Valhalla
+
+yo quiero que estos archivos se clonen a las siguientes rutas usando /home/rey_harald_finehair/.local/bin/git-bare-clone
+para ello debes cambiar los parametros del script asi
+
+BARE_HOME="/z_clones"
+WORKTREES_HOME="/????"
+
+revisa como puedes lograr eso y hazme preguntas, los repositorios se deben clonar asi:
+
+primero los repositorios bare a:
+
+/z_clones
+bare-minimun                 git-setup                    my-worktree-helpers---hermes-agent-era  Rollo
+dotfiles                     git-setup-arch               neovim-robert-flo                       searxng
+dotfiles-aur                 herdr-terminal-file-manager  RaVN                                    shared_dir
+dotfiles---hermes-agent-era  HyDE                         ravn-installer-rewrite                  shared_dir-AUR
+final.sh                     Ivar                         RaVN-VM---hermes-agent-era              Valhalla
+
+y luego las ramas en base a este orden de carpetas
+
+/z_Emptys
+dotfiles-aur  dotfiles---hermes-agent-era  my-worktree-helpers---hermes-agent-era  RaVN-VM---hermes-agent-era
+
+/z_Packages
+git-setup-arch  shared_dir-AUR
+
+/z_RaVN-DOT
+HyDE  Ivar  RaVN  Rollo  Valhall
+
+/z_Transformer
+bare-minimun  final.sh  herdr-terminal-file-manager  neovim-robert-flo  ravn-installer-rewrite  searxng
+
+/z_Shipped
+dotfiles  git-setup  shared_dir
