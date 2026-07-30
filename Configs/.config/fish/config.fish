@@ -2,6 +2,11 @@
 if status is-interactive
     source "$__fish_config_dir/auto-Hypr.fish"
 
+    # Remap the indexed colors used by this Fish-specific Starship prompt.
+    if test -f "$__fish_config_dir/sequences.txt"
+        cat "$__fish_config_dir/sequences.txt"
+    end
+
     # No greeting
     set fish_greeting
 
