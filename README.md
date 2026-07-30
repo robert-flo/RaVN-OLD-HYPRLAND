@@ -26,7 +26,7 @@ cd ~/RaVN/Scripts
 <a id="updating"></a>
 <img src="https://readme-typing-svg.herokuapp.com?font=Lexend+Giga&size=25&pause=1000&color=CCA9DD&vCenter=true&width=435&height=25&lines=UPDATING" width="450"/>
 
-To update RaVN, you will need to pull the latest changes from GitHub and restore the configs by running the following commands:
+To update RaVN and restore all resources, including any system-level resources required by the full workflow, run:
 
 > [!CAUTION]
 > The following commands will discard any uncommitted local changes in the repository.
@@ -37,6 +37,16 @@ git fetch --update-shallow --depth 1 origin master
 git reset --hard origin/master
 ./install.sh -r
 ```
+
+To test or apply only the managed configuration under your home directory, without `sudo`, use:
+
+```shell
+./install.sh -o
+```
+
+`-o` overwrites managed user configuration and skips fonts, themes, migrations,
+launchers, package installation, and other privileged-capable phases. `-ro` is
+an equivalent compatibility alias.
 
 > [!WARNING]
 > Please note that any configurations you made will be overwritten if listed to be done so as listed by `Scripts/restore_cfg.psv`.
@@ -100,4 +110,3 @@ Read more at [robert-flo.github.io/ravn](https://robert-flo.github.io/ravn).
 ## License
 
 This configuration is released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
-
