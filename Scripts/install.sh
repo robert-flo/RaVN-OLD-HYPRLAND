@@ -403,7 +403,10 @@ EOF
 
   if [ "${flg_user_only}" -eq 1 ]; then
     print_log -g "[user-only] " -b "skipping privileged phases :: " "fonts, themes, migrations, launchers, and system hooks"
-    "${scrDir}/restore_cfg.sh"
+    if ! "${scrDir}/restore_cfg.sh"; then
+      print_log -r "[user-only] " -b "restore failed :: " "HyDE reload skipped"
+      exit 1
+    fi
     reload_hyde_user_only
   else
     "${scrDir}/restore_fnt.sh"
