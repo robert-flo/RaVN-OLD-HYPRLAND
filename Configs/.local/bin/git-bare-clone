@@ -99,8 +99,8 @@ fi
 # │ Configuration                                                                │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-BARE_HOME="${BARE_HOME:-$HOME/.local/share/git-bare}"
-WORKTREES_HOME="${WORKTREES_HOME:-$HOME/Work}"
+BARE_HOME="${BARE_HOME:-/z_clones}"
+WORKTREES_HOME="${WORKTREES_HOME:-/z_Transformer}"
 
 # Iconos específicos del script
 readonly ICON_FOLDER="󰉋"
@@ -177,15 +177,23 @@ repo_name="$(basename "$repo_url" .git)"
 bare_dir="$BARE_HOME/$repo_name"
 worktrees_dir="$worktrees_base/$repo_name"
 
+# Las ejecuciones repetidas son válidas: informar y continuar sin imprimir
+# toda la interfaz de clonación.
+if [[ -d "$bare_dir" ]]; then
+  print_warn "YA EXISTE bare: $bare_dir (omitido)"
+  exit 0
+fi
+if [[ -e "$worktrees_dir" ]]; then
+  print_warn "YA EXISTE worktrees: $worktrees_dir (omitido)"
+  exit 0
+fi
+
 print_header "${ICON_GIT} git-bare-clone"
 
 print_section "${ICON_GEAR} Configuration"
 print_info "Repository:  ${WHITE}$repo_name${NC}"
 print_info "Bare:        ${GRAY}$bare_dir${NC}"
 print_info "Worktrees:   ${GRAY}$worktrees_dir${NC}"
-
-[[ -d "$bare_dir" ]] && die "Bare repo already exists at '${GRAY}$bare_dir${NC}'"
-[[ -d "$worktrees_dir" ]] && die "Worktrees dir already exists at '${GRAY}$worktrees_dir${NC}'"
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Execution Steps                                                              │

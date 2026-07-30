@@ -31,8 +31,8 @@ Owned by the RaVN installer pipeline. Restored to user environments via [restore
 These tools implement a modern Git workflow based on a **bare repository** (no working directory, holding only the `.git` metadata) shared by multiple active **worktrees** (independent folders for each branch), allowing you to work on multiple branches simultaneously without stash or checkout.
 
 ```
-~/.local/share/git-bare/<repo>/ (Bare repository containing refs, objects, config)
-  └── ~/Work/<repo>/
+/z_clones/<repo>/ (Bare repository containing refs, objects, config)
+  └── /z_Transformer/<repo>/
       ├── main/           ← Worktree 1
       ├── develop/        ← Worktree 2
       └── feature-xyz/    ← Worktree 3
@@ -42,8 +42,8 @@ These tools implement a modern Git workflow based on a **bare repository** (no w
 Clones a remote repository as a bare repo and instantiates worktrees for all remote branches.
 
 * **Default Paths**:
-  * Bare repo: `~/.local/share/git-bare/<repo>` (Override with `$BARE_HOME`)
-  * Worktrees: `~/Work/<repo>` (Override with `$WORKTREES_HOME`)
+* Bare repo: `/z_clones/<repo>` (Override with `$BARE_HOME`)
+* Worktrees: `/z_Transformer/<repo>` (Override with `$WORKTREES_HOME`)
 * **Syntax**: `git-bare-clone [-h] [-v] [-w <path>] <repository>`
 * **Options**:
   * `-h, --help`: Show help.
@@ -53,9 +53,9 @@ Clones a remote repository as a bare repo and instantiates worktrees for all rem
   ```bash
   git-bare-clone https://github.com/user/myrepo.git
   # Results in:
-  # ~/.local/share/git-bare/myrepo/ (Bare repo)
-  # ~/Work/myrepo/main/ (Worktree 1)
-  # ~/Work/myrepo/develop/ (Worktree 2)
+  # /z_clones/myrepo/ (Bare repo)
+  # /z_Transformer/myrepo/main/ (Worktree 1)
+  # /z_Transformer/myrepo/develop/ (Worktree 2)
   ```
 
 ### 2. `git-create-worktree`
