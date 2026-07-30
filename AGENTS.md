@@ -179,6 +179,7 @@ To protect the user's active system configurations from accidental resets or unc
 
 - **Isolated Development in `~/Work`**: All active development work must be carried out inside worktrees under `~/Work/<repo>/` (which are created from the bare repository at `~/.local/share/git-bare/<repo>`).
 - **No Direct Modification in Live Clone**: Do not perform development or commit changes directly inside the live configuration clone located at `~/.local/share/ravn/` (except when updating tracking config files or executing system-wide scripts).
+- **Mandatory branch-baseline preflight**: Before creating a normal feature or chore branch from `dev`, first run `git fetch origin --prune` and verify `git merge-base --is-ancestor origin/master origin/dev`. A zero exit status means the released history is already in `dev`. If it fails, do not derive new work from `dev`: create an isolated synchronization branch from `origin/master`, submit and merge it into `dev` through a PR, fetch again, and repeat the ancestry check. This preserves the no-direct-commit rule for `dev` and prevents features from missing released behavior.
 - **Automation Utilities** (all restored under `~/.local/bin/` — see "Repository Structure & Purpose" for their source in `Configs/.local/bin/`):
   - `git-create-worktree` for general feature/chore branches.
   - `git-issue-worktree` for GitHub-tracked issues.
