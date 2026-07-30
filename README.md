@@ -46,7 +46,12 @@ To test or apply only the managed configuration under your home directory, witho
 
 `-o` overwrites managed user configuration and skips fonts, themes, migrations,
 launchers, package installation, and other privileged-capable phases. `-ro` is
-an equivalent compatibility alias.
+an equivalent compatibility alias. After a successful restore, it runs
+`hyde-shell reload` so Waybar and the active HyDE session use the deployed
+configuration. If HyDE is unavailable, the installer warns and continues.
+
+To preview this workflow without changing files or reloading the desktop session,
+use `./install.sh -ot`; it reports that the HyDE reload would run.
 
 > [!WARNING]
 > Please note that any configurations you made will be overwritten if listed to be done so as listed by `Scripts/restore_cfg.psv`.

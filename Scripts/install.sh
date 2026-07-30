@@ -104,12 +104,13 @@ Usage: $0 [options]
             h : re-evaluate S[h]ell
             m : no the[m]e reinstallations
             t : [t]est run without executing (-irst to dry run all)
-            o : restore and [o]verwrite user configuration without sudo (-ro is equivalent)
+            o : restore and [o]verwrite user configuration without sudo, then reload HyDE (-ro is equivalent)
 
 NOTE:
         running without args is equivalent to -irs
         to ignore nvidia, run -irsn
-        -o restores only managed resources under $HOME and skips privileged phases
+        -o restores only managed resources under $HOME, reloads HyDE, and skips privileged phases
+        -ot previews that restoration and reload without changing files or the desktop session
 
 WRONG:
         install.sh -n # This will not work
@@ -147,6 +148,21 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
+
+reload_hyde_user_only() {
+  if ((flg_DryRun == 1)); then
+    print_log -n "[hyde] " -b "dry-run :: " "Would run hyde-shell reload"
+    return 0
+  fi
+
+  if command -v hyde-shell > /dev/null 2>&1; then
+    hyde-shell reload || print_log -y "[hyde] " -b "warning :: " "hyde-shell reload failed; continuing"
+  elif [[ -x ${HOME}/.local/bin/hyde-shell ]]; then
+    "${HOME}/.local/bin/hyde-shell" reload || print_log -y "[hyde] " -b "warning :: " "hyde-shell reload failed; continuing"
+  else
+    print_log -y "[hyde] " -b "warning :: " "hyde-shell was not found; continuing"
+  fi
+}
 
 # Gestiona el comportamiento de ejecución basándose en los argumentos provistos:
 # - Si se especificó el modo de prueba (dry-run), se imprime un mensaje de estado.
@@ -387,7 +403,11 @@ EOF
 
   if [ "${flg_user_only}" -eq 1 ]; then
     print_log -g "[user-only] " -b "skipping privileged phases :: " "fonts, themes, migrations, launchers, and system hooks"
-    "${scrDir}/restore_cfg.sh"
+    if ! "${scrDir}/restore_cfg.sh"; then
+      print_log -r "[user-only] " -b "restore failed :: " "HyDE reload skipped"
+      exit 1
+    fi
+    reload_hyde_user_only
   else
     "${scrDir}/restore_fnt.sh"
     "${scrDir}/restore_cfg.sh"
