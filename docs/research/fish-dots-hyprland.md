@@ -10,16 +10,21 @@ RaVN's Fish configuration and Fish-specific Starship prompt are derived from
 - `dots/.config/fish/auto-Hypr.fish`
 - `dots/.config/fish/fish_variables`
 - `dots/.config/starship.toml`
+- `dots/.config/quickshell/ii/scripts/colors/terminal/sequences.txt`
 
 The imported files are distributed by their upstream project under the
 [GNU General Public License version 3](https://github.com/end-4/dots-hyprland/blob/aed4d1ec63f584905c28d2a678db5845579fdafc/LICENSE).
 
-## Intentional deviation
+## Terminal color adaptation
 
-RaVN omits the block in `config.fish` that prints terminal color sequences from
-`~/.local/state/quickshell/user/generated/terminal/sequences.txt`. RaVN does not
-generate that file, and the Fish prompt uses the fixed colors defined by the
-imported Starship configuration.
+The imported Starship configuration uses extended indexed terminal colors. Its
+upstream Fish configuration prints a Quickshell-generated `sequences.txt` to
+map those indexes to Material colors. RaVN retains that mechanism without
+introducing a Quickshell dependency: the fallback file lives at
+`~/.config/fish/sequences.txt`, and the `fish-sequences.dcol` Wallbash template
+regenerates it from the active wallpaper palette. Fish prints the file before
+Starship is initialized. The Material roles are mapped to equivalent Wallbash
+primary, secondary, tertiary, error, foreground, and background roles.
 
 RaVN also sources `auto-Hypr.fish` from interactive Fish sessions. The upstream
 file is stored at the Fish configuration root, which Fish does not autoload by
