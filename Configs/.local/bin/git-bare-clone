@@ -26,6 +26,7 @@
 #   git-bare-clone git@github.com:user/repo.git
 #   git-bare-clone https://github.com/user/repo.git
 #   git-bare-clone -w /custom/path user/repo
+#   git-bare-clone --group /projects/app owner/api owner/web --group ~/Work owner/tools
 #
 # # FLUJO COMPLETO
 #   1. Crea un clon bare en $BARE_HOME/<repo>/
@@ -51,6 +52,12 @@
 #   # Bare en ~/.local/share/git-bare/repo/
 #   # Worktrees en ~/Projects/repo/{branch,...}/
 #
+#   ## Clonar varios repositorios con grupos de worktrees
+#   git-bare-clone \
+#     --group /projects/platform acme/api acme/web \
+#     --group ~/Work example/tooling example/docs
+#   # Repos existentes se omiten; un fallo de clonación detiene el lote.
+#
 #   ## Ver estructura resultante
 #   ls -la ~/.local/share/git-bare/repo/    # bare objects
 #   ls -d ~/Work/repo/*/                     # worktrees
@@ -65,6 +72,7 @@
 #   | Worktrees en ruta custom          | git-bare-clone -w ~/dev u/r.git                 | Worktrees en ~/dev/r/ en vez de ~/Work/r/        |
 #   | Solo nombre (se asume github.com) | git-bare-clone org/repo                         | Se completa a git@github.com:org/repo.git        |
 #   | Verbose                           | git-bare-clone -v git@github.com:u/r.git        | Muestra debug de cada paso                       |
+#   | Lote por grupos                   | git-bare-clone --group ~/Work u/a u/b            | Clona cada repo en ~/Work                        |
 #
 # # VARIABLES DE ENTORNO
 #   BARE_HOME=~/.local/share/git-bare   # Ruta base para bare repos
@@ -79,6 +87,7 @@
 #   - Worktrees se crean con git worktree add y tracking automático
 #   - El directorio ~/Work/<repo>/ contiene un .git file que apunta al bare
 #   - Se puede usar git-create-worktree después para ramas nuevas
+#   - --group no se combina con -w; cada grupo declara su propia ruta
 
 set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
@@ -101,6 +110,11 @@ fi
 
 BARE_HOME="${BARE_HOME:-$HOME/.local/share/git-bare}"
 WORKTREES_HOME="${WORKTREES_HOME:-$HOME/Work}"
+worktrees_base=""
+declare -a args=()
+declare -i batch_mode=0
+declare -a batch_worktrees=()
+declare -a batch_repositories=()
 
 # Iconos específicos del script
 readonly ICON_FOLDER="󰉋"
@@ -123,6 +137,7 @@ die() {
 usage() {
   echo ""
   echo -e "${WHITE}Usage:${NC} $(basename "${BASH_SOURCE[0]}") ${GRAY}[-h] [-v] [-w <path>]${NC} ${CYAN}<repository>${NC}"
+  echo -e "       $(basename "${BASH_SOURCE[0]}") ${GRAY}[options]${NC} ${CYAN}--group <path> <repository>... [--group <path> <repository>...]${NC}"
   echo ""
   echo -e "  Clone a bare git repo and create all worktrees with upstream tracking."
   echo ""
@@ -134,6 +149,12 @@ usage() {
   echo -e "  ${CYAN}-h, --help${NC}           Print this help and exit"
   echo -e "  ${CYAN}-v, --verbose${NC}        Print script debug info"
   echo -e "  ${CYAN}-w, --worktrees-dir${NC}  Override worktrees base directory"
+  echo -e "  ${CYAN}--group <path> <repos...>${NC}  Clone one or more repositories into a worktrees group"
+  echo ""
+  echo -e "${WHITE}Batch behavior:${NC} existing repositories are skipped; a clone failure stops the batch."
+  echo -e "${WHITE}Examples:${NC}"
+  echo -e "  git-bare-clone --group ~/Work acme/api acme/web"
+  echo -e "  git-bare-clone --group /projects/app owner/api owner/web --group ~/Work owner/tools"
   echo ""
   exit 0
 }
@@ -143,25 +164,57 @@ usage() {
 # └──────────────────────────────────────────────────────────────────────────────┘
 
 parse_params() {
+  local group_path=""
+  local group_count=0
+  local worktrees_override=0
+
   worktrees_base="$WORKTREES_HOME"
+  batch_mode=0
+  batch_worktrees=()
+  batch_repositories=()
 
   while :; do
     case "${1-}" in
-    -h | --help) usage ;;
-    -v | --verbose) set -x ;;
-    --no-color) : ;;
-    -w | --worktrees-dir)
-      worktrees_base="${2-}"
-      shift
-      ;;
-    -?*) die "Unknown option: $1" ;;
-    *) break ;;
+      -h | --help) usage ;;
+      -v | --verbose) set -x ;;
+      --no-color) : ;;
+      -w | --worktrees-dir)
+        [[ -n ${2-} && ${2} != -* ]] || die "$1 requires a worktrees path"
+        worktrees_base="${2-}"
+        worktrees_override=1
+        shift
+        ;;
+      --group)
+        ((worktrees_override == 0)) || die "--group cannot be combined with -w/--worktrees-dir"
+        batch_mode=1
+        group_path="${2-}"
+        [[ -z $group_path || $group_path == "--group" ]] && die "--group requires a worktrees path"
+        shift 2
+        group_count=0
+
+        while [[ $# -gt 0 && ${1} != "--group" ]]; do
+          [[ ${1} == -* ]] && die "Unexpected option in --group: $1"
+          batch_worktrees+=("$group_path")
+          batch_repositories+=("${1}")
+          group_count=$((group_count + 1))
+          shift
+        done
+
+        ((group_count > 0)) || die "--group requires at least one repository"
+        continue
+        ;;
+      -?*) die "Unknown option: $1" ;;
+      *) break ;;
     esac
     shift
   done
 
   args=("$@")
-  [[ ${#args[@]} -eq 0 ]] && usage
+  if ((batch_mode == 1)); then
+    ((${#args[@]} == 0))   || die "Repositories must follow --group <path>"
+  else
+    [[ ${#args[@]} -eq 0 ]] && usage
+  fi
 
   return 0
 }
@@ -172,85 +225,103 @@ parse_params "$@"
 # │ Pre-flight Checks                                                            │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-repo_url="${args[0]}"
-repo_name="$(basename "$repo_url" .git)"
-bare_dir="$BARE_HOME/$repo_name"
-worktrees_dir="$worktrees_base/$repo_name"
+normalize_repository() {
+  local repository=$1
 
-# Las ejecuciones repetidas son válidas: informar y continuar sin imprimir
-# toda la interfaz de clonación.
-if [[ -d "$bare_dir" ]]; then
-  print_warn "YA EXISTE bare: $bare_dir (omitido)"
-  exit 0
+  case "$repository" in
+    git@* | http://* | https://* | file://* | /* | ./* | ../*) printf '%s\n' "$repository" ;;
+    */*)
+      if [[ $repository == *.git ]]; then
+        printf 'git@github.com:%s\n' "$repository"
+      else
+        printf 'git@github.com:%s.git\n' "$repository"
+      fi
+      ;;
+    *) die "Repository must be an owner/repo or a Git URL: $repository" ;;
+  esac
+}
+
+clone_repository() {
+  local repository=$1
+  local worktrees_base=$2
+  local repo_url=""
+  local repo_name=""
+  local bare_dir=""
+  local worktrees_dir=""
+  local branch=""
+  local -a branches=()
+
+  repo_url="$(normalize_repository "$repository")"
+  repo_name="$(basename "$repo_url" .git)"
+  bare_dir="$BARE_HOME/$repo_name"
+  worktrees_dir="$worktrees_base/$repo_name"
+
+  if [[ -d $bare_dir ]]; then
+    print_warn "YA EXISTE bare: $bare_dir (omitido)"
+    return 0
+  fi
+  if [[ -e $worktrees_dir ]]; then
+    print_warn "YA EXISTE worktrees: $worktrees_dir (omitido)"
+    return 0
+  fi
+
+  print_header "${ICON_GIT} git-bare-clone"
+  print_section "${ICON_GEAR} Configuration"
+  print_info "Repository:  ${WHITE}$repo_name${NC}"
+  print_info "Bare:        ${GRAY}$bare_dir${NC}"
+  print_info "Worktrees:   ${GRAY}$worktrees_dir${NC}"
+
+  print_section "${ICON_CLONE} [1/5] Cloning bare repository"
+  mkdir -p "$BARE_HOME"
+  git clone --bare "$repo_url" "$bare_dir"
+  print_success "Bare repo cloned to ${GRAY}$bare_dir${NC}"
+
+  print_section "${ICON_GEAR} [2/5] Configuring remote fetch refs"
+  pushd "$bare_dir" > /dev/null
+  git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  print_success "Fetch refspec configured"
+
+  print_section "${ICON_ARROW} [3/5] Fetching remote tracking refs"
+  git fetch origin
+  print_success "All remote refs fetched"
+  popd > /dev/null
+
+  print_section "${ICON_FOLDER} [4/5] Setting up worktrees directory"
+  mkdir -p "$worktrees_dir"
+  echo "gitdir: $bare_dir" > "$worktrees_dir/.git"
+  print_success "Worktrees root created at ${GRAY}$worktrees_dir${NC}"
+
+  print_section "${ICON_BRANCH} [5/5] Creating worktrees for all remote branches"
+  mapfile -t branches < <(
+    git --git-dir="$bare_dir" for-each-ref \
+      --format='%(refname)' \
+      refs/remotes/origin/ |
+      grep -v 'refs/remotes/origin/HEAD' |
+      sed 's|^refs/remotes/origin/||'
+  )
+
+  pushd "$worktrees_dir" > /dev/null
+  for branch in "${branches[@]}"; do
+    print_step "${CYAN}$branch${NC}"
+    git worktree add "$branch" "$branch"
+    git -C "$branch" branch --set-upstream-to="origin/$branch" "$branch"
+  done
+  popd > /dev/null
+
+  print_header "${ICON_ROCKET} All worktrees ready"
+  echo -e "  ${CYAN}$worktrees_dir/${NC}"
+  for branch in "${branches[@]}"; do
+    echo -e "  ${GREEN}${ICON_CHECK}${NC} ${WHITE}$branch${NC}  ${GRAY}→  origin/$branch${NC}"
+  done
+  echo ""
+  print_info "cd ${CYAN}$worktrees_dir/<branch>${NC} to start working"
+  echo ""
+}
+
+if ((batch_mode == 1)); then
+  for index in "${!batch_repositories[@]}"; do
+    clone_repository "${batch_repositories[$index]}" "${batch_worktrees[$index]}"
+  done
+else
+  clone_repository "${args[0]}" "$worktrees_base"
 fi
-if [[ -e "$worktrees_dir" ]]; then
-  print_warn "YA EXISTE worktrees: $worktrees_dir (omitido)"
-  exit 0
-fi
-
-print_header "${ICON_GIT} git-bare-clone"
-
-print_section "${ICON_GEAR} Configuration"
-print_info "Repository:  ${WHITE}$repo_name${NC}"
-print_info "Bare:        ${GRAY}$bare_dir${NC}"
-print_info "Worktrees:   ${GRAY}$worktrees_dir${NC}"
-
-# ┌──────────────────────────────────────────────────────────────────────────────┐
-# │ Execution Steps                                                              │
-# └──────────────────────────────────────────────────────────────────────────────┘
-
-# ── Step 1/5: Clone bare ──────────────────────────────────────────────────────
-print_section "${ICON_CLONE} [1/5] Cloning bare repository"
-mkdir -p "$BARE_HOME"
-git clone --bare "$repo_url" "$bare_dir"
-print_success "Bare repo cloned to ${GRAY}$bare_dir${NC}"
-
-# ── Step 2/5: Configure fetch refspec ────────────────────────────────────────
-print_section "${ICON_GEAR} [2/5] Configuring remote fetch refs"
-pushd "$bare_dir" >/dev/null
-git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-print_success "Fetch refspec configured"
-
-# ── Step 3/5: Fetch all remote tracking refs ─────────────────────────────────
-print_section "${ICON_ARROW} [3/5] Fetching remote tracking refs"
-git fetch origin
-print_success "All remote refs fetched"
-popd >/dev/null
-
-# ── Step 4/5: Create worktrees directory with .git pointer ───────────────────
-print_section "${ICON_FOLDER} [4/5] Setting up worktrees directory"
-mkdir -p "$worktrees_dir"
-echo "gitdir: $bare_dir" >"$worktrees_dir/.git"
-print_success "Worktrees root created at ${GRAY}$worktrees_dir${NC}"
-
-# ── Step 5/5: Create all worktrees with upstream tracking ────────────────────
-print_section "${ICON_BRANCH} [5/5] Creating worktrees for all remote branches"
-mapfile -t branches < <(
-  git --git-dir="$bare_dir" for-each-ref \
-    --format='%(refname)' \
-    refs/remotes/origin/ |
-    grep -v 'refs/remotes/origin/HEAD' |
-    sed 's|^refs/remotes/origin/||'
-)
-
-pushd "$worktrees_dir" >/dev/null
-for branch in "${branches[@]}"; do
-  print_step "${CYAN}$branch${NC}"
-  git worktree add "$branch" "$branch"
-  git -C "$branch" branch --set-upstream-to="origin/$branch" "$branch"
-done
-popd >/dev/null
-
-# ┌──────────────────────────────────────────────────────────────────────────────┐
-# │ Summary                                                                      │
-# └──────────────────────────────────────────────────────────────────────────────┘
-
-print_header "${ICON_ROCKET} All worktrees ready"
-
-echo -e "  ${CYAN}$worktrees_dir/${NC}"
-for branch in "${branches[@]}"; do
-  echo -e "  ${GREEN}${ICON_CHECK}${NC} ${WHITE}$branch${NC}  ${GRAY}→  origin/$branch${NC}"
-done
-echo ""
-print_info "cd ${CYAN}$worktrees_dir/<branch>${NC} to start working"
-echo ""

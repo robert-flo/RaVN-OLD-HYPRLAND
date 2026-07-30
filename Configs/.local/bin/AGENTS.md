@@ -44,11 +44,18 @@ Clones a remote repository as a bare repo and instantiates worktrees for all rem
 * **Default Paths**:
 * Bare repo: `~/.local/share/git-bare/<repo>` (Override with `$BARE_HOME`)
 * Worktrees: `~/Work/<repo>` (Override with `$WORKTREES_HOME`)
-* **Syntax**: `git-bare-clone [-h] [-v] [-w <path>] <repository>`
+* **Syntax**:
+  ```bash
+  git-bare-clone [-h] [-v] [-w <path>] <repository>
+  git-bare-clone [--verbose] --group <worktrees-path> <repository>... [--group <worktrees-path> <repository>...]
+  ```
 * **Options**:
   * `-h, --help`: Show help.
   * `-v, --verbose`: Enable debug verbosity.
   * `-w, --worktrees-dir`: Custom worktrees base directory.
+  * `--group <worktrees-path> <repository>...`: Batch clone one or more repositories into the given worktrees path. Repeat `--group` to use several destinations in one invocation.
+* **Repository formats**: Accepts SSH and HTTPS Git URLs, local paths, and GitHub shorthand (`owner/repository`, expanded to `git@github.com:owner/repository.git`).
+* **Batch contract**: An existing bare repo or worktrees directory is skipped and later repositories continue. A real clone failure stops the batch immediately and returns Git's failure status.
 * **Workflow Example**:
   ```bash
   git-bare-clone https://github.com/user/myrepo.git
@@ -57,6 +64,13 @@ Clones a remote repository as a bare repo and instantiates worktrees for all rem
   # ~/Work/myrepo/main/ (Worktree 1)
   # ~/Work/myrepo/develop/ (Worktree 2)
   ```
+* **Batch Example**:
+  ```bash
+  git-bare-clone \
+    --group /projects/platform acme/api acme/web \
+    --group ~/Work example/tooling example/docs
+  ```
+  Each repository keeps its bare clone under `~/.local/share/git-bare/`; only its worktrees go to the group path.
 
 ### 2. `git-create-worktree`
 Creates a new worktree linked to a branch with automatic upstream tracking.
