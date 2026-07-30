@@ -99,8 +99,8 @@ fi
 # │ Configuration                                                                │
 # └──────────────────────────────────────────────────────────────────────────────┘
 
-BARE_HOME="${BARE_HOME:-/z_clones}"
-WORKTREES_HOME="${WORKTREES_HOME:-/z_Transformer}"
+BARE_HOME="${BARE_HOME:-$HOME/.local/share/git-bare}"
+WORKTREES_HOME="${WORKTREES_HOME:-$HOME/Work}"
 
 # Iconos específicos del script
 readonly ICON_FOLDER="󰉋"
