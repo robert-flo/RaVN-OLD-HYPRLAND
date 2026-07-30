@@ -18,7 +18,7 @@ Owned by the RaVN installer pipeline. Changes here propagate to user systems on 
 - Shell config files (`.bashrc`, `.zshenv`, `.profile`) live at the `Configs/` root.
 - Application configs live under `Configs/.config/<app>/`.
 - Local binaries and desktop entries live under `Configs/.local/`.
-- After adding or removing a config target, update `restore_cfg.psv` and verify with `restore_cfg.sh --dry-run` when available.
+- After adding or removing a config target, update `restore_cfg.psv`. After every change beneath `Configs/`, run `bash Scripts/install.sh -o` and verify the affected live target in `$HOME`; this is the required non-privileged overwrite validation for agents.
 
 # Verification
 
