@@ -31,6 +31,7 @@
 #    make git-pull            DRY_RUN=1   · skip git pull
 #    make git-amend           DRY_RUN=1   · skip git commit --amend
 #    make git-clean            DRY_RUN=1   · preview cleanup without removing
+#    make git-protect-default-branch DRY_RUN=1 · preview GitHub branch protection
 #    (git-status, git-diff, git-log, git-add-fuzzy, git-diff-fuzzy, git-search are read-only)
 
 DRY_RUN ?= 0
@@ -53,9 +54,10 @@ RAVN_WTS_DIR ?= $(abspath $(RAVN_DIR)/..)
 GIT_REMOTE ?= origin
 BASE_BRANCH ?= master
 PROTECTED_BRANCHES ?= master dev rc imgbot
+GIT_PROTECTION_REQUIRED_APPROVALS ?= 0
 
 .PHONY: help-git git-add git-commit git-cm git-add-commit git-push git-pull git-status git-diff git-log git-setup git-sync git-diff-dev git-diff-rc git-diff-here \
-        git-add-fuzzy git-amend git-clean git-prune-branches git-diff-fuzzy git-search
+        git-add-fuzzy git-amend git-clean git-prune-branches git-diff-fuzzy git-search git-protect-default-branch
 
 # ═══════════════════════════════════════════════════════════════
 # 🔀 HELP-GIT - Show Git operations
@@ -81,7 +83,48 @@ help-git: ## Show Git operation targets
 	@printf "  make git-setup            Create a bare clone and worktrees\n"
 	@printf "  make git-sync             Rebase topic worktrees onto origin/master\n"
 	@printf "  make git-diff-here        Compare the worktree with the base branch\n"
+	@printf "  make git-protect-default-branch\n"
+	@printf "                            Require PRs before updating the GitHub default branch\n"
 	@printf "\nRun make help-aliases for compatibility aliases. Set DRY_RUN=1 to preview mutating targets.\n"
+
+# ═══════════════════════════════════════════════════════════════
+# 🛡️  GIT-PROTECT-DEFAULT-BRANCH - Require pull requests on GitHub
+# ═══════════════════════════════════════════════════════════════
+# ──── Protection: Resolves the current GitHub repo and its default branch ────
+# ──── Usage: make git-protect-default-branch [GIT_PROTECTION_REQUIRED_APPROVALS=1] ────
+git-protect-default-branch: ## Require PRs before updating the GitHub default branch
+	@set -eu; \
+	if ! command -v gh > /dev/null 2>&1; then \
+		printf "$(RED)  ✗ GitHub CLI (gh) is required$(NC)\n"; \
+		exit 1; \
+	fi; \
+	if ! gh auth status > /dev/null 2>&1; then \
+		printf "$(RED)  ✗ authenticate GitHub CLI first: gh auth login$(NC)\n"; \
+		exit 1; \
+	fi; \
+	case "$(GIT_PROTECTION_REQUIRED_APPROVALS)" in \
+		'' | *[!0-9]*) \
+			printf "$(RED)  ✗ GIT_PROTECTION_REQUIRED_APPROVALS must be a non-negative integer$(NC)\n"; \
+			exit 1 ;; \
+	esac; \
+	REPOSITORY=$$(gh repo view --json nameWithOwner --jq '.nameWithOwner') || exit 1; \
+	DEFAULT_BRANCH=$$(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name') || exit 1; \
+	if [ -z "$$REPOSITORY" ] || [ -z "$$DEFAULT_BRANCH" ] || [ "$$REPOSITORY" = "null" ] || [ "$$DEFAULT_BRANCH" = "null" ]; then \
+		printf "$(RED)  ✗ could not resolve a GitHub repository and default branch$(NC)\n"; \
+		exit 1; \
+	fi; \
+	PAYLOAD=$$(printf '%s' '{"required_status_checks":null,"enforce_admins":true,"required_pull_request_reviews":{"dismiss_stale_reviews":false,"require_code_owner_reviews":false,"required_approving_review_count":$(GIT_PROTECTION_REQUIRED_APPROVALS),"require_last_push_approval":false},"restrictions":null,"required_linear_history":false,"allow_force_pushes":false,"allow_deletions":false,"block_creations":false,"required_conversation_resolution":false,"lock_branch":false,"allow_fork_syncing":false}'); \
+	printf "  $(DIM)repository:$(NC) $$REPOSITORY\n"; \
+	printf "  $(DIM)branch:$(NC)     $$DEFAULT_BRANCH\n"; \
+	printf "  $(DIM)approvals:$(NC)  $(GIT_PROTECTION_REQUIRED_APPROVALS)\n"; \
+	if [ "$(DRY_RUN)" = "1" ]; then \
+		printf "\n  ▶ [dry-run] would require pull requests and block direct/force pushes\n"; \
+		exit 0; \
+	fi; \
+	printf '%s\n' "$$PAYLOAD" | gh api --method PUT \
+		"repos/$$REPOSITORY/branches/$$DEFAULT_BRANCH/protection" --input - > /dev/null; \
+	printf "\n$(GREEN)  ✓ protected $$DEFAULT_BRANCH: updates now require a pull request$(NC)\n\n"; \
+	printf "  $(DIM)Administrators cannot bypass the rule; force-pushes and deletion are blocked.\n$(NC)"
 
 # ═══════════════════════════════════════════════════════════════
 # 💾 GIT-ADD - Stage all modified/new files for commit
@@ -225,8 +268,7 @@ ifndef EMBEDDED
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • verify remote history: $(BLUE)make git-log$(NC)\n"
-	@printf "  • check repo state: $(BLUE)make git-status$(NC)\n"
-	@printf "  • apply system after push: $(BLUE)make sys-apply$(NC)\n\n"
+	@printf "  • check repo state: $(BLUE)make git-status$(NC)\n\n"
 endif
 
 # ═══════════════════════════════════════════════════════════════
@@ -250,8 +292,7 @@ ifndef EMBEDDED
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • check repo state:     $(BLUE)make git-status$(NC)\n"
-	@printf "  • view history:         $(BLUE)make git-log$(NC)\n"
-	@printf "  • validate formatting:  $(BLUE)make fmt-check$(NC)\n\n"
+	@printf "  • view history:         $(BLUE)make git-log$(NC)\n\n"
 endif
 
 # ═══════════════════════════════════════════════════════════════
@@ -353,9 +394,7 @@ ifndef EMBEDDED
 	@printf "\n$(GREEN)  ✓ done$(NC)\n"
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
-	@printf "  • stage and commit: $(BLUE)make git-add-commit$(NC)\n"
-	@printf "  • validate scripts: $(BLUE)make fmt-lint$(NC)\n"
-	@printf "  • test in RavnVM:   $(BLUE)make dev-vm$(NC)\n\n"
+	@printf "  • stage and commit: $(BLUE)make git-add-commit$(NC)\n\n"
 endif
 
 # ═══════════════════════════════════════════════════════════════
