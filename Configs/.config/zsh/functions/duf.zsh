@@ -7,5 +7,5 @@ _df() {
 }
 
 if command -v "duf" &>/dev/null; then
-    alias df='_df'
+    alias disk='_df'
 fi

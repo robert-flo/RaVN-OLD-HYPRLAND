@@ -79,7 +79,7 @@ add_to_path "$NPM_CONFIG_PREFIX/bin"
 alias fn='nvim $(fzf)'
 alias fp='zathura $(fzf)'
 alias da='direnv allow .'
-alias d='docker'
+alias dk='docker'
 alias lzd='lazydocker'
 alias rviz2='QT_QPA_PLATFORM=xcb rviz2'
 alias t='tree --depth=1'
