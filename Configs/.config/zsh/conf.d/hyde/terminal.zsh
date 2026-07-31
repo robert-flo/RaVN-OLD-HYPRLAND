@@ -230,7 +230,7 @@ __package_manager () {
     ${PM_COMMAND[@]} "$@"
 }
 
-alias c='clear' \
+alias cls='clear' \
     in='__package_manager install' \
     un='__package_manager remove' \
     up='__package_manager upgrade' \
@@ -244,5 +244,4 @@ alias c='clear' \
     .4='cd ../../../..' \
     .5='cd ../../../../..' \
     mkdir='mkdir -p'
-
 
