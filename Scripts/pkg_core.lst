@@ -132,6 +132,7 @@ yazi                                                   # Terminal file manager w
 starship|zsh                                           # customizable shell prompt written in Rust
 # starship-git                                         # The cross-shell prompt for astronauts
 starship|fish                                          # customizable shell prompt
+pre-commit                                             # Git pre-commit framework
 shfmt                                                  # Shell script formatter
 shellcheck                                             # Shell script static analysis tool
 zoxide                                                 # A smarter cd command for your terminal
