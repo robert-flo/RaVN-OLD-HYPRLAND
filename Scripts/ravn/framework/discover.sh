@@ -5,6 +5,7 @@
 
 # Populated by discover_tasks(); consumed by run_pipeline().
 TASKS=()
+RAVN_DISCOVERY_RESULT="not-run"
 
 task_is_reference_only() (
   local file="$1"
@@ -21,6 +22,10 @@ task_is_reference_only() (
 #   Populates the global TASKS array.
 discover_tasks() {
   local search_dir="${1:-${RAVN_DIR}/tasks}"
+  local discovery_file=""
+
+  TASKS=()
+  RAVN_DISCOVERY_RESULT="failed"
 
   if [[ ! -d $search_dir ]]; then
     error_msg "Task directory not found: ${search_dir}"
@@ -28,22 +33,29 @@ discover_tasks() {
   fi
 
   local -a discovered_tasks=()
-  mapfile -t discovered_tasks < <(
-    find "$search_dir" \
-      -type f \
-      -name "*.sh" |
-      sort
-  )
+  discovery_file=$(mktemp) || {
+    error_msg "Could not prepare task discovery."
+    return 1
+  }
+  if ! find "$search_dir" -type f -name "*.sh" -print > "$discovery_file"; then
+    rm -f "$discovery_file"
+    error_msg "Task discovery failed: ${search_dir}"
+    return 1
+  fi
+  mapfile -t discovered_tasks < <(sort "$discovery_file")
+  rm -f "$discovery_file"
 
-  TASKS=()
   for file in "${discovered_tasks[@]}"; do
     task_is_reference_only "$file" && TASKS+=("$file")
   done
 
   if ((${#TASKS[@]} == 0)); then
+    RAVN_DISCOVERY_RESULT="empty"
     warn_msg "No task modules found in ${search_dir}"
     return 0
   fi
 
+  # shellcheck disable=SC2034 # Consumed by the interactive runner.
+  RAVN_DISCOVERY_RESULT="success"
   info "Discovered ${#TASKS[@]} task modules"
 }
