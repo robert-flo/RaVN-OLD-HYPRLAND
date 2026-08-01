@@ -75,3 +75,8 @@ export RUSTICL_ENABLE=iris
 export LIBVA_DRIVER_NAME=i965
 export VDPAU_DRIVER=va_gll
 
+# =============================================================================
+# Final PATH cleanup (deduplicate after all sources)
+# =============================================================================
+typeset -U path
+path=("${path[@]}")

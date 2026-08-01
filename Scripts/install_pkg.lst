@@ -125,6 +125,7 @@ mpv                                                    # Media player for local 
 resvg                                                  # SVG rasterization for elio previews
 7zip                                                   # Archive preview support for elio
 elio                                                   # Terminal file manager with rich previews (AUR)
+yazi                                                   # Terminal file manager with shell integration
 
 # --------------------------------------------------- // Shell
 starship|zsh                                           # customizable shell prompt written in Rust
