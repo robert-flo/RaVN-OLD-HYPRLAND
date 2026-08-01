@@ -16,7 +16,8 @@ installer pipeline.
 - **Interactive menu**: no-argument execution validates the environment, then
   exposes revision execution, storage, snapshots, resources, usage, and SSH.
 - **Direct CLI**: preserve `--persist`, `--list`, `--clean`, `--install-deps`,
-  `--check-deps`, `--ssh`, and `--help`, plus direct branch/commit arguments.
+  `--check-deps`, `--install-ssh-alias`, `--ssh`, and `--help`, plus direct
+  branch/commit arguments.
 - **VM defaults**: use `VM_MEMORY=4G` and `VM_CPUS=2` unless overridden for the
   current invocation or session.
 - **Repository source**: VM setup must clone or update the configured RaVN
@@ -24,6 +25,8 @@ installer pipeline.
   local-working-tree execution path.
 - **Cache**: use `$XDG_CACHE_HOME/ravnvm/`, preserving `archbase.qcow2` when
   cleaning snapshots and temporary VM data.
+- **Single VM session**: reject a second VM launch while another RavnVM process
+  owns the session lock; keep read-only commands and SSH access available.
 - **Make interface**: `make/dev.mk` is an alternative interaction surface over
   the same RavnVM engine. Do not duplicate VM execution logic there.
 - **Visual language**: preserve the shared numbered-menu convention: green
@@ -44,6 +47,7 @@ The menu currently provides:
 8. Configure RAM and CPU for the current session.
 9. Show the shared RavnVM usage information.
 10. Connect to the running VM through SSH.
+11. Install the optional `ssh ravnvm` host alias.
 
 Missing dependencies must be handled before the normal menu and may offer only
 dependency installation or exit. Empty snapshots, failed cleanup, missing VMs,
@@ -58,7 +62,7 @@ corrupting cached base data.
   new seams.
 - Keep session resource changes in memory; do not create a persistent resource
   configuration file unless explicitly requested.
-- Make changes on a feature branch and merge them into `dev` through a PR.
+- Make changes on a feature branch and merge them into `master` through a PR.
 - Keep commits focused and preserve unrelated user changes.
 
 # Verification
@@ -67,6 +71,12 @@ Run the executable interaction suite:
 
 ```bash
 Scripts/ravnvm/tests/menu.sh
+Scripts/ravnvm/tests/interrupt.sh
+Scripts/ravnvm/tests/snapshot.sh
+Scripts/ravnvm/tests/download.sh
+Scripts/ravnvm/tests/ssh.sh
+Scripts/ravnvm/tests/session.sh
+Scripts/ravnvm/tests/make.sh
 ```
 
 Also run `bash -n`, `shellcheck`, `shfmt`, and the repository pre-commit hook.

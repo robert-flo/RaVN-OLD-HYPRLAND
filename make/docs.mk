@@ -60,14 +60,14 @@ endif
 		} \
 	} \
 	END { \
-		print_cat("Documentation & Help", "help help-examples help-aliases doc-local doc-dev doc-build doc-install doc-clean"); \
+		print_cat("Documentation & Help", "help help-examples help-aliases help-ravnvm doc-local doc-dev doc-build doc-install doc-clean"); \
 		print_cat("System Maintenance", "sys-apply sys-apply-safe sys-apply-fast sys-test sys-build sys-dry-run sys-boot sys-check sys-debug sys-force sys-doctor sys-fix-git sys-hw-scan sys-copy-hw-config sys-deploy"); \
 		print_cat("Cleanup & Optimization", "sys-purge sys-clean-vm sys-disk-repo sys-disk-home sys-optimize sys-clean-result sys-fix-store"); \
 		print_cat("Updates & Flakes", "upd-all upd-nixpkgs upd-hydenix upd-input upd-ai upd-diff upd-upgrade upd-show upd-check"); \
 		print_cat("Generations & Rollback", "gen-list gen-rollback gen-rollback-commit gen-diff gen-diff-current gen-sizes gen-current"); \
 		print_cat("Git Operations", "git-setup git-sync git-add git-commit git-cm git-add-commit git-push git-pull git-status git-diff git-log git-add-fuzzy git-amend git-prune-branches git-diff-fuzzy git-search"); \
 		print_cat("Diagnostics & Logs", "sys-status log-net log-net-enhanced log-watch log-boot log-err log-svc"); \
-		print_cat("Development Tools", "dev-setup dev-vm dev-vm-persist dev-vm-list dev-vm-clean dev-vm-size"); \
+		print_cat("Development Tools", "dev-setup dev-vm dev-vm-persist dev-vm-list dev-vm-clean dev-vm-setup dev-vm-storage dev-vm-size dev-vm-ssh dev-vm-install-ssh-alias dev-vm-external"); \
 		print_cat("Formatting & Linting", "fmt fmt-check fmt-lint fmt-report fmt-tree fmt-diff"); \
 	}'
 ifndef EMBEDDED

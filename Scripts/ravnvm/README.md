@@ -1,13 +1,11 @@
 # RavnVM - Simplified VM Tool for RaVN Contributors
 
-RavnVM is a streamlined development tool that automatically sets up RaVN in a virtual machine for testing different branches and commits.
+RavnVM is a streamlined development tool that guides RaVN setup in a virtual machine for testing different branches and commits.
 
 - [RavnVM - Simplified VM Tool for RaVN Contributors](#ravnvm---simplified-vm-tool-for-ravn-contributors)
   - [Hardware Requirements](#hardware-requirements)
   - [Features](#features)
   - [Quick Start](#quick-start)
-    - [Arch Linux](#arch-linux)
-    - [NixOS](#nixos)
   - [First-Time Setup](#first-time-setup)
   - [Usage](#usage)
     - [Interactive menu](#interactive-menu)
@@ -19,10 +17,8 @@ RavnVM is a streamlined development tool that automatically sets up RaVN in a vi
     - [KVM Not Available](#kvm-not-available)
     - [Missing Dependencies](#missing-dependencies)
     - [Clean Start](#clean-start)
-    - [Killing http server](#killing-http-server)
   - [VM Host Guide](#vm-host-guide)
     - [Hardware Requirements (Detailed)](#hardware-requirements-detailed)
-    - [Non-NixOS Hosts using Nix](#non-nixos-hosts-using-nix)
     - [AMD GPU + Any CPU ✅](#amd-gpu--any-cpu-)
     - [Intel CPU with iGPU ✅](#intel-cpu-with-igpu-)
     - [NVIDIA GPU + Any CPU ⚠️](#nvidia-gpu--any-cpu-️)
@@ -47,7 +43,7 @@ RavnVM is a streamlined development tool that automatically sets up RaVN in a vi
 
 ## Features
 
-- **Zero Configuration**: Automatically downloads Arch Linux base image and sets up RaVN
+- **Guided Setup**: Automatically downloads the Arch Linux base image and copies the RaVN setup script into the VM
 - **Branch Testing**: Easily test any RaVN branch or commit hash
 - **Smart Caching**: Creates cached snapshots for faster subsequent runs (uses XDG cache directory)
 - **Optional Persistence**: Choose whether changes should be saved or discarded
@@ -55,23 +51,11 @@ RavnVM is a streamlined development tool that automatically sets up RaVN in a vi
 
 ## Quick Start
 
-### Arch Linux
-
 ```bash
-# Download and run (will auto-detect missing packages)
-curl -L https://raw.githubusercontent.com/robert-flo/RaVN/master/Scripts/ravnvm/ravnvm.sh -o ravnvm
-chmod +x ravnvm
-./ravnvm
-```
-
-### NixOS
-
-```bash
-# Using flakes from RaVN repository
-nix run github:robert-flo/RaVN
-
-# Or if you have the repository cloned locally
-nix run
+# Clone and run (will auto-detect missing packages)
+git clone https://github.com/robert-flo/Valhalla.git
+cd Valhalla
+Scripts/ravnvm/ravnvm.sh
 ```
 
 ## First-Time Setup
@@ -79,11 +63,11 @@ nix run
 When you run a new branch/commit for the first time, ravnvm will:
 
 1. **OS Detection**: Automatically detects your OS and checks dependencies
-2. **Dependency Installation**: (Arch only) Prompts to install missing packages
-3. **VM Setup**: Shows a VM window with setup instructions
+2. **Dependency Installation**: On Arch, offers to install missing packages
+3. **VM Setup**: Copies a setup script into the VM and shows the command to run
 4. **RaVN Installation**: You'll need to:
    - Login as `arch` / `arch`
-   - Run the provided curl command to download and execute the setup script
+   - Run `chmod +x ./setup.sh && ./setup.sh`
    - Wait for RaVN installation to complete
      - Hit enter for defaults
      - It will prompt for a password at the end, use `arch`
@@ -111,6 +95,7 @@ interactive menu. The menu is the friendly interface for the same VM engine:
 8  Configure RAM and CPU
 9  Show RavnVM usage
 10 Connect to VM via SSH
+11 Install SSH alias
 q  Exit
 ```
 
@@ -121,7 +106,8 @@ GitHub inside the VM; it does not provision from local working-tree changes.
 
 Option 8 changes RAM and CPU for the current process only. The defaults are
 `VM_MEMORY=4G` and `VM_CPUS=2`. Option 9 displays the same usage information as
-`ravnvm --help`, and option 10 connects to the running VM on SSH port 2222.
+`ravnvm --help`, option 10 connects to the running VM on SSH port 2222, and
+option 11 installs the optional `ssh ravnvm` host alias.
 
 The menu validates the host environment first and shows the RavnVM cache size,
 filesystem usage, free space, and a storage warning when usage reaches 80% or
@@ -150,14 +136,20 @@ ravnvm --persist dev-branch
 # List cached snapshots
 ravnvm --list
 
-# Clean all cached data
+# Clean snapshots and temporary data while preserving the base image
 ravnvm --clean
+
+# Show cache and filesystem storage usage
+ravnvm --storage
 
 # Check dependencies
 ravnvm --check-deps
 
 # Install dependencies (Arch only)
 ravnvm --install-deps
+
+# Install the optional `ssh ravnvm` host alias
+ravnvm --install-ssh-alias
 ```
 
 ### Make interface
@@ -180,14 +172,27 @@ make dev-vm-clean
 
 # Check dependencies and inspect VM disk usage
 make dev-vm-setup
-make dev-vm-size
+make dev-vm-storage
+make dev-vm-size # Compatibility alias for dev-vm-storage
+make dev-vm-ssh
+make dev-vm-install-ssh-alias
+
+# Run an external repository for a one-off test
+make dev-vm-external REPO=robert-flo/Valhalla REF=master
+make dev-vm-external REPO=https://github.com/robert-flo/Valhalla.git REF=dev
 
 # Preview a target without launching or changing the VM
 make dev-vm DRY_RUN=1 REF=dev
 ```
 
+The Make integration source is `make/dev.mk`; it mirrors the interactive menu
+for revision execution, persistence, snapshots, cleanup, storage, dependency
+setup, resource defaults, and SSH access.
+
 `make dev-vm` defaults `REF` to the active checkout branch. VM resource
 variables and QEMU overrides can be passed through the make interface.
+`dev-vm-external` requires `REPO` and defaults `REF` to `master`; it does not
+change the default RaVN repository used by the regular targets.
 
 ### Environment Variables
 
@@ -198,6 +203,10 @@ VM_MEMORY=8G VM_CPUS=4 ravnvm
 # Set extra QEMU arguments
 VM_EXTRA_ARGS="-display vnc=:1" ravnvm
 
+# Use another repository from the command line; owner/name is also accepted
+RAVNVM_REPO=robert-flo/Valhalla ravnvm master
+ravnvm --repo robert-flo/Valhalla master
+
 # Override QEMU command entirely, provided $VM_DISK will be substituted with the actual disk image
 VM_QEMU_OVERRIDE="qemu-system-x86_64 -m 4G -smp 2 -enable-kvm -drive file=\$VM_DISK,format=qcow2,if=virtio -device virtio-vga -display gtk" ravnvm
 ```
@@ -205,7 +214,8 @@ VM_QEMU_OVERRIDE="qemu-system-x86_64 -m 4G -smp 2 -enable-kvm -drive file=\$VM_D
 ## VM Details
 
 - **Login**: `arch` / `arch`
-- **SSH Access**: `ssh arch@localhost -p 2222`
+- **SSH Access**: `ssh arch@127.0.0.1 -p 2222` or `ravnvm --ssh`
+- **SSH Alias**: run `ravnvm --install-ssh-alias` once, then use `ssh ravnvm`
 - **Persistence**: Optional flag determines if changes are saved
 - **Cache Directory**: Uses XDG Base Directory specification (`$XDG_CACHE_HOME/ravnvm/`)
 - **Snapshots**: Stored in `$XDG_CACHE_HOME/ravnvm/snapshots/` (typically `~/.cache/ravnvm/snapshots/`)
@@ -225,21 +235,13 @@ virtualisation.libvirtd.enable = true;
 
 ### Missing Dependencies
 
-- **Arch**: Script will prompt to install missing packages
-- **NixOS**: Nix will automatically install missing packages
+- **Arch**: Run `ravnvm --install-deps` when the dependency check reports missing commands.
+- **NixOS**: Provide `qemu`, `curl`, `python3`, and `git` through `nix-shell` or the system configuration.
 
 ### Clean Start
 
 ```bash
-ravnvm --clean  # Remove all cached data from $XDG_CACHE_HOME/ravnvm/
-```
-
-### Killing http server
-
-If you are running into issues with the http server, you can kill it with:
-
-```bash
-pkill -f "python3 -m http.server"
+ravnvm --clean  # Remove snapshots and temporary data; preserve archbase.qcow2
 ```
 
 ## VM Host Guide
@@ -268,15 +270,6 @@ RaVN uses Hyprland, which has specific requirements for VM environments. Hyprlan
 - ✅ **Intel**: HD 4000+ (Ivy Bridge) or newer
 - ⚠️ **NVIDIA**: GTX 600+ series (proprietary drivers may cause issues)
 - **OpenGL 3.3+ support required**
-
-### Non-NixOS Hosts using Nix
-
-For non-NixOS hosts, use [nixGL](https://github.com/nix-community/nixGL) for better graphics support:
-
-```bash
-# Install nixGL first, then run RavnVM
-nixGL nix run github:robert-flo/RaVN
-```
 
 ### AMD GPU + Any CPU ✅
 
