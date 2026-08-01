@@ -164,6 +164,21 @@ reload_hyde_user_only() {
   fi
 }
 
+install_mise_tools() {
+  if ((flg_DryRun == 1)); then
+    print_log -n "[mise] " -b "dry-run :: " "Would run mise install --locked"
+    return 0
+  fi
+
+  if ! command -v mise > /dev/null 2>&1; then
+    print_log -r "[mise] " -b "error :: " "mise was not found after package installation"
+    return 1
+  fi
+
+  print_log -g "[mise] " -b " :: " "Installing locked development runtimes..."
+  mise install --locked
+}
+
 # Gestiona el comportamiento de ejecución basándose en los argumentos provistos:
 # - Si se especificó el modo de prueba (dry-run), se imprime un mensaje de estado.
 # - Si el script se ejecutó sin ningún argumento (OPTIND=1), se habilitan por
@@ -410,7 +425,16 @@ EOF
     reload_hyde_user_only
   else
     "${scrDir}/restore_fnt.sh"
-    "${scrDir}/restore_cfg.sh"
+    if ! "${scrDir}/restore_cfg.sh"; then
+      print_log -r "[restore] " -b "error :: " "Configuration restoration failed"
+      exit 1
+    fi
+    if ((flg_Install == 1)); then
+      if ! install_mise_tools; then
+        print_log -r "[mise] " -b "error :: " "Failed to install locked development runtimes"
+        exit 1
+      fi
+    fi
     "${scrDir}/restore_thm.sh"
     print_log -g "[generate] " "cache ::" "Wallpapers..."
     if [ "${flg_DryRun}" -ne 1 ]; then

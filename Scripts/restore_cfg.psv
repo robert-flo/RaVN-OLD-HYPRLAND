@@ -76,6 +76,7 @@ O|${HOME}/.local/share|wallbash|bash imagemagick
  Git 
 S|${HOME}/.config|lazygit|lazygit
 P|${HOME}/.config/hunk|config.toml|hunk-bin
+S|${HOME}/.config/mise|config.toml mise.lock|mise
 O|${HOME}/.local/bin|git-bare-clone git-create-worktree git-issue-worktree git-setup ravn-dot global_fn.sh|git
 
  Editor 
