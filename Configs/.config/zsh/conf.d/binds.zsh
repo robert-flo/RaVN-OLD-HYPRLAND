@@ -6,3 +6,5 @@ bindkey "^[[5C" forward-word
 bindkey "^[[5D" backward-word
 bindkey "^[OC" forward-word
 bindkey "^[OD" backward-word
+bindkey '^y' yazi_choose
+bindkey '^u' yazi_cd
