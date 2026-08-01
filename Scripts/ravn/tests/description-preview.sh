@@ -23,11 +23,12 @@ grep -q 'No description available.' <<< "$preview"
 # shellcheck disable=SC2034 # Consumed by the sourced runner.
 RAVN_UI_EFFECTIVE=bash
 # shellcheck disable=SC2034 # Consumed by select_tasks_for_family.
-SELECTED_TASK_FAMILY=ALL
+selected_task_family=ALL
 selection_output_file=$(mktemp)
 trap 'rm -f "$fixture" "$selection_output_file"' EXIT
 select_tasks_for_family <<< '1' > "$selection_output_file"
-selected_task="${SELECTED_TASKS[0]}"
+# shellcheck disable=SC2154 # Populated by select_tasks_for_family().
+selected_task="${selected_tasks[0]}"
 resolve_task_files "$selected_task"
 preview=$(print_task_preview "${RESOLVED_TASKS[@]}")
 grep -q 'Task preview' <<< "$preview"

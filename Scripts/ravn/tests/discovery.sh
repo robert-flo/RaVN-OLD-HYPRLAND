@@ -12,7 +12,7 @@ source "${RAVN_DIR}/framework/package.sh"
 source "${RAVN_DIR}/framework/discover.sh"
 
 discover_tasks
-[[ ${RAVN_DISCOVERY_RESULT:-} == success ]]
+[[ ${ravn_discovery_result:-} == "success" ]]
 [[ ${#TASKS[@]} -eq 23 ]]
 [[ $(printf '%s\n' "${TASKS[@]}" | grep -c '/00-core/' || true) -eq 0 ]]
 [[ $(printf '%s\n' "${TASKS[@]}" | grep -c '/30-system/' || true) -eq 0 ]]

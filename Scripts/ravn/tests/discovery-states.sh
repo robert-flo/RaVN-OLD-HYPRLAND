@@ -18,7 +18,7 @@ menu_empty_output="$empty_dir/discovery-menu-empty"
 trap 'rm -rf "$empty_dir"' EXIT
 
 discover_tasks "$empty_dir"
-[[ ${RAVN_DISCOVERY_RESULT:-} == empty ]]
+[[ ${ravn_discovery_result:-} == "empty" ]]
 [[ ${#TASKS[@]} -eq 0 ]]
 
 missing_dir="$empty_dir/missing"
@@ -26,12 +26,12 @@ if discover_tasks "$missing_dir" > "$failure_output" 2>&1; then
   printf 'FAIL: missing task directory was accepted\n' >&2
   exit 1
 fi
-[[ ${RAVN_DISCOVERY_RESULT:-} == failed ]]
+[[ ${ravn_discovery_result:-} == "failed" ]]
 grep -q 'Task directory not found' "$failure_output"
 
 # shellcheck disable=SC2329 # Invoked indirectly by run_menu.
 discover_tasks() {
-  RAVN_DISCOVERY_RESULT=failed
+  ravn_discovery_result=failed
   return 1
 }
 if run_menu > "$menu_failure_output" 2>&1; then
@@ -41,7 +41,7 @@ fi
 grep -q 'interactive menu cannot start' "$menu_failure_output"
 
 discover_tasks() {
-  RAVN_DISCOVERY_RESULT=empty
+  ravn_discovery_result=empty
   return 0
 }
 read_task_runner_main_menu_choice() {

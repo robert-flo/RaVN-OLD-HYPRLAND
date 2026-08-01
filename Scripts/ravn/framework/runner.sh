@@ -495,7 +495,7 @@ print_task_results() {
   print_summary "Task Results"
 }
 
-task_description() (
+get_task_description() (
   local file="$1"
 
   load_task "$file"
@@ -510,7 +510,7 @@ print_task_preview() {
   print_section "${ICON_UI_DATABASE} Task preview"
   for file in "$@"; do
     name=$(task_name "$file")
-    description=$(task_description "$file")
+    description=$(get_task_description "$file")
     printf '  %s  %s\n' "$name" "$description"
   done
 }
@@ -524,16 +524,16 @@ confirm_task_action() {
   print_section "${ICON_UI_COMMAND} Confirm selection"
   print_info "$prompt"
 
-  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == gum ]]; then
+  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == "gum" ]]; then
     gum confirm "$prompt"
     return
   fi
 
   read -r -p "${LIGHT_GRAY}Proceed? [y/N]:${NC} " answer
-  [[ ${answer,,} == y || ${answer,,} == yes ]]
+  [[ ${answer,,} == "y" || ${answer,,} == "yes" ]]
 }
 
-task_family_display_name() {
+get_task_family_display_name() {
   case "$1" in
     cli-tools) printf 'CLI Tools' ;;
     legacy) printf 'Legacy' ;;
@@ -541,7 +541,7 @@ task_family_display_name() {
   esac
 }
 
-task_family_icon() {
+get_task_family_icon() {
   case "$1" in
     cli-tools) printf '%s' "$ICON_UI_TERMINAL" ;;
     legacy) printf '%s' "$ICON_DIAGNOSTIC_WARNING" ;;
@@ -549,7 +549,7 @@ task_family_icon() {
   esac
 }
 
-task_family_keys() {
+get_task_family_keys() {
   local file family
   local -a known=() unknown=()
 
@@ -569,7 +569,7 @@ task_family_keys() {
   printf '%s\n' "${known[@]}" "${unknown[@]}" | sed '/^$/d'
 }
 
-task_family_count() {
+get_task_family_count() {
   local target="$1"
   local file family count=0
 
@@ -586,17 +586,17 @@ print_task_catalog() {
 
   print_section "${ICON_UI_DATABASE} Task inventory"
   while IFS= read -r family; do
-    display=$(task_family_display_name "$family")
-    count=$(task_family_count "$family")
-    printf '  %s  %s · %s tasks\n' "$(task_family_icon "$family")" "$display" "$count"
-  done < <(task_family_keys)
+    display=$(get_task_family_display_name "$family")
+    count=$(get_task_family_count "$family")
+    printf '  %s  %s · %s tasks\n' "$(get_task_family_icon "$family")" "$display" "$count"
+  done < <(get_task_family_keys)
 }
 
 select_task_family() {
   local family display count choice selected
   local -a families=() options=()
 
-  mapfile -t families < <(task_family_keys)
+  mapfile -t families < <(get_task_family_keys)
   ((${#families[@]} > 0)) || {
     print_info "No tasks available"
     return 1
@@ -604,9 +604,9 @@ select_task_family() {
 
   local index=1
   for family in "${families[@]}"; do
-    display=$(task_family_display_name "$family")
-    count=$(task_family_count "$family")
-    options+=("${index}  $(task_family_icon "$family")  ${display} · ${count} tasks")
+    display=$(get_task_family_display_name "$family")
+    count=$(get_task_family_count "$family")
+    options+=("${index}  $(get_task_family_icon "$family")  ${display} · ${count} tasks")
     index=$((index + 1))
   done
   options+=("${index}  ${ICON_UI_DATABASE}  All categories · $((${#TASKS[@]})) tasks")
@@ -614,7 +614,7 @@ select_task_family() {
   clear || true
   print_ravn_banner "RaVN Task Runner"
   print_section "${ICON_UI_DATABASE} Choose tasks"
-  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == gum ]]; then
+  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == "gum" ]]; then
     selected=$(gum choose --header "" --cursor "$ICON_UI_ARROW" "${options[@]}") || return 1
     choice="${selected%% *}"
   else
@@ -623,7 +623,7 @@ select_task_family() {
     if ! read -r -p "${LIGHT_GRAY}Selection:${NC} " choice; then
       return 1
     fi
-    [[ ${choice,,} == q || $choice == $'\e' ]] && return 1
+    [[ ${choice,,} == "q" || $choice == $'\e' ]] && return 1
   fi
 
   if ! [[ $choice =~ ^[1-9][0-9]*$ ]] || ((choice < 1 || choice > ${#options[@]})); then
@@ -632,9 +632,9 @@ select_task_family() {
   fi
 
   if ((choice == ${#options[@]})); then
-    SELECTED_TASK_FAMILY="ALL"
+    selected_task_family="ALL"
   else
-    SELECTED_TASK_FAMILY="${families[choice - 1]}"
+    selected_task_family="${families[choice - 1]}"
   fi
 }
 
@@ -649,7 +649,7 @@ select_tasks_for_family() {
     for file in "${TASKS[@]}"; do
       family=$(task_family "$file")
       [[ -n $family ]] || family="legacy"
-      [[ $SELECTED_TASK_FAMILY == ALL || $family == "$SELECTED_TASK_FAMILY" ]] || continue
+      [[ $selected_task_family == "ALL" || $family == "$selected_task_family" ]] || continue
       printf '%s\t%s\n' "$(task_name "$file")" "$file"
     done | sort -f -k1,1
   )
@@ -662,14 +662,14 @@ select_tasks_for_family() {
   for index in "${!files[@]}"; do
     family=$(task_family "${files[index]}")
     [[ -n $family ]] || family="legacy"
-    display=$(task_family_display_name "$family")
-    options+=("$((index + 1))  $(task_family_icon "$family")  ${names[index]} · ${display}")
+    display=$(get_task_family_display_name "$family")
+    options+=("$((index + 1))  $(get_task_family_icon "$family")  ${names[index]} · ${display}")
   done
 
   clear || true
   print_ravn_banner "RaVN Task Runner"
   print_section "${ICON_UI_DATABASE} Choose tasks"
-  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == gum ]]; then
+  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == "gum" ]]; then
     mapfile -t selections < <(gum choose --no-limit --header "" --cursor "$ICON_UI_ARROW" "${options[@]}") || return 1
   else
     printf '%s\n' "${options[@]}"
@@ -677,13 +677,13 @@ select_tasks_for_family() {
     if ! read -r -p "${LIGHT_GRAY}Selection (comma-separated):${NC} " selected; then
       return 1
     fi
-    [[ ${selected,,} == q || $selected == $'\e' || -z $selected ]] && return 1
+    [[ ${selected,,} == "q" || $selected == $'\e' || -z $selected ]] && return 1
     IFS=',' read -ra selections <<< "$selected"
   fi
 
-  SELECTED_TASKS=()
+  selected_tasks=()
   for selected in "${selections[@]}"; do
-    if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == gum ]]; then
+    if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == "gum" ]]; then
       choice="${selected%% *}"
     elif [[ $selected =~ ^[[:space:]]*([1-9][0-9]*)[[:space:]]*$ ]]; then
       choice="${BASH_REMATCH[1]}"
@@ -692,17 +692,17 @@ select_tasks_for_family() {
       continue
     fi
     if [[ $choice =~ ^[1-9][0-9]*$ ]] && ((choice <= ${#files[@]})); then
-      SELECTED_TASKS+=("$(task_name "${files[choice - 1]}")")
+      selected_tasks+=("$(task_name "${files[choice - 1]}")")
     else
       invalid=1
     fi
   done
   if ((invalid == 1)); then
-    SELECTED_TASKS=()
+    selected_tasks=()
     print_warn "Invalid task selection; no tasks were selected."
     return 1
   fi
-  ((${#SELECTED_TASKS[@]} > 0)) || {
+  ((${#selected_tasks[@]} > 0)) || {
     print_info "No tasks selected"
     return 1
   }
@@ -714,7 +714,7 @@ run_menu_selection() {
 
   select_task_family || return 0
   select_tasks_for_family || return 0
-  selectors=("${SELECTED_TASKS[@]}")
+  selectors=("${selected_tasks[@]}")
   resolve_task_files "${selectors[@]}" || return 0
   print_task_preview "${RESOLVED_TASKS[@]}"
   if [[ $action == "test" || $action == "reset" || $action == "run" ]]; then
@@ -746,9 +746,9 @@ read_task_runner_main_menu_choice() {
   local gum_choice=""
 
   mapfile -t options < <(task_runner_main_menu_options)
-  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == gum ]]; then
+  if [[ ${RAVN_UI_EFFECTIVE:-${RAVN_UI:-bash}} == "gum" ]]; then
     gum_choice=$(gum choose --header "" --cursor "$ICON_UI_ARROW" "${options[@]}") || return 1
-    MENU_CHOICE="${gum_choice%% *}"
+    menu_choice="${gum_choice%% *}"
     return 0
   fi
 
@@ -759,7 +759,7 @@ read_task_runner_main_menu_choice() {
     return 1
   fi
   [[ $choice == $'\e' ]] && return 1
-  MENU_CHOICE="$choice"
+  menu_choice="$choice"
 }
 
 run_menu() {
@@ -769,7 +769,7 @@ run_menu() {
     error_msg "Task discovery failed; the interactive menu cannot start."
     return 1
   fi
-  if [[ ${RAVN_DISCOVERY_RESULT:-} == empty ]]; then
+  if [[ ${ravn_discovery_result:-} == "empty" ]]; then
     info "No tasks are available; the interactive menu cannot start."
     return 0
   fi
@@ -783,7 +783,7 @@ run_menu() {
     if ! read_task_runner_main_menu_choice; then
       return 0
     fi
-    choice="$MENU_CHOICE"
+    choice="$menu_choice"
 
     case "${choice,,}" in
       1)

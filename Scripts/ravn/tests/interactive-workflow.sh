@@ -15,14 +15,15 @@ discover_tasks
 # shellcheck disable=SC2034 # Consumed by the sourced runner.
 RAVN_UI_EFFECTIVE=bash
 # shellcheck disable=SC2034 # Consumed by select_tasks_for_family.
-SELECTED_TASK_FAMILY=ALL
+selected_task_family=ALL
 all_categories_output_file=$(mktemp)
 trap 'rm -f "$all_categories_output_file"' EXIT
 select_tasks_for_family <<< '1,2' > "$all_categories_output_file"
 all_categories_output=$(< "$all_categories_output_file")
 grep -q 'CLI Tools' <<< "$all_categories_output"
 grep -q 'Legacy' <<< "$all_categories_output"
-[[ ${#SELECTED_TASKS[@]} -eq 2 ]]
+# shellcheck disable=SC2154 # Populated by select_tasks_for_family().
+[[ ${#selected_tasks[@]} -eq 2 ]]
 
 discovered_tasks=("${TASKS[@]}")
 PIPELINE_CALLS=0
@@ -38,7 +39,7 @@ menu_choices=(2 q)
 menu_index=0
 read_task_runner_main_menu_choice() {
   # shellcheck disable=SC2034 # Consumed indirectly by run_menu.
-  MENU_CHOICE="${menu_choices[menu_index]}"
+  menu_choice="${menu_choices[menu_index]}"
   menu_index=$((menu_index + 1))
 }
 

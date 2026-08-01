@@ -76,7 +76,7 @@ ravn_validate_interactive_dependencies() {
     fi
   done
 
-  if [[ $RAVN_UI == bash ]]; then
+  if [[ $RAVN_UI == "bash" ]]; then
     RAVN_UI_EFFECTIVE="bash"
   else
     RAVN_UI_EFFECTIVE="gum"

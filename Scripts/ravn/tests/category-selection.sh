@@ -25,7 +25,8 @@ bash_selection_output=$(printf '1\n3,4\n' | {
   select_tasks_for_family
   printf 'SELECTED:%s\n' "$(
                             IFS=,
-                                   printf '%s' "${SELECTED_TASKS[*]}"
+                                   # shellcheck disable=SC2154 # Populated by select_tasks_for_family().
+                                   printf '%s' "${selected_tasks[*]}"
   )"
 })
 assert_contains "$bash_selection_output" "CLI Tools"
@@ -46,7 +47,8 @@ gum_selection_output=$(
   select_tasks_for_family
   printf 'SELECTED:%s\n' "$(
                             IFS=,
-                                   printf '%s' "${SELECTED_TASKS[*]}"
+                                   # shellcheck disable=SC2154 # Populated by select_tasks_for_family().
+                                   printf '%s' "${selected_tasks[*]}"
   )"
 )
 assert_contains "$gum_selection_output" "SELECTED:codex,copilot"
@@ -58,7 +60,7 @@ if printf '\033\n' | select_task_family > /dev/null 2>&1; then
 fi
 
 # shellcheck disable=SC2034 # Consumed by select_tasks_for_family from the sourced runner.
-SELECTED_TASK_FAMILY=cli-tools
+selected_task_family=cli-tools
 if printf '\033\n' | select_tasks_for_family > /dev/null 2>&1; then
   printf 'FAIL: Escape did not return from task selection\n' >&2
   exit 1

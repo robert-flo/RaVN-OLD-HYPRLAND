@@ -5,7 +5,7 @@
 
 # Populated by discover_tasks(); consumed by run_pipeline().
 TASKS=()
-RAVN_DISCOVERY_RESULT="not-run"
+ravn_discovery_result="not-run"
 
 task_is_reference_only() (
   local file="$1"
@@ -25,7 +25,7 @@ discover_tasks() {
   local discovery_file=""
 
   TASKS=()
-  RAVN_DISCOVERY_RESULT="failed"
+  ravn_discovery_result="failed"
 
   if [[ ! -d $search_dir ]]; then
     error_msg "Task directory not found: ${search_dir}"
@@ -50,12 +50,12 @@ discover_tasks() {
   done
 
   if ((${#TASKS[@]} == 0)); then
-    RAVN_DISCOVERY_RESULT="empty"
+    ravn_discovery_result="empty"
     warn_msg "No task modules found in ${search_dir}"
     return 0
   fi
 
   # shellcheck disable=SC2034 # Consumed by the interactive runner.
-  RAVN_DISCOVERY_RESULT="success"
+  ravn_discovery_result="success"
   info "Discovered ${#TASKS[@]} task modules"
 }

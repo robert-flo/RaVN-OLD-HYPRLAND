@@ -29,7 +29,7 @@ source "$fixture_dir/setup.sh"
 PATH="$bin_dir:$PATH"
 export PATH RAVN_OS_RELEASE_FILE="$os_release" RAVN_UI=bash
 ravn_validate_interactive_dependencies
-[[ ${RAVN_UI_EFFECTIVE:-} == bash ]]
+[[ ${RAVN_UI_EFFECTIVE:-} == "bash" ]]
 
 cat > "$os_release" << 'EOF'
 ID=ubuntu
