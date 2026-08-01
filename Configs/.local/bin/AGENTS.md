@@ -55,7 +55,8 @@ Clones a remote repository as a bare repo and instantiates worktrees for all rem
   * `-w, --worktrees-dir`: Custom worktrees base directory.
   * `--group <worktrees-path> <repository>...`: Batch clone one or more repositories into the given worktrees path. Repeat `--group` to use several destinations in one invocation.
 * **Repository formats**: Accepts SSH and HTTPS Git URLs, local paths, and GitHub shorthand (`owner/repository`, expanded to `git@github.com:owner/repository.git`).
-* **Batch contract**: An existing bare repo or worktrees directory is skipped and later repositories continue. A real clone failure stops the batch immediately and returns Git's failure status.
+* **Batch / re-run contract**: An existing bare is **not** re-cloned; the script fetches `origin` and creates worktrees only for remote branches that still lack a local directory. A worktrees directory without a bare is skipped. A real clone/sync failure stops the batch immediately and returns Git's failure status.
+* **Sync example**: after `master` was the only remote branch at first clone, re-run `git-bare-clone owner/repo` once `dev`/`rc` exist on the remote to materialize their worktrees.
 * **Workflow Example**:
   ```bash
   git-bare-clone https://github.com/user/myrepo.git
