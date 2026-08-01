@@ -271,26 +271,35 @@ clone_repository() {
   print_info "Bare:        ${GRAY}$bare_dir${NC}"
   print_info "Worktrees:   ${GRAY}$worktrees_dir${NC}"
 
+  # ┌──────────────────────────────────────────────────────────────────────────────┐
+  # │ Execution Steps                                                              │
+  # └──────────────────────────────────────────────────────────────────────────────┘
+
+  # ── Step 1/5: Clone bare ──────────────────────────────────────────────────────
   print_section "${ICON_CLONE} [1/5] Cloning bare repository"
   mkdir -p "$BARE_HOME"
   git clone --bare "$repo_url" "$bare_dir"
   print_success "Bare repo cloned to ${GRAY}$bare_dir${NC}"
 
+  # ── Step 2/5: Configure fetch refspec ────────────────────────────────────────
   print_section "${ICON_GEAR} [2/5] Configuring remote fetch refs"
   pushd "$bare_dir" > /dev/null
   git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   print_success "Fetch refspec configured"
 
+  # ── Step 3/5: Fetch all remote tracking refs ─────────────────────────────────
   print_section "${ICON_ARROW} [3/5] Fetching remote tracking refs"
   git fetch origin
   print_success "All remote refs fetched"
   popd > /dev/null
 
+  # ── Step 4/5: Create worktrees directory with .git pointer ───────────────────
   print_section "${ICON_FOLDER} [4/5] Setting up worktrees directory"
   mkdir -p "$worktrees_dir"
   echo "gitdir: $bare_dir" > "$worktrees_dir/.git"
   print_success "Worktrees root created at ${GRAY}$worktrees_dir${NC}"
 
+  # ── Step 5/5: Create all worktrees with upstream tracking ────────────────────
   print_section "${ICON_BRANCH} [5/5] Creating worktrees for all remote branches"
   mapfile -t branches < <(
     git --git-dir="$bare_dir" for-each-ref \
@@ -307,6 +316,10 @@ clone_repository() {
     git -C "$branch" branch --set-upstream-to="origin/$branch" "$branch"
   done
   popd > /dev/null
+
+  # ┌──────────────────────────────────────────────────────────────────────────────┐
+  # │ Summary                                                                      │
+  # └──────────────────────────────────────────────────────────────────────────────┘
 
   print_header "${ICON_ROCKET} All worktrees ready"
   echo -e "  ${CYAN}$worktrees_dir/${NC}"

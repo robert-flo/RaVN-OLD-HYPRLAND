@@ -1,9 +1,10 @@
-# RaVN-owned user binaries.
+# RaVN-managed user binaries (sources live under Configs/.local/bin).
 # flag|destination|artifact|owner
 P|${HOME}/.local/bin|git-bare-clone|bash
 P|${HOME}/.local/bin|git-create-worktree|bash
 P|${HOME}/.local/bin|git-issue-worktree|bash
 P|${HOME}/.local/bin|git-setup|bash
+P|${HOME}/.local/bin|global_fn.sh|bash
 P|${HOME}/.local/bin|meld-comparisons|bash
 P|${HOME}/.local/bin|ravn-dot|bash
 P|${HOME}/.local/bin|top-why|bash

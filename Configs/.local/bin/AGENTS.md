@@ -103,6 +103,19 @@ Creates a worktree linked to a GitHub issue using `gh` CLI and parses context me
 
 ---
 
+### 4. `meld-comparisons`
+Interactive menu that opens Meld for common multi-repo directory comparisons
+(Valhalla / RaVN / Rollo / HyDE under `~/Work`).
+
+* **Syntax**: `meld-comparisons`
+* **Dependencies**: `meld`, `global_fn.sh` (same directory when restored)
+
+### 5. `ravn-dot`
+Interactive TUI (`fzf`) for reconciling drift between `Configs/` and `$HOME`
+using `Scripts/restore_cfg.psv`.
+
+---
+
 ## Decision Matrix: When to use which?
 
 ```

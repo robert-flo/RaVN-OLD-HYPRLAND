@@ -21,7 +21,7 @@ bash "$BINARIES_DIR/install_binaries.sh" > "$FIXTURE_DIR/install.out"
 printf '# undeclared\n' > "$HOME/.local/bin/keep-me"
 
 bash "$BINARIES_DIR/manage_binaries.sh" --test > "$FIXTURE_DIR/test.out"
-grep -Fq 'Present: 7' "$FIXTURE_DIR/test.out" || fail "binary audit did not report declared files"
+grep -Fq 'Present: 8' "$FIXTURE_DIR/test.out" || fail "binary audit did not report declared files"
 
 printf 'yes\n' | bash "$BINARIES_DIR/manage_binaries.sh" --clean > "$FIXTURE_DIR/clean.out"
 [[ ! -e "$HOME/.local/bin/ravn-dot" ]] || fail "declared binary was not cleaned"
