@@ -360,6 +360,7 @@ ifndef EMBEDDED
 	@printf "\n$(YELLOW)📋 Quick Actions:$(NC)\n"
 	@printf "$(DIM)────────────────────────────────────────────────────────────────────────────────$(NC)\n"
 	@printf "  • stage and commit: $(BLUE)make git-add-commit$(NC)\n"
+	@printf "  • test in RavnVM:   $(BLUE)make dev-vm$(NC)\n"
 	@printf "  • push changes:     $(BLUE)make git-push$(NC)\n"
 	@printf "  • full history:     $(BLUE)make git-log$(NC)\n\n"
 endif
