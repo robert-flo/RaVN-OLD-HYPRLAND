@@ -293,6 +293,20 @@ ensure_worktrees_root() {
   fi
 }
 
+# Returns 0 when the branch is already bound to some worktree (any path).
+branch_checked_out_elsewhere() {
+  local bare_dir=$1
+  local branch=$2
+  local line=""
+
+  while IFS= read -r line; do
+    if [[ $line == "branch refs/heads/$branch" ]]; then
+      return 0
+    fi
+  done < <(git --git-dir="$bare_dir" worktree list --porcelain 2> /dev/null || true)
+  return 1
+}
+
 add_branch_worktree() {
   local bare_dir=$1
   local worktrees_dir=$2
@@ -302,6 +316,11 @@ add_branch_worktree() {
   target="$worktrees_dir/$branch"
   if [[ -e $target ]]; then
     print_info "Already present: ${CYAN}$branch${NC}"
+    return 0
+  fi
+
+  if branch_checked_out_elsewhere "$bare_dir" "$branch"; then
+    print_info "Already checked out elsewhere: ${CYAN}$branch${NC}"
     return 0
   fi
 
@@ -322,6 +341,7 @@ create_missing_worktrees() {
   local -n skipped_ref=$4
   local branch=""
   local -a branches=()
+  local before=""
 
   mapfile -t branches < <(list_remote_branches "$bare_dir")
   if ((${#branches[@]} == 0)); then
@@ -335,8 +355,19 @@ create_missing_worktrees() {
       print_info "Already present: ${CYAN}$branch${NC}"
       continue
     fi
+    if branch_checked_out_elsewhere "$bare_dir" "$branch"; then
+      skipped_ref+=("$branch")
+      print_info "Already checked out elsewhere: ${CYAN}$branch${NC}"
+      continue
+    fi
+    before=0
+    [[ -e $worktrees_dir/$branch ]] && before=1
     add_branch_worktree "$bare_dir" "$worktrees_dir" "$branch"
-    created_ref+=("$branch")
+    if [[ -e $worktrees_dir/$branch && $before -eq 0 ]]; then
+      created_ref+=("$branch")
+    else
+      skipped_ref+=("$branch")
+    fi
   done
 }
 
