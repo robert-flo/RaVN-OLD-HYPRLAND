@@ -104,7 +104,7 @@ S|${HOME}/.config/skim|skimrc|skim
 P|${HOME}/.config|fastfetch|fastfetch
 O|${HOME}/.local/share/fastfetch/presets|hyde|fastfetch
 
-S|${HOME}/.config/kitty|hyde.conf theme.conf|kitty
+S|${HOME}/.config/kitty|hyde.conf theme.conf kitty.md|kitty
 P|${HOME}/.config/kitty|kitty.conf|kitty
 S|${HOME}/.config|alacritty|alacritty
 S|${HOME}/.local/share|konsole|konsole
