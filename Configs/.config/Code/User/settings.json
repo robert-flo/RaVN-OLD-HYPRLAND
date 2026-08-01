@@ -1,64 +1,140 @@
 {
-  // ════════════════════════════════════════════════════════════
-  // Editor
-  // ════════════════════════════════════════════════════════════
-  "editor.renderWhitespace": "trailing",
-  "editor.formatOnSave": true,
-  "editor.fontFamily": "'JetbrainsMono Nerd Font','Maple Mono', monospace",
-  "editor.fontSize": 12,
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EDITOR: Apariencia visual
+  // ═══════════════════════════════════════════════════════════════════════════
+  "editor.fontFamily": "'Maple Mono NF SemiBold', 'JetbrainsMono Nerd Font', monospace",
+  "editor.fontSize": 20,
   "editor.fontLigatures": true,
+  "editor.mouseWheelZoom": true,
   "editor.minimap.side": "left",
   "editor.scrollbar.vertical": "hidden",
   "editor.scrollbar.verticalScrollbarSize": 0,
+  "editor.renderWhitespace": "trailing",
+  "editor.wordWrap": "on",
+  "editor.rulers": [
+    80,
+    100,
+    120
+  ],
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.guides.bracketPairsHorizontal": "active",
+  "editor.guides.indentation": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.semanticHighlighting.enabled": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.smoothScrolling": true,
+  "editor.cursorBlinking": "phase",
+  "editor.cursorSmoothCaretAnimation": "off",
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      }
+    ]
+  },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EDITOR: Comportamiento
+  // ═══════════════════════════════════════════════════════════════════════════
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit",
+    "source.sortMembers": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.indentSize": "tabSize",
+  "editor.detectIndentation": false,
+  "editor.tabCompletion": "on",
+  "editor.linkedEditing": true,
   "editor.suggest.showStatusBar": true,
-
-  // ════════════════════════════════════════════════════════════
-  // Workbench / Window
-  // ════════════════════════════════════════════════════════════
-  "workbench.iconTheme": "flow-dim",
-  "workbench.colorTheme": "One Dark Pro Mix",
-  "workbench.statusBar.visible": false,
-  "workbench.activityBar.location": "top",
-  "workbench.sideBar.location": "right",
-  "window.menuBarVisibility": "toggle",
-  "window.customTitleBarVisibility": "auto",
-  "flow-icons.licenseKey": "FLOW-P3D0RB-HYIO76-JY5Y3W-SPF311",
-
-  // ════════════════════════════════════════════════════════════
-  // Lenguajes / IntelliSense
-  // ════════════════════════════════════════════════════════════
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "editor.inlineSuggest.enabled": true,
+  "editor.inlayHints.enabled": "off",
+  "editor.cursorSurroundingLines": 8,
+  "editor.accessibilitySupport": "off",
+  "editor.screenReaderAnnounceInlineSuggestion": false,
+  "files.insertFinalNewline": true,
+  "files.autoSave": "onFocusChange",
+  "files.watcherExclude": {
+    "**/.direnv/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.next/**": true,
+    "**/.venv/**": true,
+    "**/coverage/**": true,
+    "**/node_modules/**": true
+  },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DIFF EDITOR
+  // ═══════════════════════════════════════════════════════════════════════════
+  "diffEditor.experimental.showMoves": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  // ═══════════════════════════════════════════════════════════════════════════
+  // LENGUAJES / FORMATEADORES
+  // ═══════════════════════════════════════════════════════════════════════════
   "python.languageServer": "Default",
   "js/ts.suggest.autoImports": true,
-
-  // ════════════════════════════════════════════════════════════
-  // Terminal
-  // ════════════════════════════════════════════════════════════
-  "terminal.integrated.fontFamily": "JetBrainsMonoNL NF",
-  "terminal.integrated.fontLigatures.enabled": true,
-  "terminal.external.linuxExec": "kitty",
-  "terminal.explorerKind": "both",
-  "terminal.sourceControlRepositoriesKind": "both",
-
-  // ════════════════════════════════════════════════════════════
-  // Git / GitLens
-  // ════════════════════════════════════════════════════════════
-  "git.enableSmartCommit": true,
-  "git.autofetch": true,
-  "git.confirmSync": false,
-  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
-  "gitlens.ai.model": "gitkraken",
-  "gitlens.ai.gitkraken.model": "gemini:gemini-2.5-flash",
-
-  // ════════════════════════════════════════════════════════════
-  // Shell: Formatter (shfmt)
-  // ════════════════════════════════════════════════════════════
+  "js/ts.referencesCodeLens.enabled": true,
+  "js/ts.tsserver.maxMemory": 8192,
+  "js/ts.tsserver.node.path": "~/.local/share/mise/shims/node",
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "rust-analyzer.inlayHints.typeHints.enable": false,
+  "[css]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    // TODO: Biome no soporta YAML — este formatter no hace nada.
+    // Considera "redhat.vscode-yaml" o "esbenp.prettier-vscode" aquí.
+    "editor.defaultFormatter": "biomejs.biome",
+    "prettier.trailingComma": "none"
+  },
+  "[python]": {
+    // TODO: falta "editor.defaultFormatter" — formatOnType no tiene a quién llamar.
+    "editor.formatOnType": true
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true
+  },
+  "biome.requireConfiguration": true,
+  "biome.suggestInstallingGlobally": false,
   "shellformat.path": "shfmt",
   "shellformat.flag": "-i 2 -sr -kp -ci",
-  "shellformat.effectLanguages": ["shellscript"],
-
-  // ════════════════════════════════════════════════════════════
-  // Shell: Linter (shellcheck)
-  // ════════════════════════════════════════════════════════════
+  "shellformat.effectLanguages": [
+    "shellscript"
+  ],
   "shellcheck.enable": true,
   "shellcheck.run": "onType",
   "shellcheck.executablePath": "/usr/bin/shellcheck",
@@ -77,48 +153,138 @@
     "**/Scripts/install_pst.sh": true,
     "**/Scripts/restore_cfg.sh": true,
     "**/Scripts/restore_shl.sh": true,
-    "**/Scripts/uninstall.sh": true,
+    "**/Scripts/uninstall.sh": true
   },
-
-  // ════════════════════════════════════════════════════════════
-  // Seguridad, privacidad y extensiones
-  // ════════════════════════════════════════════════════════════
-  "security.workspace.trust.untrustedFiles": "newWindow",
-  "security.workspace.trust.startupPrompt": "never",
-  "security.workspace.trust.enabled": false,
-  "telemetry.telemetryLevel": "off",
-  "extensions.autoUpdate": "off",
-
-  // ════════════════════════════════════════════════════════════
-  // Tasks, chat, misc
-  // ════════════════════════════════════════════════════════════
+  "markdown.preview.fontFamily": "\"Noto Sans\", \"Liberation Sans\", system-ui, sans-serif",
+  "json.schemaDownload.enable": true,
+  "colorInfo.languages": [
+    {
+      "colors": "css",
+      "selector": "css"
+    },
+    {
+      "colors": "css",
+      "selector": "less"
+    },
+    {
+      "colors": "css",
+      "selector": "sass"
+    },
+    {
+      "colors": "css",
+      "selector": "scss"
+    },
+    {
+      "colors": "css",
+      "selector": "typescript"
+    },
+    {
+      "colors": "css",
+      "selector": "typescriptreact"
+    },
+    {
+      "colors": "css",
+      "selector": "xml"
+    }
+  ],
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TERMINAL
+  // ═══════════════════════════════════════════════════════════════════════════
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.fontFamily": "Maple Mono NF SemiBold, JetbrainsMono Nerd Font, monospace",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.minimumContrastRatio": 1,
+  "terminal.integrated.gpuAcceleration": "auto",
+  "terminal.external.linuxExec": "kitty",
+  "terminal.explorerKind": "both",
+  "terminal.sourceControlRepositoriesKind": "both",
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GIT / GITLENS
+  // ═══════════════════════════════════════════════════════════════════════════
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.ignoreMissingGitWarning": true,
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "gitlens.ai.model": "gitkraken",
+  "gitlens.ai.gitkraken.model": "gemini:gemini-2.5-flash",
+  "gitlens.advanced.messages": {
+    "suppressGitMissingWarning": true
+  },
+  "gitlens.blame.fontFamily": "\"Noto Sans\", \"Liberation Sans\", system-ui, sans-serif",
+  "gitlens.currentLine.fontFamily": "\"Noto Sans\", \"Liberation Sans\", system-ui, sans-serif",
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.hovers.enabled": true,
+  "gitlens.telemetry.enabled": false,
+  "gitlens.views.commitDetails.files.layout": "list",
+  // ═══════════════════════════════════════════════════════════════════════════
+  // WORKBENCH / WINDOW
+  // ═══════════════════════════════════════════════════════════════════════════
+  "workbench.colorTheme": "One Dark Pro Mix",
+  "workbench.preferredDarkColorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "flow-dim",
+  "workbench.statusBar.visible": false,
+  "workbench.activityBar.location": "top",
+  "workbench.activityBar.visible": true,
+  "workbench.sideBar.location": "right",
+  "workbench.editor.decorations.badges": true,
+  "workbench.editor.decorations.colors": true,
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.wrapTabs": true,
+  "workbench.editorAssociations": {
+    "*.svg": "default"
+  },
+  "workbench.list.smoothScrolling": true,
+  "workbench.enableExperiments": false,
+  "workbench.settings.enableNaturalLanguageSearch": false,
+  "window.menuBarVisibility": "toggle",
+  "window.customTitleBarVisibility": "auto",
+  "window.titleBarStyle": "custom",
+  "window.autoDetectColorScheme": true,
+  "flow-icons.licenseKey": "",
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EXPLORER
+  // ═══════════════════════════════════════════════════════════════════════════
+  "explorer.compactFolders": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TASKS / CHAT / OTRAS EXTENSIONES
+  // ═══════════════════════════════════════════════════════════════════════════
   "task.allowAutomaticTasks": "on",
+  "task.quickOpen.detail": false,
   "chat.tips.enabled": false,
   "console-ninja.featureSet": "Community",
-
-  // ════════════════════════════════════════════════════════════
-  // Formateadores por lenguaje
-  // ════════════════════════════════════════════════════════════
-  "[astro]": {
-    "editor.defaultFormatter": "astro-build.astro-vscode",
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
-  "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format",
-    "editor.formatOnSave": true,
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-  },
+  "versionlens.suggestions.showOnStartup": false,
+  "RadonIDE.panelLocation": "tab",
+  "react-native-tools.showUserTips": false,
+  "symbols.hidesExplorerArrows": false,
+  "vsicons.dontShowNewVersionMessage": true,
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SEGURIDAD, PRIVACIDAD Y TELEMETRÍA
+  // ═══════════════════════════════════════════════════════════════════════════
+  "security.workspace.trust.enabled": false,
+  "security.workspace.trust.untrustedFiles": "newWindow",
+  "security.workspace.trust.startupPrompt": "never",
+  "security.promptForLocalFileProtocolHandling": true,
+  "security.promptForRemoteFileProtocolHandling": true,
+  "telemetry.telemetryLevel": "off",
+  "telemetry.feedback.enabled": false,
+  "redhat.telemetry.enabled": false,
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EXTENSIONES Y ACTUALIZACIONES
+  // ═══════════════════════════════════════════════════════════════════════════
+  "extensions.autoCheckUpdates": true,
+  "extensions.autoUpdate": "on",
+  "extensions.ignoreRecommendations": true,
+  "update.mode": "start"
+  // ═══════════════════════════════════════════════════════════════════════════
+  // VIBRANCY (deshabilitado)
+  // ═══════════════════════════════════════════════════════════════════════════
+  // "vscode_vibrancy.enableAutoTheme": true,
+  // "vscode_vibrancy.imports": ["/path/to/file"],
+  // "vscode_vibrancy.opacity": -1,
+  // "vscode_vibrancy.refreshInterval": 33.33,
+  // "vscode_vibrancy.theme": "Default Dark",
 }
