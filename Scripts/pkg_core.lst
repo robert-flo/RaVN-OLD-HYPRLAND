@@ -81,6 +81,7 @@ kde-cli-tools                                          # for dolphin file type d
 libnotify                                              # for notifications
 noto-fonts-emoji                                       # emoji font
 sshpass                                                # non-interactive ssh password provider
+qemu-desktop                                           # QEMU/KVM tools required by RavnVM
 
 # --------------------------------------------------- // Utilities & Debugging
 curl                                                  # Command line tool for transferring data with URLs
