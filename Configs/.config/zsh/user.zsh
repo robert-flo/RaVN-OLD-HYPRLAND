@@ -86,3 +86,8 @@ alias t='tree --depth=1'
 alias tt='tree --depth=2'
 alias ttt='tree --depth=3'
 alias h='herdr'
+
+# Directory bookmarks (usage: cd ~dl, cd ~cfg)
+hash -d dl="$HOME/Downloads"
+hash -d cfg="$HOME/.config"
+hash -d lcb="$HOME/.local/bin"

@@ -76,6 +76,7 @@ O|${HOME}/.local/share|wallbash|bash imagemagick
  Git 
 S|${HOME}/.config|lazygit|lazygit
 P|${HOME}/.config/hunk|config.toml|hunk-bin
+S|${HOME}/.config/mise|config.toml mise.lock|mise
 O|${HOME}/.local/bin|git-bare-clone git-create-worktree git-issue-worktree git-setup ravn-dot global_fn.sh|git
 
  Editor 
@@ -119,13 +120,14 @@ S|${HOME}|.zshenv|zsh
 S|${HOME}|.profile|bash
 S|${HOME}|.bashrc|bash
 S|${HOME}/.config/zsh|.zshenv|zsh
-S|${HOME}/.config/zsh/conf.d|hyde 00-hyde.zsh|zsh
+S|${HOME}/.config/zsh/conf.d|hyde 00-hyde.zsh binds.zsh|zsh
 S|${HOME}/.config/zsh/functions|error-handlers.zsh|zsh
 S|${HOME}/.config/zsh/functions|fzf.zsh|zsh fzf
 S|${HOME}/.config/zsh/functions|skim.zsh|zsh skim
 S|${HOME}/.config/zsh/functions|duf.zsh|zsh duf
 S|${HOME}/.config/zsh/functions|eza.zsh|zsh eza
 S|${HOME}/.config/zsh/functions|bat.zsh|zsh bat
+S|${HOME}/.config/zsh/functions|yazi.zsh|zsh
 S|${HOME}/.config/zsh/completions|fzf.zsh|zsh fzf
 S|${HOME}/.config/zsh/completions|hydectl.zsh|zsh
 
