@@ -179,6 +179,7 @@ duf|zsh                                                  # prettier version of d
 # --------------------------------------------------- // Editor
 visual-studio-code-bin                                # MS  text editor
 visual-studio-code-insiders-bin                       # MS  text editor
+github-copilot-bin                                    # GitHub Copilot CLI
 antigravity-ide                                       # An agentic development platform from Google, evolving the IDE into the agent-first era	kIERO	2026-06-04 04:02 (UTC)
 antigravity-cli                                       # Google's agentic development platform (CLI companion)	viridivn	2026-06-06 07:10 (UTC)
 antigravity                                           # Google Antigravity 2.0 multi-agent orchestration platform
