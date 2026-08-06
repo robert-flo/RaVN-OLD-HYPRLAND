@@ -7,7 +7,11 @@ manifests under `Scripts/`.
 - `.config/waybar` is the RaVN configuration overlay.
 - `.local/share/waybar` contains RaVN-owned Waybar resources.
 - `.local/share/applications/icons` contains reusable RaVN launcher icons.
-- `.local/bin` contains explicitly declared RaVN user binaries.
 
-`Configs/` remains the upstream configuration tree. Do not add RaVN resources
-there; update the appropriate RaVN manifest when adding a managed resource.
+User binaries (`git-bare-clone`, `ravn-dot`, `meld-comparisons`, etc.) live in
+`Configs/.local/bin` as the single source of truth. The binaries category
+installer (`Scripts/binaries/`) reads that tree via `restore_binaries.psv`;
+do not reintroduce a parallel copy under `Configs_RaVN/.local/bin`.
+
+`Configs/` remains the upstream configuration tree for home-layout resources
+that are not exclusive to the RaVN installer overlay (Waybar, icons).

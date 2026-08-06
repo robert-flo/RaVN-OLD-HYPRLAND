@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MANIFEST="${SCRIPT_DIR}/restore_binaries.psv"
-SOURCE_DIR="${SCRIPT_DIR}/../../Configs_RaVN"
+SOURCE_DIR="${SCRIPT_DIR}/../../Configs"
 RESTORE_SCRIPT="${SCRIPT_DIR}/restore_binaries.sh"
 
 if [[ ! -f $RESTORE_SCRIPT || ! -d $SOURCE_DIR ]]; then

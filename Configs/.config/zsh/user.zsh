@@ -45,6 +45,9 @@ add_to_path "$HOME/.local/share/mise/shims"
 export EDITOR="emacsclient -nw"
 export VISUAL="emacsclient -nw"
 
+#  Rust/Cargo 
+add_to_path "$HOME/.cargo/bin"
+
 #  Go 
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin:/usr/local/go/bin

@@ -31,6 +31,13 @@ if [[ -n ${FAKE_GIT_FAIL_MATCH:-} && $* == *$FAKE_GIT_FAIL_MATCH* ]]; then
   exit 42
 fi
 
+# Strip leading -C <dir> so worktree/branch ops see the real subcommand.
+cwd=""
+if [[ ${1:-} == -C ]]; then
+  cwd="${2:-}"
+  shift 2
+fi
+
 case "${1:-}" in
 clone)
   if [[ ${FAKE_GIT_FAIL_URL:-} == $3 ]]; then
@@ -39,10 +46,29 @@ clone)
   mkdir -p "$4"
   ;;
 --git-dir=*)
-  printf '%s\n' 'refs/remotes/origin/main'
+  # Emulate bare-repo git invocations: for-each-ref / show-ref / fetch / config
+  if [[ $* == *'for-each-ref'* ]]; then
+    printf '%s\n' 'refs/remotes/origin/main'
+  elif [[ $* == *'show-ref'* ]]; then
+    # Local heads exist after a bare clone in the happy path
+    exit 0
+  fi
   ;;
 worktree)
-  mkdir -p "$4"
+  # worktree add <path> <commit>  OR  worktree add -b <branch> <path> <start>
+  path=""
+  if [[ ${2:-} == add && ${3:-} == -b ]]; then
+    path="${5:-.}"
+  elif [[ ${2:-} == add ]]; then
+    path="${3:-.}"
+  fi
+  if [[ -n $path ]]; then
+    if [[ -n $cwd && $path != /* ]]; then
+      mkdir -p "$cwd/$path"
+    else
+      mkdir -p "$path"
+    fi
+  fi
   ;;
 *)
   ;;
@@ -85,20 +111,27 @@ test -d "$BARE_HOME/single"
 test -d "$SINGLE_GROUP/single/main"
 
 mkdir -p "$BARE_HOME/existing"
+: > "$FAKE_GIT_LOG"
 run_clone --group "$GROUP_ONE" robert-flo/existing robert-flo/after-existing > /dev/null
 test -d "$BARE_HOME/after-existing"
 if grep -q 'clone --bare git@github.com:robert-flo/existing.git' "$FAKE_GIT_LOG"; then
-  printf 'expected existing bare repository to be skipped\n' >&2
+  printf 'expected existing bare repository not to be re-cloned\n' >&2
   exit 1
 fi
+grep -q 'fetch origin' "$FAKE_GIT_LOG" || {
+  printf 'expected existing bare repository to be fetched for sync\n' >&2
+  exit 1
+}
+test -d "$GROUP_ONE/existing/main"
 grep -q 'clone --bare git@github.com:robert-flo/after-existing.git' "$FAKE_GIT_LOG"
 
 mkdir -p "$GROUP_ONE/worktrees-existing"
+: > "$FAKE_GIT_LOG"
 run_clone --group "$GROUP_ONE" robert-flo/worktrees-existing robert-flo/after-worktrees > /dev/null
 test ! -e "$BARE_HOME/worktrees-existing"
 test -d "$BARE_HOME/after-worktrees"
 if grep -q 'clone --bare git@github.com:robert-flo/worktrees-existing.git' "$FAKE_GIT_LOG"; then
-  printf 'expected existing worktrees directory to be skipped\n' >&2
+  printf 'expected worktrees-without-bare to be skipped (no bare clone)\n' >&2
   exit 1
 fi
 
