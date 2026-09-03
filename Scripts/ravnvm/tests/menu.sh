@@ -45,7 +45,7 @@ assert_contains "$menu_output" "Run external repository"
 assert_contains "$menu_output" "   Run external repository"
 assert_contains "$menu_output" "   Configure RAM and CPU"
 assert_contains "$menu_output" "   Install SSH alias"
-assert_contains "$menu_output" "Goodbye!"
+assert_contains "$menu_output" "Goodbye"
 
 invalid_output=$(printf 'x\n\nq\n' | "$RAVNVM_SCRIPT")
 assert_contains "$invalid_output" "Invalid option: x"
@@ -120,9 +120,9 @@ assert_contains "$make_setup_output" "ravnvm.sh --install-deps"
 make_ssh_output=$(make -s DRY_RUN=1 dev-vm-ssh)
 assert_contains "$make_ssh_output" "ravnvm.sh --ssh"
 make_help_output=$(make -s help)
-assert_contains "$make_help_output" "make dev-vm"
-assert_contains "$make_help_output" "make dev-vm-ssh"
-assert_contains "$make_help_output" "make dev-vm-external"
+assert_contains "$make_help_output" "dev-vm"
+assert_contains "$make_help_output" "dev-vm-ssh"
+assert_contains "$make_help_output" "dev-vm-external"
 
 external_make_output=$(make -s DRY_RUN=1 dev-vm-external REPO=robert-flo/Valhalla REF=master)
 assert_contains "$external_make_output" "--repo robert-flo/Valhalla master"

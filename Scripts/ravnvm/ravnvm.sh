@@ -101,6 +101,37 @@ SSH_READY_TIMEOUT="${RAVNVM_SSH_READY_TIMEOUT:-120}"
 if [[ ! $SSH_READY_TIMEOUT =~ ^[0-9]+$ ]]; then
     SSH_READY_TIMEOUT=120
 fi
+
+function is_port_free() {
+  local port="$1"
+  if command -v ss > /dev/null 2>&1; then
+    ! ss -H -tln "sport = :$port" 2> /dev/null | grep -q .
+  elif command -v netstat > /dev/null 2>&1; then
+    ! netstat -tln 2> /dev/null | grep -q ":$port "
+  else
+    ! (echo > /dev/tcp/127.0.0.1/"$port") > /dev/null 2>&1
+  fi
+}
+
+function ensure_ssh_port_free() {
+  local original_port="$SSH_PORT"
+  local port="$SSH_PORT"
+  local tries=0
+  while ((tries < 10)); do
+    if is_port_free "$port"; then
+      if [[ $port != "$original_port" ]]; then
+        print_warn "Port $original_port in use, using $port instead (set SSH_PORT to override)"
+      fi
+      SSH_PORT="$port"
+      return 0
+    fi
+    ((port++))
+    ((tries++))
+  done
+  print_error "No free SSH port found starting from $original_port (tried 10 ports)"
+  print_info "Stop the process using $original_port (ss -tlnp | grep $original_port) or set SSH_PORT to a free port"
+  return 1
+}
 # Required packages for Arch Linux
 ARCH_PACKAGES=(
     "qemu-desktop"
@@ -468,6 +499,18 @@ function run_qemu_vm() {
         if [[ $execution_mode == "background" ]]; then
             "$qemu_cmd" "${qemu_args[@]}" 2> "$CACHE_DIR/qemu.log" &
             ACTIVE_QEMU_PID=$!
+            # Detect immediate QEMU startup failure (e.g., port already in use)
+            sleep 0.5
+            if ! kill -0 "$ACTIVE_QEMU_PID" 2> /dev/null; then
+                if grep -q "Could not set up host forwarding" "$CACHE_DIR/qemu.log" 2> /dev/null; then
+                    wait "$ACTIVE_QEMU_PID" 2> /dev/null || true
+                    ACTIVE_QEMU_PID=""
+                    print_error "QEMU failed to start: host forwarding for port $SSH_PORT failed (port in use)"
+                    print_info "Stop the process using that port (ss -tlnp | grep $SSH_PORT) or set SSH_PORT to a free port"
+                    return 1
+                fi
+                # For other immediate exits (e.g., test fakes that exit 0), keep PID and let wait_for_guest_ssh handle it as original did
+            fi
             return 0
     fi
 
@@ -674,8 +717,16 @@ SETUP_EOF
     echo "      (This will automatically complete the snapshot creation on the host)"
     echo ""
 
+    # Ensure SSH port is free before launching (avoids false-positive ssh-keyscan on another VM)
+    if ! ensure_ssh_port_free; then
+        cleanup_runtime
+        return 1
+    fi
     # Start VM for setup in background with SSH port forward
-    run_qemu_vm "$temp_image" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}" "hostfwd=tcp::${SSH_PORT}-:22" "background"
+    if ! run_qemu_vm "$temp_image" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}" "hostfwd=tcp::${SSH_PORT}-:22" "background"; then
+        cleanup_runtime
+        return 1
+    fi
     local qemu_pid="$ACTIVE_QEMU_PID"
 
     echo "${ICON_WAITING} Waiting for VM SSH server to be fully ready..."
@@ -687,14 +738,22 @@ SETUP_EOF
 
     print_step "Copying setup script to VM..."
     # We use StrictHostKeyChecking=no and UserKnownHostsFile=/dev/null to avoid host key warnings
-    local ssh_opts=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null)
+    local ssh_opts=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10)
+    local scp_status=0
     if command -v sshpass > /dev/null 2>&1; then
-        sshpass -p 'arch' scp -P "$SSH_PORT" "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh
+        sshpass -p 'arch' scp -P "$SSH_PORT" "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh || scp_status=$?
   else
         print_info "Tip: Install 'sshpass' to avoid entering the 'arch' password manually."
-        scp -P "$SSH_PORT" "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh
+        scp -P "$SSH_PORT" "${ssh_opts[@]}" "$setup_script" arch@127.0.0.1:/home/arch/setup.sh || scp_status=$?
   fi
-    print_success "setup.sh copied successfully to /home/arch/setup.sh"
+    if ((scp_status != 0)); then
+        print_error "Failed to copy setup.sh to VM (scp exit $scp_status). Port $SSH_PORT may be wrong or VM not ready"
+        print_info "Check: ss -tlnp | grep $SSH_PORT  and  cat $CACHE_DIR/qemu.log"
+        # Do not treat as fatal copy race — let user retry manually, but warn clearly
+        print_warn "Continuing; you can copy manually: scp -P $SSH_PORT $setup_script arch@127.0.0.1:/home/arch/setup.sh"
+    else
+        print_success "setup.sh copied successfully to /home/arch/setup.sh"
+    fi
     print_info "Login to the VM and run: chmod +x ./setup.sh && ./setup.sh"
 
     # Wait for QEMU process to finish cleanly
@@ -761,9 +820,12 @@ function run_vm() {
     print_info "Login: arch / arch"
     print_info "SSH: ssh arch@127.0.0.1 -p ${SSH_PORT} (or run: ravnvm --ssh or ssh ravnvm)"
 
+    if ! ensure_ssh_port_free; then
+        return 1
+    fi
+    print_info "Using SSH port $SSH_PORT"
     # Run VM with SSH port forwarding
     run_qemu_vm "$vm_disk" "${VM_MEMORY:-4G}" "${VM_CPUS:-2}" "hostfwd=tcp::${SSH_PORT}-:22"
-
     if [ "$persistent" != "true" ]; then
         rm -f -- "$vm_disk"
   fi
