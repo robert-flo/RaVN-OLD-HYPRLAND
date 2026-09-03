@@ -976,10 +976,14 @@ function install_base() {
 
   build_machine_args "$building_disk" "$building_ovmf" machine_args
   machine_args+=(
+    # Both CD-ROMs on an explicit AHCI controller: the default IDE bus
+    # allows a single unit, so a second bare ide-cd fails with
+    # "Can't create IDE unit 1, bus supports only 1 units".
+    -device "ahci,id=ahci0"
     -drive "file=$ISO_PATH,media=cdrom,if=none,format=raw,id=cdrom0"
-    -device "ide-cd,drive=cdrom0,bootindex=2"
+    -device "ide-cd,drive=cdrom0,bus=ahci0.0,bootindex=2"
     -drive "file=$CIDATA_ISO,media=cdrom,if=none,format=raw,id=cdrom1"
-    -device "ide-cd,drive=cdrom1,bootindex=3"
+    -device "ide-cd,drive=cdrom1,bus=ahci0.1,bootindex=3"
   )
 
   if ! acquire_vm_lock; then
