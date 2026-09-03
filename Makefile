@@ -59,5 +59,6 @@ include make/generations.mk
 include make/git.mk
 include make/logs.mk
 include make/dev.mk
+include make/omarchy.mk
 include make/format.mk
 include make/aliases.mk
